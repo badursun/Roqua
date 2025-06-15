@@ -91,10 +91,9 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     func requestAlwaysPermission() async {
-        guard permissionState == .whenInUseGranted else {
-            print("⚠️ When in use permission required first")
-            // Önce when in use izni alınmalı
-            await requestWhenInUsePermission()
+        // When in use permission kontrolü - ama recursive call yapma
+        if permissionState != .whenInUseGranted {
+            print("⚠️ When in use permission required first. Current state: \(permissionState)")
             return
         }
         
