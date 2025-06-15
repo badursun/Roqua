@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Roqua Test Route" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>İstanbul Gezi Rotası - Comprehensive Tour</name>
+    <desc>Sultanahmet'ten başlayıp Galata, Beşiktaş, Ortaköy, Bebek üzerinden Sarıyer'e kadar kapsamlı İstanbul turu</desc>
+    <time>2024-01-15T09:00:00Z</time>
+  </metadata>
+  
+  <trk>
+    <name>İstanbul Comprehensive Tour</name>
+    <desc>Sultanahmet → Eminönü → Galata → Karaköy → Beşiktaş → Ortaköy → Bebek → Sarıyer</desc>
+    
+    <trkseg>
+      <!-- Sultanahmet Başlangıç -->
+      <trkpt lat="41.0082" lon="28.9784"><time>2024-01-15T09:00:00Z</time></trkpt>
+      <trkpt lat="41.0085" lon="28.9788"><time>2024-01-15T09:02:00Z</time></trkpt>
+      <trkpt lat="41.0088" lon="28.9792"><time>2024-01-15T09:04:00Z</time></trkpt>
+      
+      <!-- Ayasofya çevresi -->
+      <trkpt lat="41.0086" lon="28.9802"><time>2024-01-15T09:06:00Z</time></trkpt>
+      <trkpt lat="41.0084" lon="28.9806"><time>2024-01-15T09:08:00Z</time></trkpt>
+      <trkpt lat="41.0082" lon="28.9810"><time>2024-01-15T09:10:00Z</time></trkpt>
+      
+      <!-- Sultanahmet Camii -->
+      <trkpt lat="41.0054" lon="28.9768"><time>2024-01-15T09:15:00Z</time></trkpt>
+      <trkpt lat="41.0050" lon="28.9772"><time>2024-01-15T09:17:00Z</time></trkpt>
+      <trkpt lat="41.0048" lon="28.9776"><time>2024-01-15T09:19:00Z</time></trkpt>
+      
+      <!-- Hippodrome -->
+      <trkpt lat="41.0058" lon="28.9754"><time>2024-01-15T09:22:00Z</time></trkpt>
+      <trkpt lat="41.0062" lon="28.9750"><time>2024-01-15T09:24:00Z</time></trkpt>
+      
+      <!-- Kapali Çarşı yönü -->
+      <trkpt lat="41.0108" lon="28.9681"><time>2024-01-15T09:30:00Z</time></trkpt>
+      <trkpt lat="41.0112" lon="28.9685"><time>2024-01-15T09:32:00Z</time></trkpt>
+      <trkpt lat="41.0115" lon="28.9689"><time>2024-01-15T09:34:00Z</time></trkpt>
+      
+      <!-- Eminönü'ne doğru -->
+      <trkpt lat="41.0168" lon="28.9703"><time>2024-01-15T09:40:00Z</time></trkpt>
+      <trkpt lat="41.0172" lon="28.9707"><time>2024-01-15T09:42:00Z</time></trkpt>
+      <trkpt lat="41.0176" lon="28.9711"><time>2024-01-15T09:44:00Z</time></trkpt>
+      
+      <!-- Galata Köprüsü -->
+      <trkpt lat="41.0196" lon="28.9744"><time>2024-01-15T09:50:00Z</time></trkpt>
+      <trkpt lat="41.0200" lon="28.9748"><time>2024-01-15T09:52:00Z</time></trkpt>
+      <trkpt lat="41.0204" lon="28.9752"><time>2024-01-15T09:54:00Z</time></trkpt>
+      
+      <!-- Karaköy -->
+      <trkpt lat="41.0255" lon="28.9741"><time>2024-01-15T10:00:00Z</time></trkpt>
+      <trkpt lat="41.0259" lon="28.9745"><time>2024-01-15T10:02:00Z</time></trkpt>
+      <trkpt lat="41.0263" lon="28.9749"><time>2024-01-15T10:04:00Z</time></trkpt>
+      
+      <!-- Galata Kulesi -->
+      <trkpt lat="41.0256" lon="28.9741"><time>2024-01-15T10:10:00Z</time></trkpt>
+      <trkpt lat="41.0260" lon="28.9737"><time>2024-01-15T10:12:00Z</time></trkpt>
+      <trkpt lat="41.0264" lon="28.9733"><time>2024-01-15T10:14:00Z</time></trkpt>
+      
+      <!-- Tophane -->
+      <trkpt lat="41.0284" lon="28.9823"><time>2024-01-15T10:20:00Z</time></trkpt>
+      <trkpt lat="41.0288" lon="28.9827"><time>2024-01-15T10:22:00Z</time></trkpt>
+      <trkpt lat="41.0292" lon="28.9831"><time>2024-01-15T10:24:00Z</time></trkpt>
+      
+      <!-- Dolmabahçe -->
+      <trkpt lat="41.0391" lon="29.0007"><time>2024-01-15T10:35:00Z</time></trkpt>
+      <trkpt lat="41.0395" lon="29.0011"><time>2024-01-15T10:37:00Z</time></trkpt>
+      <trkpt lat="41.0399" lon="29.0015"><time>2024-01-15T10:39:00Z</time></trkpt>
+      
+      <!-- Beşiktaş -->
+      <trkpt lat="41.0422" lon="29.0067"><time>2024-01-15T10:45:00Z</time></trkpt>
+      <trkpt lat="41.0426" lon="29.0071"><time>2024-01-15T10:47:00Z</time></trkpt>
+      <trkpt lat="41.0430" lon="29.0075"><time>2024-01-15T10:49:00Z</time></trkpt>
+      
+      <!-- Barbaros Bulvarı -->
+      <trkpt lat="41.0468" lon="29.0134"><time>2024-01-15T10:55:00Z</time></trkpt>
+      <trkpt lat="41.0472" lon="29.0138"><time>2024-01-15T10:57:00Z</time></trkpt>
+      <trkpt lat="41.0476" lon="29.0142"><time>2024-01-15T10:59:00Z</time></trkpt>
+      
+      <!-- Ortaköy -->
+      <trkpt lat="41.0553" lon="29.0268"><time>2024-01-15T11:10:00Z</time></trkpt>
+      <trkpt lat="41.0557" lon="29.0272"><time>2024-01-15T11:12:00Z</time></trkpt>
+      <trkpt lat="41.0561" lon="29.0276"><time>2024-01-15T11:14:00Z</time></trkpt>
+      
+      <!-- Ortaköy Camii çevresi -->
+      <trkpt lat="41.0565" lon="29.0280"><time>2024-01-15T11:16:00Z</time></trkpt>
+      <trkpt lat="41.0569" lon="29.0284"><time>2024-01-15T11:18:00Z</time></trkpt>
+      <trkpt lat="41.0573" lon="29.0288"><time>2024-01-15T11:20:00Z</time></trkpt>
+      
+      <!-- Boğaz kıyısı -->
+      <trkpt lat="41.0612" lon="29.0334"><time>2024-01-15T11:28:00Z</time></trkpt>
+      <trkpt lat="41.0616" lon="29.0338"><time>2024-01-15T11:30:00Z</time></trkpt>
+      <trkpt lat="41.0620" lon="29.0342"><time>2024-01-15T11:32:00Z</time></trkpt>
+      
+      <!-- Arnavutköy -->
+      <trkpt lat="41.0678" lon="29.0423"><time>2024-01-15T11:40:00Z</time></trkpt>
+      <trkpt lat="41.0682" lon="29.0427"><time>2024-01-15T11:42:00Z</time></trkpt>
+      <trkpt lat="41.0686" lon="29.0431"><time>2024-01-15T11:44:00Z</time></trkpt>
+      
+      <!-- Bebek -->
+      <trkpt lat="41.0834" lon="29.0434"><time>2024-01-15T11:55:00Z</time></trkpt>
+      <trkpt lat="41.0838" lon="29.0438"><time>2024-01-15T11:57:00Z</time></trkpt>
+      <trkpt lat="41.0842" lon="29.0442"><time>2024-01-15T11:59:00Z</time></trkpt>
+      
+      <!-- Bebek Parkı -->
+      <trkpt lat="41.0846" lon="29.0446"><time>2024-01-15T12:01:00Z</time></trkpt>
+      <trkpt lat="41.0850" lon="29.0450"><time>2024-01-15T12:03:00Z</time></trkpt>
+      <trkpt lat="41.0854" lon="29.0454"><time>2024-01-15T12:05:00Z</time></trkpt>
+      
+      <!-- Rumeli Hisarı -->
+      <trkpt lat="41.0842" lon="29.0567"><time>2024-01-15T12:15:00Z</time></trkpt>
+      <trkpt lat="41.0846" lon="29.0571"><time>2024-01-15T12:17:00Z</time></trkpt>
+      <trkpt lat="41.0850" lon="29.0575"><time>2024-01-15T12:19:00Z</time></trkpt>
+      
+      <!-- Emirgan -->
+      <trkpt lat="41.1089" lon="29.0567"><time>2024-01-15T12:30:00Z</time></trkpt>
+      <trkpt lat="41.1093" lon="29.0571"><time>2024-01-15T12:32:00Z</time></trkpt>
+      <trkpt lat="41.1097" lon="29.0575"><time>2024-01-15T12:34:00Z</time></trkpt>
+      
+      <!-- Emirgan Korusu -->
+      <trkpt lat="41.1101" lon="29.0579"><time>2024-01-15T12:36:00Z</time></trkpt>
+      <trkpt lat="41.1105" lon="29.0583"><time>2024-01-15T12:38:00Z</time></trkpt>
+      <trkpt lat="41.1109" lon="29.0587"><time>2024-01-15T12:40:00Z</time></trkpt>
+      
+      <!-- İstinye -->
+      <trkpt lat="41.1156" lon="29.0634"><time>2024-01-15T12:48:00Z</time></trkpt>
+      <trkpt lat="41.1160" lon="29.0638"><time>2024-01-15T12:50:00Z</time></trkpt>
+      <trkpt lat="41.1164" lon="29.0642"><time>2024-01-15T12:52:00Z</time></trkpt>
+      
+      <!-- Yeniköy -->
+      <trkpt lat="41.1234" lon="29.0723"><time>2024-01-15T13:00:00Z</time></trkpt>
+      <trkpt lat="41.1238" lon="29.0727"><time>2024-01-15T13:02:00Z</time></trkpt>
+      <trkpt lat="41.1242" lon="29.0731"><time>2024-01-15T13:04:00Z</time></trkpt>
+      
+      <!-- Tarabya -->
+      <trkpt lat="41.1345" lon="29.0823"><time>2024-01-15T13:12:00Z</time></trkpt>
+      <trkpt lat="41.1349" lon="29.0827"><time>2024-01-15T13:14:00Z</time></trkpt>
+      <trkpt lat="41.1353" lon="29.0831"><time>2024-01-15T13:16:00Z</time></trkpt>
+      
+      <!-- Büyükdere -->
+      <trkpt lat="41.1423" lon="29.0912"><time>2024-01-15T13:24:00Z</time></trkpt>
+      <trkpt lat="41.1427" lon="29.0916"><time>2024-01-15T13:26:00Z</time></trkpt>
+      <trkpt lat="41.1431" lon="29.0920"><time>2024-01-15T13:28:00Z</time></trkpt>
+      
+      <!-- Sarıyer -->
+      <trkpt lat="41.1567" lon="29.0934"><time>2024-01-15T13:40:00Z</time></trkpt>
+      <trkpt lat="41.1571" lon="29.0938"><time>2024-01-15T13:42:00Z</time></trkpt>
+      <trkpt lat="41.1575" lon="29.0942"><time>2024-01-15T13:44:00Z</time></trkpt>
+      
+      <!-- Sarıyer İskelesi -->
+      <trkpt lat="41.1579" lon="29.0946"><time>2024-01-15T13:46:00Z</time></trkpt>
+      <trkpt lat="41.1583" lon="29.0950"><time>2024-01-15T13:48:00Z</time></trkpt>
+      <trkpt lat="41.1587" lon="29.0954"><time>2024-01-15T13:50:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx> 

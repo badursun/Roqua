@@ -195,7 +195,7 @@ struct BottomControlPanel: View {
                         .foregroundStyle(.secondary)
                     
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(gridHashManager.getExplorationPercentage(decimals: 2))
+                        Text(gridHashManager.formattedPercentage)
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)

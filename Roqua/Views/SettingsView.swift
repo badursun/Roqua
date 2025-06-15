@@ -165,27 +165,7 @@ struct SettingsView: View {
                 
                 // MARK: - Grid & Percentage Section
                 Section {
-                    // Grid Resolution
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "grid")
-                                .foregroundColor(.cyan)
-                            Text("Grid Çözünürlüğü")
-                                .font(.headline)
-                        }
-                        
-                        Picker("Grid Resolution", selection: $settings.gridResolution) {
-                            Text("0.005° (~550m) - Detaylı").tag(0.005)
-                            Text("0.001° (~111m) - Çok Detaylı").tag(0.001)
-                            Text("0.01° (~1.1km) - Hızlı").tag(0.01)
-                        }
-                        .pickerStyle(.menu)
-                        
-                        Text("Küçük grid = daha hassas hesaplama, büyük grid = daha hızlı")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
+
                     // Percentage Decimals
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -195,11 +175,13 @@ struct SettingsView: View {
                                 .font(.headline)
                         }
                         
-                        Picker("Percentage Decimals", selection: $settings.percentageDecimals) {
-                            Text("2 basamak (0.01%)").tag(2)
-                            Text("4 basamak (0.0001%)").tag(4)
-                            Text("6 basamak (0.000001%)").tag(6)
-                            Text("8 basamak (0.00000001%)").tag(8)
+                        Picker("Basamak", selection: $settings.percentageDecimals) {
+                            Text("4 basamaklı").tag(4)
+                            Text("5 basamaklı").tag(5)
+                            Text("6 basamaklı").tag(6)
+                            Text("7 basamaklı").tag(7)
+                            Text("8 basamaklı").tag(8)
+                            Text("9 basamaklı").tag(9)
                         }
                         .pickerStyle(.menu)
                         

@@ -30,8 +30,7 @@ class AppSettings: ObservableObject {
     @AppStorage("backgroundProcessing") var backgroundProcessing: Bool = true
     
     // MARK: - Grid & Exploration Settings
-    @AppStorage("gridResolution") var gridResolution: Double = 0.005 // ~550m grid (more realistic)
-    @AppStorage("percentageDecimals") var percentageDecimals: Int = 4 // 0.0001% precision (more visible)
+    @AppStorage("percentageDecimals") var percentageDecimals: Int = 5 // 0.00001% precision (balanced)
     @AppStorage("enableExplorationStats") var enableExplorationStats: Bool = true
     
     // MARK: - Singleton
@@ -92,10 +91,9 @@ class AppSettings: ObservableObject {
         enableGeocoding = true
         offlineMode = false
         maxRegionsInMemory = 1000
-        backgroundProcessing = true
-        gridResolution = 0.005
-        percentageDecimals = 4
-        enableExplorationStats = true
+                  backgroundProcessing = true
+          percentageDecimals = 5
+          enableExplorationStats = true
     }
     
     func exportSettings() -> [String: Any] {
@@ -114,7 +112,7 @@ class AppSettings: ObservableObject {
             "offlineMode": offlineMode,
             "maxRegionsInMemory": maxRegionsInMemory,
             "backgroundProcessing": backgroundProcessing,
-            "gridResolution": gridResolution,
+
             "percentageDecimals": percentageDecimals,
             "enableExplorationStats": enableExplorationStats
         ]
@@ -163,9 +161,7 @@ class AppSettings: ObservableObject {
         if let value = dict["backgroundProcessing"] as? Bool {
             backgroundProcessing = value
         }
-        if let value = dict["gridResolution"] as? Double {
-            gridResolution = value
-        }
+
         if let value = dict["percentageDecimals"] as? Int {
             percentageDecimals = value
         }
