@@ -22,6 +22,7 @@ class LocationManager: NSObject, ObservableObject {
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     
     private let locationManager = CLLocationManager()
+    private var permissionContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
     
     override init() {
         super.init()
@@ -35,10 +36,12 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.distanceFilter = 10 // 10 metre hareket ettiğinde güncelle
         
         isLocationServicesEnabled = CLLocationManager.locationServicesEnabled()
+        print("📍 Location services enabled: \(isLocationServicesEnabled)")
     }
     
     private func updatePermissionState() {
         authorizationStatus = locationManager.authorizationStatus
+        print("📍 Current authorization status: \(authorizationStatus.rawValue)")
         
         switch authorizationStatus {
         case .notDetermined:
@@ -57,47 +60,56 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     // MARK: - Permission Request Methods
-    func requestWhenInUsePermission() {
-        // Main thread blocking sorununu çöz
-        Task { @MainActor in
-            guard permissionState == .notRequested else { 
-                print("⚠️ Permission already requested or granted")
-                return 
-            }
+    func requestWhenInUsePermission() async {
+        guard permissionState == .notRequested else { 
+            print("⚠️ Permission already requested or granted: \(permissionState)")
+            return 
+        }
+        
+        guard CLLocationManager.locationServicesEnabled() else {
+            print("❌ Location services disabled")
+            permissionState = .denied
+            return
+        }
+        
+        print("📍 Requesting when in use permission...")
+        permissionState = .requesting
+        
+        // Async permission request
+        let status = await withCheckedContinuation { continuation in
+            self.permissionContinuation = continuation
             
-            guard CLLocationManager.locationServicesEnabled() else {
-                print("❌ Location services disabled")
-                permissionState = .denied
-                return
-            }
-            
-            print("📍 Requesting when in use permission...")
-            permissionState = .requesting
-            
-            // Asenkron permission request
-            DispatchQueue.main.async { [weak self] in
-                self?.locationManager.requestWhenInUseAuthorization()
+            // Main thread'de permission request
+            DispatchQueue.main.async {
+                self.locationManager.requestWhenInUseAuthorization()
             }
         }
+        
+        print("📍 Permission request completed with status: \(status.rawValue)")
     }
     
-    func requestAlwaysPermission() {
-        Task { @MainActor in
-            guard permissionState == .whenInUseGranted else {
-                print("⚠️ When in use permission required first")
-                // Önce when in use izni alınmalı
-                requestWhenInUsePermission()
-                return
-            }
+    func requestAlwaysPermission() async {
+        guard permissionState == .whenInUseGranted else {
+            print("⚠️ When in use permission required first")
+            // Önce when in use izni alınmalı
+            await requestWhenInUsePermission()
+            return
+        }
+        
+        print("📍 Requesting always permission...")
+        permissionState = .requesting
+        
+        // Async permission request
+        let status = await withCheckedContinuation { continuation in
+            self.permissionContinuation = continuation
             
-            print("📍 Requesting always permission...")
-            permissionState = .requesting
-            
-            // Asenkron permission request
-            DispatchQueue.main.async { [weak self] in
-                self?.locationManager.requestAlwaysAuthorization()
+            // Main thread'de permission request
+            DispatchQueue.main.async {
+                self.locationManager.requestAlwaysAuthorization()
             }
         }
+        
+        print("📍 Always permission request completed with status: \(status.rawValue)")
     }
     
     func startLocationUpdates() {
@@ -148,7 +160,7 @@ class LocationManager: NSObject, ObservableObject {
 
 // MARK: - CLLocationManagerDelegate
 extension LocationManager: @preconcurrency CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         
         Task { @MainActor in
@@ -157,7 +169,7 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("❌ Location error: \(error.localizedDescription)")
         
         Task { @MainActor in
@@ -177,8 +189,8 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        print("🔄 Authorization changed to: \(status.rawValue)")
+    nonisolated func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        print("🔄 Authorization changed to: \(status.rawValue) (\(status.description))")
         
         Task { @MainActor in
             authorizationStatus = status
@@ -213,11 +225,25 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
                 print("🔄 Permission state changed: \(previousState) → \(permissionState)")
             }
             
-            // When In Use izni alındıktan sonra otomatik olarak always izni isteme
-            // (Bu onboarding flow'da kontrol edilecek)
-            if status == .authorizedWhenInUse && previousState == .requesting {
-                print("ℹ️ When in use granted, ready for always permission request")
+            // Continuation'ı resolve et
+            if let continuation = permissionContinuation {
+                permissionContinuation = nil
+                continuation.resume(returning: status)
             }
+        }
+    }
+}
+
+// MARK: - CLAuthorizationStatus Extension
+extension CLAuthorizationStatus {
+    var description: String {
+        switch self {
+        case .notDetermined: return "notDetermined"
+        case .restricted: return "restricted"
+        case .denied: return "denied"
+        case .authorizedAlways: return "authorizedAlways"
+        case .authorizedWhenInUse: return "authorizedWhenInUse"
+        @unknown default: return "unknown"
         }
     }
 } 

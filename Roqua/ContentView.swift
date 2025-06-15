@@ -296,7 +296,9 @@ struct SettingsView: View {
                             if locationManager.permissionState == .denied || locationManager.permissionState == .restricted {
                                 locationManager.openSettings()
                             } else if locationManager.canRequestAlwaysPermission {
-                                locationManager.requestAlwaysPermission()
+                                Task {
+                                    await locationManager.requestAlwaysPermission()
+                                }
                             }
                         }
                         .buttonStyle(.bordered)

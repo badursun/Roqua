@@ -397,7 +397,9 @@ struct LocationPermissionStep: View {
                 } else {
                     Button(action: {
                         print("🎯 User tapped permission button")
-                        locationManager.requestWhenInUsePermission()
+                        Task {
+                            await locationManager.requestWhenInUsePermission()
+                        }
                     }) {
                         HStack {
                             Image(systemName: "location.fill")
@@ -492,7 +494,9 @@ struct AlwaysPermissionStep: View {
                     VStack(spacing: 16) {
                         Button(action: {
                             print("🎯 User requesting always permission")
-                            locationManager.requestAlwaysPermission()
+                            Task {
+                                await locationManager.requestAlwaysPermission()
+                            }
                         }) {
                             HStack {
                                 Image(systemName: "clock.arrow.circlepath")
