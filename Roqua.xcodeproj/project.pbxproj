@@ -27,6 +27,7 @@
 		367BBF782DFEACA60020D657 /* Roqua.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Roqua.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		367BBF872DFEACA70020D657 /* RoquaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoquaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		367BBF912DFEACA70020D657 /* RoquaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoquaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		367BC0262DFEBC640020D657 /* 40kmh.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = 40kmh.gpx; path = "../../../../../burakyeni/Desktop/belə vəziyyət içine soxum/40kmh.gpx"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +89,7 @@
 		367BBF6F2DFEACA60020D657 = {
 			isa = PBXGroup;
 			children = (
+				367BC0262DFEBC640020D657 /* 40kmh.gpx */,
 				367BBF7A2DFEACA60020D657 /* Roqua */,
 				367BBF8A2DFEACA70020D657 /* RoquaTests */,
 				367BBF942DFEACA70020D657 /* RoquaUITests */,

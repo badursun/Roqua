@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Genel Kurallar
+- Github Repo: https://github.com/badursun/Roqua
+- "Push Et" komutunu kullanıcıdan almadan asla push etme
+- `prd.md` ve `main-todo-list.md` kurallarına ve akışına sadık kal

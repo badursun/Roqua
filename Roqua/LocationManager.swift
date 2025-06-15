@@ -38,8 +38,8 @@ class LocationManager: NSObject, ObservableObject {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10 // 10 metre hareket ettiğinde güncelle
         
-        isLocationServicesEnabled = CLLocationManager.locationServicesEnabled()
-        print("📍 Location services enabled: \(isLocationServicesEnabled)")
+        // Location services check'i delegate callback'inde yapılacak
+        print("📍 Setting up location manager...")
     }
     
     private func updatePermissionState() {
@@ -63,20 +63,8 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     private func checkExistingPermissions() {
-        // Mevcut izin durumunu kontrol et
-        switch authorizationStatus {
-        case .authorizedAlways:
-            print("✅ Always permission already granted - starting location updates")
-            startLocationUpdates()
-        case .authorizedWhenInUse:
-            print("✅ When in use permission already granted")
-        case .denied, .restricted:
-            print("❌ Location permission denied or restricted")
-        case .notDetermined:
-            print("📍 Location permission not determined yet")
-        @unknown default:
-            print("⚠️ Unknown location permission state")
-        }
+        // Bu fonksiyon artık delegate callback'inde çağrılacak
+        print("📍 Will check permissions in delegate callback")
     }
     
     // MARK: - Permission Request Methods
@@ -86,7 +74,7 @@ class LocationManager: NSObject, ObservableObject {
             return 
         }
         
-        guard CLLocationManager.locationServicesEnabled() else {
+        guard isLocationServicesEnabled else {
             print("❌ Location services disabled")
             permissionState = .denied
             return
@@ -220,6 +208,10 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         print("🔄 Authorization changed to: \(status.rawValue) (\(status.description))")
         
         Task { @MainActor in
+            // Location services durumunu güncelle
+            isLocationServicesEnabled = CLLocationManager.locationServicesEnabled()
+            print("📍 Location services enabled: \(isLocationServicesEnabled)")
+            
             authorizationStatus = status
             
             // Önceki state'i sakla
