@@ -9,10 +9,25 @@ import SwiftUI
 
 @main
 struct RoquaApp: App {
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .statusBarHidden()
+            if hasCompletedOnboarding {
+                ContentView()
+                    .statusBarHidden()
+            } else {
+                OnboardingView()
+                    .statusBarHidden()
+                    .onReceive(NotificationCenter.default.publisher(for: .onboardingCompleted)) { _ in
+                        hasCompletedOnboarding = true
+                    }
+            }
         }
     }
+}
+
+// MARK: - Notification Extension
+extension Notification.Name {
+    static let onboardingCompleted = Notification.Name("onboardingCompleted")
 }
