@@ -114,19 +114,31 @@ class LocationManager: NSObject, ObservableObject {
         }
         
         print("✅ Starting location updates")
-        locationManager.startUpdatingLocation()
         
-        // Background location için
+        // Background location için gerekli ayarlar - startUpdatingLocation'dan önce
         if permissionState == .alwaysGranted {
+            // Background modes kontrolü
+            guard Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") != nil else {
+                print("❌ Background modes not configured in Info.plist")
+                return
+            }
+            
             locationManager.allowsBackgroundLocationUpdates = true
             locationManager.pausesLocationUpdatesAutomatically = false
+            print("✅ Background location updates enabled")
         }
+        
+        locationManager.startUpdatingLocation()
     }
     
     func stopLocationUpdates() {
         print("⏹️ Stopping location updates")
         locationManager.stopUpdatingLocation()
-        locationManager.allowsBackgroundLocationUpdates = false
+        
+        // Background updates'i güvenli şekilde kapat
+        if permissionState == .alwaysGranted {
+            locationManager.allowsBackgroundLocationUpdates = false
+        }
     }
     
     // MARK: - Helper Methods
