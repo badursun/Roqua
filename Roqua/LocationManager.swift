@@ -28,6 +28,9 @@ class LocationManager: NSObject, ObservableObject {
         super.init()
         setupLocationManager()
         updatePermissionState()
+        
+        // Mevcut izinleri kontrol et ve gerekirse location updates'i başlat
+        checkExistingPermissions()
     }
     
     private func setupLocationManager() {
@@ -56,6 +59,23 @@ class LocationManager: NSObject, ObservableObject {
             permissionState = .restricted
         @unknown default:
             permissionState = .unknown
+        }
+    }
+    
+    private func checkExistingPermissions() {
+        // Mevcut izin durumunu kontrol et
+        switch authorizationStatus {
+        case .authorizedAlways:
+            print("✅ Always permission already granted - starting location updates")
+            startLocationUpdates()
+        case .authorizedWhenInUse:
+            print("✅ When in use permission already granted")
+        case .denied, .restricted:
+            print("❌ Location permission denied or restricted")
+        case .notDetermined:
+            print("📍 Location permission not determined yet")
+        @unknown default:
+            print("⚠️ Unknown location permission state")
         }
     }
     
@@ -117,15 +137,15 @@ class LocationManager: NSObject, ObservableObject {
         
         // Background location için gerekli ayarlar - startUpdatingLocation'dan önce
         if permissionState == .alwaysGranted {
-            // Background modes kontrolü
-            guard Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") != nil else {
-                print("❌ Background modes not configured in Info.plist")
-                return
+            // Background modes kontrolü - Info.plist'te location background mode var mı?
+            if let backgroundModes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String],
+               backgroundModes.contains("location") {
+                locationManager.allowsBackgroundLocationUpdates = true
+                locationManager.pausesLocationUpdatesAutomatically = false
+                print("✅ Background location updates enabled")
+            } else {
+                print("⚠️ Background location mode not configured in Info.plist - continuing with foreground only")
             }
-            
-            locationManager.allowsBackgroundLocationUpdates = true
-            locationManager.pausesLocationUpdatesAutomatically = false
-            print("✅ Background location updates enabled")
         }
         
         locationManager.startUpdatingLocation()

@@ -14,6 +14,10 @@ struct ContentView: View {
     @State private var showingSettings = false
     @State private var showingAccount = false
     
+    private var isLocationTrackingActive: Bool {
+        return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
+    }
+    
     var body: some View {
         ZStack {
             // Tam Ekran Harita
@@ -159,6 +163,10 @@ struct BottomControlPanel: View {
     @ObservedObject var locationManager: LocationManager
     @State private var explorationPercentage: Double = 2.13
     
+    private var isLocationTrackingActive: Bool {
+        return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
             // İstatistik Kartı
@@ -217,7 +225,7 @@ struct BottomControlPanel: View {
             HStack(spacing: 12) {
                 // Konumum Butonu
                 Button(action: {
-                    if let location = locationManager.currentLocation {
+                    if isLocationTrackingActive && locationManager.currentLocation != nil {
                         withAnimation(.easeInOut(duration: 1.0)) {
                             // position güncelleme kodu buraya gelecek
                         }
@@ -227,9 +235,9 @@ struct BottomControlPanel: View {
                     }
                 }) {
                     HStack(spacing: 8) {
-                        Image(systemName: locationManager.currentLocation != nil ? "location.fill" : "location.slash.fill")
+                        Image(systemName: isLocationTrackingActive ? "location.fill" : "location.slash.fill")
                             .font(.callout)
-                        Text(locationManager.currentLocation != nil ? "Konumum" : "Konum Kapalı")
+                        Text(isLocationTrackingActive ? "Konumum" : "Konum Kapalı")
                             .font(.callout)
                             .fontWeight(.medium)
                     }
@@ -240,7 +248,7 @@ struct BottomControlPanel: View {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(
                                 LinearGradient(
-                                    colors: locationManager.currentLocation != nil ? 
+                                    colors: isLocationTrackingActive ? 
                                         [.blue, .blue.opacity(0.8)] : 
                                         [.red.opacity(0.8), .red.opacity(0.6)],
                                     startPoint: .topLeading,
@@ -277,6 +285,10 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var locationManager: LocationManager
     
+    private var isLocationTrackingActive: Bool {
+        return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -312,8 +324,8 @@ struct SettingsView: View {
                             
                             Spacer()
                             
-                            Text(locationManager.currentLocation != nil ? "Aktif" : "Pasif")
-                                .foregroundStyle(locationManager.currentLocation != nil ? .green : .red)
+                            Text(isLocationTrackingActive ? "Aktif" : "Pasif")
+                                .foregroundStyle(isLocationTrackingActive ? .green : .red)
                         }
                     }
                 }
@@ -375,6 +387,8 @@ struct SettingsView: View {
     private var canRequestPermission: Bool {
         return locationManager.permissionState != .alwaysGranted
     }
+    
+
 }
 
 // Hesap View aynı kalabilir

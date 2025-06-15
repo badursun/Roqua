@@ -37,10 +37,35 @@ struct OnboardingView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            checkExistingPermissionsAndSkip()
+        }
         .onChange(of: showingMainApp) { _, newValue in
             if newValue {
                 NotificationCenter.default.post(name: .onboardingCompleted, object: nil)
             }
+        }
+    }
+    
+    private func checkExistingPermissionsAndSkip() {
+        // Mevcut izinleri kontrol et ve uygun adıma geç
+        switch locationManager.permissionState {
+        case .alwaysGranted:
+            // Always permission varsa direkt ana uygulamaya geç
+            print("✅ Always permission already exists - skipping onboarding")
+            showingMainApp = true
+        case .whenInUseGranted:
+            // When in use permission varsa always permission adımına geç
+            print("✅ When in use permission exists - skipping to always permission step")
+            currentStep = .alwaysPermission
+        case .denied, .restricted:
+            // İzin reddedildiyse location permission adımına geç
+            print("❌ Permission denied - going to location permission step")
+            currentStep = .locationPermission
+        case .notRequested, .requesting, .unknown:
+            // İzin istenmemişse normal akışa devam et
+            print("📍 No permission yet - starting normal onboarding flow")
+            break
         }
     }
 }
@@ -374,6 +399,19 @@ struct LocationPermissionStep: View {
                         HStack {
                             Image(systemName: "checkmark")
                             Text("İzin Verildi, Devam Et")
+                                .fontWeight(.medium)
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.green.opacity(0.8))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                } else if locationManager.permissionState == .alwaysGranted {
+                    Button(action: onNext) {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Sürekli İzin Verildi, Devam Et")
                                 .fontWeight(.medium)
                         }
                         .foregroundStyle(.white)
