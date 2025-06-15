@@ -400,6 +400,9 @@
 				DEVELOPMENT_TEAM = C54BZRZDG2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Roqua, gezdiğin yerleri haritada gösterebilmek için konumuna ihtiyaç duyar. Veriler sadece cihazında saklanır.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Roqua'nın arka planda çalışması, uygulamayı kapatsan bile gezdiğin yerleri kaydetmesini sağlar. Tüm veriler cihazında güvenle saklanır, hiçbir sunucuya gönderilmez.";
+				INFOPLIST_KEY_UIBackgroundModes = location;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +431,9 @@
 				DEVELOPMENT_TEAM = C54BZRZDG2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Roqua, gezdiğin yerleri haritada gösterebilmek için konumuna ihtiyaç duyar. Veriler sadece cihazında saklanır.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Roqua'nın arka planda çalışması, uygulamayı kapatsan bile gezdiğin yerleri kaydetmesini sağlar. Tüm veriler cihazında güvenle saklanır, hiçbir sunucuya gönderilmez.";
+				INFOPLIST_KEY_UIBackgroundModes = location;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

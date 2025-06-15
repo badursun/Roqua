@@ -75,16 +75,12 @@ class LocationManager: NSObject, ObservableObject {
         print("📍 Requesting when in use permission...")
         permissionState = .requesting
         
-        // Async permission request - background thread'de yap
+        // iOS permission request - delegate callback bekle
         let status = await withCheckedContinuation { continuation in
             self.permissionContinuation = continuation
             
-            // Background thread'de permission request
-            DispatchQueue.global(qos: .userInitiated).async {
-                DispatchQueue.main.async {
-                    self.locationManager.requestWhenInUseAuthorization()
-                }
-            }
+            // Main thread'de permission request - iOS requirement
+            self.locationManager.requestWhenInUseAuthorization()
         }
         
         print("📍 Permission request completed with status: \(status.rawValue)")
@@ -100,16 +96,12 @@ class LocationManager: NSObject, ObservableObject {
         print("📍 Requesting always permission...")
         permissionState = .requesting
         
-        // Async permission request - background thread'de yap
+        // iOS permission request - delegate callback bekle
         let status = await withCheckedContinuation { continuation in
             self.permissionContinuation = continuation
             
-            // Background thread'de permission request
-            DispatchQueue.global(qos: .userInitiated).async {
-                DispatchQueue.main.async {
-                    self.locationManager.requestAlwaysAuthorization()
-                }
-            }
+            // Main thread'de permission request - iOS requirement
+            self.locationManager.requestAlwaysAuthorization()
         }
         
         print("📍 Always permission request completed with status: \(status.rawValue)")
