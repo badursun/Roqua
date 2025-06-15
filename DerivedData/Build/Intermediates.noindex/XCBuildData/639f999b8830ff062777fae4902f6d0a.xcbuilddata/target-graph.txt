@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'RoquaUITests' in project 'Roqua'
+➜ Explicit dependency on target 'Roqua' in project 'Roqua'
+Target 'RoquaTests' in project 'Roqua'
+➜ Explicit dependency on target 'Roqua' in project 'Roqua'
+Target 'Roqua' in project 'Roqua' (no dependencies)

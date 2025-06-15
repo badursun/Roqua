@@ -12,21 +12,28 @@ import CoreLocation
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
     @StateObject private var exploredCirclesManager = ExploredCirclesManager()
+    @StateObject private var visitedRegionManager = VisitedRegionManager.shared
+    @StateObject private var reverseGeocoder = ReverseGeocoder.shared
+    @StateObject private var gridHashManager = GridHashManager.shared
     @State private var position = MapCameraPosition.automatic
     @State private var showingSettings = false
     @State private var showingAccount = false
+    @State private var hasInitialized = false
+    @State private var currentZoomLevel: String = "1:200m"
     
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
     }
-    
+
     var body: some View {
         ZStack {
             // Tam Ekran Harita
             FogOfWarMapView(
                 locationManager: locationManager,
                 exploredCirclesManager: exploredCirclesManager,
-                position: $position
+                visitedRegionManager: visitedRegionManager,
+                position: $position,
+                currentZoomLevel: $currentZoomLevel
             )
             .ignoresSafeArea(.all)
             
@@ -74,14 +81,14 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 
-                BottomControlPanel(locationManager: locationManager)
+                BottomControlPanel(locationManager: locationManager, reverseGeocoder: reverseGeocoder, gridHashManager: gridHashManager, position: $position, currentZoomLevel: $currentZoomLevel)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 30)
             }
         }
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showingSettings) {
-            SettingsView(locationManager: locationManager)
+            SettingsView()
         }
         .sheet(isPresented: $showingAccount) {
             AccountView()
@@ -91,6 +98,28 @@ struct ContentView: View {
             if locationManager.isFullyAuthorized {
                 locationManager.startLocationUpdates()
             }
+            
+            // İlk kez açılışta migration yap
+            if !hasInitialized {
+                performMigrationIfNeeded()
+                hasInitialized = true
+            }
+        }
+        .onChange(of: locationManager.currentLocation) { _, newLocation in
+            if let location = newLocation {
+                exploredCirclesManager.addLocation(location)
+                visitedRegionManager.processNewLocation(location)
+                reverseGeocoder.geocodeLocation(location)
+            }
+        }
+    }
+    
+    // MARK: - Migration
+    private func performMigrationIfNeeded() {
+        // Eğer VisitedRegionManager boşsa ve ExploredCircles varsa migration yap
+        if visitedRegionManager.visitedRegions.isEmpty && !exploredCirclesManager.exploredCircles.isEmpty {
+            print("🔄 Starting migration from ExploredCircles to VisitedRegions...")
+            visitedRegionManager.migrateFromExploredCircles(exploredCirclesManager.exploredCircles)
         }
     }
 }
@@ -146,7 +175,11 @@ struct LocationStatusIndicator: View {
 
 struct BottomControlPanel: View {
     @ObservedObject var locationManager: LocationManager
-    @State private var explorationPercentage: Double = 2.13
+    @ObservedObject var reverseGeocoder: ReverseGeocoder
+    @ObservedObject var gridHashManager: GridHashManager
+    @Binding var position: MapCameraPosition
+    @Binding var currentZoomLevel: String
+    // explorationPercentage artık gridHashManager'dan gelecek
     
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
@@ -162,7 +195,7 @@ struct BottomControlPanel: View {
                         .foregroundStyle(.secondary)
                     
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text("\(explorationPercentage, specifier: "%.2f")")
+                        Text(gridHashManager.getExplorationPercentage(decimals: 2))
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
@@ -210,9 +243,13 @@ struct BottomControlPanel: View {
             HStack(spacing: 12) {
                 // Konumum Butonu
                 Button(action: {
-                    if isLocationTrackingActive && locationManager.currentLocation != nil {
+                    if isLocationTrackingActive, let currentLocation = locationManager.currentLocation {
                         withAnimation(.easeInOut(duration: 1.0)) {
-                            // position güncelleme kodu buraya gelecek
+                            position = .region(MKCoordinateRegion(
+                                center: currentLocation.coordinate,
+                                latitudinalMeters: 200,
+                                longitudinalMeters: 200
+                            ))
                         }
                     } else if !locationManager.isFullyAuthorized {
                         // İzin yoksa ayarlara yönlendir
@@ -227,8 +264,8 @@ struct BottomControlPanel: View {
                             .fontWeight(.medium)
                     }
                     .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .padding(.horizontal, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
                             .fill(
@@ -253,127 +290,64 @@ struct BottomControlPanel: View {
                             .fontWeight(.medium)
                     }
                     .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .padding(.horizontal, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
                             .fill(.regularMaterial)
                     )
                 }
             }
-        }
-    }
-}
-
-// MARK: - Settings View (Güncellenmiş)
-struct SettingsView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var locationManager: LocationManager
-    
-    private var isLocationTrackingActive: Bool {
-        return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
-    }
-    
-    var body: some View {
-        NavigationView {
-            List {
-                Section("Konum Ayarları") {
-                    HStack {
-                        Image(systemName: "location")
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Konum İzni")
-                            Text(permissionDescription)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(permissionButtonText) {
-                            if locationManager.permissionState == .denied || locationManager.permissionState == .restricted {
-                                locationManager.openSettings()
-                            } else if locationManager.canRequestAlwaysPermission {
-                                Task {
-                                    await locationManager.requestAlwaysPermission()
-                                }
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(!canRequestPermission)
-                    }
+            
+            // Bilgi Çubuğu (Alt kısım)
+            HStack(spacing: 16) {
+                // Konum Bilgisi
+                HStack(spacing: 6) {
+                    Image(systemName: "location.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
                     
-                    if locationManager.isFullyAuthorized {
-                        HStack {
-                            Image(systemName: "antenna.radiowaves.left.and.right")
-                            Text("Konum Takibi")
-                            
-                            Spacer()
-                            
-                            Text(isLocationTrackingActive ? "Aktif" : "Pasif")
-                                .foregroundStyle(isLocationTrackingActive ? .green : .red)
-                        }
+                    Text(reverseGeocoder.currentLocationInfo?.shortDisplayText ?? "Konum alınıyor...")
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+                
+                // Zoom Seviyesi
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                    
+                    Text(currentZoomLevel)
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+                }
+                
+                // GPS Doğruluğu
+                if let location = locationManager.currentLocation {
+                    HStack(spacing: 6) {
+                        Image(systemName: "dot.radiowaves.left.and.right")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        
+                        Text("±\(Int(location.horizontalAccuracy))m")
+                            .font(.caption)
+                            .foregroundStyle(.primary)
                     }
                 }
                 
-                Section("Gizlilik") {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text("Veriyi Temizle")
-                    }
-                }
-                
-                Section("Görünüm") {
-                    HStack {
-                        Image(systemName: "map")
-                        Text("Harita Stili")
-                    }
-                }
+                Spacer()
             }
-            .navigationTitle("Ayarlar")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Kapat") {
-                        dismiss()
-                    }
-                }
-            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.8)
+            )
         }
     }
-    
-    private var permissionDescription: String {
-        switch locationManager.permissionState {
-        case .alwaysGranted:
-            return "Sürekli izin verildi"
-        case .whenInUseGranted:
-            return "Sadece kullanırken"
-        case .denied:
-            return "İzin reddedildi"
-        case .restricted:
-            return "Kısıtlanmış"
-        default:
-            return "İzin bekleniyor"
-        }
-    }
-    
-    private var permissionButtonText: String {
-        switch locationManager.permissionState {
-        case .alwaysGranted:
-            return "✓ Tam İzin"
-        case .whenInUseGranted:
-            return "Sürekli İzin"
-        case .denied, .restricted:
-            return "Ayarlar"
-        default:
-            return "İzin Ver"
-        }
-    }
-    
-    private var canRequestPermission: Bool {
-        return locationManager.permissionState != .alwaysGranted
-    }
-    
-
 }
 
 // Hesap View aynı kalabilir
@@ -414,203 +388,7 @@ struct AccountView: View {
     }
 }
 
-// MARK: - Fog of War Overlay
-class FogOfWarOverlay: NSObject, MKOverlay {
-    let coordinate: CLLocationCoordinate2D
-    let boundingMapRect: MKMapRect
-    
-    init(center: CLLocationCoordinate2D) {
-        self.coordinate = center
-        
-        // Tüm dünyayı kaplayan bir rect oluştur
-        self.boundingMapRect = MKMapRect.world
-        super.init()
-    }
-}
-
-class FogOfWarRenderer: MKOverlayRenderer {
-    let exploredCircles: [CLLocationCoordinate2D]
-    let circleRadius: Double = 200.0 // 200 metre (PRD'ye göre)
-    
-    init(overlay: FogOfWarOverlay, exploredCircles: [CLLocationCoordinate2D]) {
-        self.exploredCircles = exploredCircles
-        super.init(overlay: overlay)
-        print("🎨 FogOfWarRenderer created with \(exploredCircles.count) explored circles")
-    }
-    
-    override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        let drawRect = rect(for: mapRect)
-        print("🎨 Drawing fog overlay. MapRect: \(mapRect), DrawRect: \(drawRect), ZoomScale: \(zoomScale)")
-        print("🎨 Explored circles count: \(exploredCircles.count)")
-        
-        // Önce tüm alanı karanlık yap
-        context.setFillColor(UIColor.black.withAlphaComponent(0.85).cgColor)
-        context.fill(drawRect)
-        
-        // Keşfedilen alanları temizle (clear blend mode ile)
-        if !exploredCircles.isEmpty {
-            context.setBlendMode(.clear)
-            
-            for circleCenter in exploredCircles {
-                let mapPoint = MKMapPoint(circleCenter)
-                
-                // Sadece görünür alandaki circle'ları çiz
-                if mapRect.intersects(MKMapRect(
-                    origin: MKMapPoint(x: mapPoint.x - 1000, y: mapPoint.y - 1000),
-                    size: MKMapSize(width: 2000, height: 2000)
-                )) {
-                    let circlePoint = point(for: mapPoint)
-                    
-                    // Doğru radius hesaplama - zoom ile birlikte büyür/küçülür
-                    let metersPerMapPoint = MKMapPointsPerMeterAtLatitude(circleCenter.latitude)
-                    let radiusInMapPoints = circleRadius * metersPerMapPoint
-                    let radiusInPoints = radiusInMapPoints * zoomScale
-                    
-                    // Minimum ve maksimum radius sınırları
-                    let minRadius: CGFloat = 5.0
-                    let maxRadius: CGFloat = 500.0
-                    let finalRadius = max(minRadius, min(maxRadius, radiusInPoints))
-                    
-                    let circleRect = CGRect(
-                        x: circlePoint.x - finalRadius,
-                        y: circlePoint.y - finalRadius,
-                        width: finalRadius * 2,
-                        height: finalRadius * 2
-                    )
-                    
-                    // Circle çiz (keşfedilen alanı temizle)
-                    context.fillEllipse(in: circleRect)
-                    
-                    print("🎨 Drew circle at (\(circlePoint.x), \(circlePoint.y)) with radius \(finalRadius)")
-                }
-            }
-            
-            // Blend mode'u normale döndür
-            context.setBlendMode(.normal)
-        }
-    }
-}
-
-// MARK: - Explored Circles Manager
-class ExploredCirclesManager: ObservableObject {
-    @Published var exploredCircles: [CLLocationCoordinate2D] = []
-    private let minimumDistance: Double = 10.0 // 10 metre minimum mesafe - daha sık circle
-    
-    init() {
-        print("🎯 ExploredCirclesManager initialized")
-    }
-    
-    func addLocation(_ location: CLLocation) {
-        let newCoordinate = location.coordinate
-        
-        // Çok yakın bir konum varsa ekleme
-        for existingCoordinate in exploredCircles {
-            let existingLocation = CLLocation(latitude: existingCoordinate.latitude, longitude: existingCoordinate.longitude)
-            if location.distance(from: existingLocation) < minimumDistance {
-                return
-            }
-        }
-        
-        // Yeni konumu ekle
-        DispatchQueue.main.async {
-            self.exploredCircles.append(newCoordinate)
-            print("🎯 New explored area added: \(newCoordinate.latitude), \(newCoordinate.longitude)")
-            print("📊 Total explored areas: \(self.exploredCircles.count)")
-        }
-    }
-}
-
-// MARK: - Fog of War Map View
-struct FogOfWarMapView: UIViewRepresentable {
-    @ObservedObject var locationManager: LocationManager
-    @ObservedObject var exploredCirclesManager: ExploredCirclesManager
-    @Binding var position: MapCameraPosition
-    
-    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
-        mapView.mapType = .standard
-        mapView.showsUserLocation = true
-        mapView.userTrackingMode = .follow // Kullanıcıyı takip et
-        
-        // Zoom ve pan kontrollerini etkinleştir
-        mapView.isZoomEnabled = true
-        mapView.isPitchEnabled = true
-        mapView.isRotateEnabled = true
-        mapView.isScrollEnabled = true
-        
-        // Standard map configuration
-        mapView.preferredConfiguration = MKStandardMapConfiguration()
-        
-        return mapView
-    }
-    
-    func updateUIView(_ mapView: MKMapView, context: Context) {
-        // Konum güncellendiğinde overlay'i yenile
-        context.coordinator.updateOverlay(mapView: mapView, exploredCircles: exploredCirclesManager.exploredCircles)
-        
-        // İlk konum set'i - sadece bir kez yapılır
-        if let currentLocation = locationManager.currentLocation, !context.coordinator.hasSetInitialRegion {
-            let region = MKCoordinateRegion(
-                center: currentLocation.coordinate,
-                latitudinalMeters: 1500, // Biraz daha yakın başlangıç
-                longitudinalMeters: 1500
-            )
-            mapView.setRegion(region, animated: false) // İlk set animasyonsuz
-            context.coordinator.hasSetInitialRegion = true
-            print("🗺️ Initial map region set to user location")
-        }
-        
-        // Yeni konumu explored circles'a ekle (her konum güncellemesinde)
-        if let currentLocation = locationManager.currentLocation {
-            exploredCirclesManager.addLocation(currentLocation)
-            
-            // Haritayı kullanıcı konumuna ortalamaya devam et (yumuşak geçiş)
-            if context.coordinator.hasSetInitialRegion {
-                let currentRegion = mapView.region
-                let newRegion = MKCoordinateRegion(
-                    center: currentLocation.coordinate,
-                    span: currentRegion.span // Mevcut zoom seviyesini koru
-                )
-                mapView.setRegion(newRegion, animated: true) // Yumuşak geçiş
-                print("🗺️ Map centered to user location: \(currentLocation.coordinate)")
-            }
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, MKMapViewDelegate {
-        var parent: FogOfWarMapView
-        private var fogOverlay: FogOfWarOverlay?
-        var hasSetInitialRegion: Bool = false
-        
-        init(_ parent: FogOfWarMapView) {
-            self.parent = parent
-        }
-        
-        func updateOverlay(mapView: MKMapView, exploredCircles: [CLLocationCoordinate2D]) {
-            // Eski overlay'i kaldır
-            if let existingOverlay = fogOverlay {
-                mapView.removeOverlay(existingOverlay)
-            }
-            
-            // Yeni overlay ekle
-            let newOverlay = FogOfWarOverlay(center: CLLocationCoordinate2D(latitude: 0, longitude: 0))
-            fogOverlay = newOverlay
-            mapView.addOverlay(newOverlay)
-        }
-        
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if let fogOverlay = overlay as? FogOfWarOverlay {
-                return FogOfWarRenderer(overlay: fogOverlay, exploredCircles: parent.exploredCirclesManager.exploredCircles)
-            }
-            return MKOverlayRenderer(overlay: overlay)
-        }
-    }
-}
+// Map view artık ayrı dosyada - Views/MapView/FogOfWarMapView.swift
 
 #Preview {
     ContentView()

@@ -1,0 +1,454 @@
+import SwiftUI
+
+struct SettingsView: View {
+    @StateObject private var settings = AppSettings.shared
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingResetAlert = false
+    @State private var showingDataResetAlert = false
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                // MARK: - Location Tracking Section
+                Section {
+                    // Tracking Distance
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "location.circle")
+                                .foregroundColor(.blue)
+                            Text("Konum Takip Mesafesi")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Tracking Distance", selection: $settings.locationTrackingDistance) {
+                            ForEach(AppSettings.trackingDistanceOptions, id: \.value) { option in
+                                VStack(alignment: .leading) {
+                                    Text(option.label)
+                                        .font(.body)
+                                    Text(option.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .tag(option.value)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Mevcut: \(settings.currentTrackingOption.description)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Auto Map Centering
+                    HStack {
+                        Image(systemName: "scope")
+                            .foregroundColor(.green)
+                        VStack(alignment: .leading) {
+                            Text("Otomatik Harita Ortalama")
+                                .font(.headline)
+                            Text("Konum değişiminde haritayı otomatik ortala")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.autoMapCentering)
+                    }
+                    
+                    // Preserve Zoom/Pan
+                    HStack {
+                        Image(systemName: "hand.draw")
+                            .foregroundColor(.orange)
+                        VStack(alignment: .leading) {
+                            Text("Zoom/Pan Koruması")
+                                .font(.headline)
+                            Text("Kullanıcı etkileşimlerini koru")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.preserveZoomPan)
+                    }
+                    
+                } header: {
+                    Label("Konum Takibi", systemImage: "location")
+                }
+                
+                // MARK: - Exploration Section
+                Section {
+                    // Exploration Radius
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "circle.dashed")
+                                .foregroundColor(.purple)
+                            Text("Keşif Radius'u")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Exploration Radius", selection: $settings.explorationRadius) {
+                            ForEach(AppSettings.radiusOptions, id: \.value) { option in
+                                VStack(alignment: .leading) {
+                                    Text(option.label)
+                                        .font(.body)
+                                    Text(option.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .tag(option.value)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Mevcut: \(settings.currentRadiusOption.description)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Accuracy Threshold
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "target")
+                                .foregroundColor(.red)
+                            Text("Doğruluk Eşiği")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Accuracy Threshold", selection: $settings.accuracyThreshold) {
+                            ForEach(AppSettings.accuracyOptions, id: \.value) { option in
+                                VStack(alignment: .leading) {
+                                    Text(option.label)
+                                        .font(.body)
+                                    Text(option.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .tag(option.value)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Mevcut: \(settings.currentAccuracyOption.description)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Clustering Radius
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "circle.grid.cross")
+                                .foregroundColor(.indigo)
+                            Text("Gruplandırma Radius'u")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Clustering Radius", selection: $settings.clusteringRadius) {
+                            ForEach(AppSettings.clusteringOptions, id: \.value) { option in
+                                VStack(alignment: .leading) {
+                                    Text(option.label)
+                                        .font(.body)
+                                    Text(option.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .tag(option.value)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Mevcut: \(settings.currentClusteringOption.description)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                } header: {
+                    Label("Keşif Ayarları", systemImage: "map")
+                }
+                
+                // MARK: - Grid & Percentage Section
+                Section {
+                    // Grid Resolution
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "grid")
+                                .foregroundColor(.cyan)
+                            Text("Grid Çözünürlüğü")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Grid Resolution", selection: $settings.gridResolution) {
+                            Text("0.005° (~550m) - Detaylı").tag(0.005)
+                            Text("0.001° (~111m) - Çok Detaylı").tag(0.001)
+                            Text("0.01° (~1.1km) - Hızlı").tag(0.01)
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Küçük grid = daha hassas hesaplama, büyük grid = daha hızlı")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Percentage Decimals
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "percent")
+                                .foregroundColor(.mint)
+                            Text("Yüzde Hassasiyeti")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Percentage Decimals", selection: $settings.percentageDecimals) {
+                            Text("2 basamak (0.01%)").tag(2)
+                            Text("4 basamak (0.0001%)").tag(4)
+                            Text("6 basamak (0.000001%)").tag(6)
+                            Text("8 basamak (0.00000001%)").tag(8)
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text("Mevcut: \(GridHashManager.shared.getExplorationPercentage()) keşfedildi")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Enable Exploration Stats
+                    HStack {
+                        Image(systemName: "chart.bar.fill")
+                            .foregroundColor(.green)
+                        VStack(alignment: .leading) {
+                            Text("Keşif İstatistikleri")
+                                .font(.headline)
+                            Text("Real-time yüzde hesaplama")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.enableExplorationStats)
+                    }
+                    
+                } header: {
+                    Label("Grid & Yüzde Ayarları", systemImage: "chart.pie")
+                }
+                
+                // MARK: - Map Section
+                Section {
+                    // Map Type
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "map")
+                                .foregroundColor(.blue)
+                            Text("Harita Türü")
+                                .font(.headline)
+                        }
+                        
+                        Picker("Map Type", selection: $settings.mapType) {
+                            Text("Standart").tag(0)
+                            Text("Uydu").tag(1)
+                            Text("Hibrit").tag(2)
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                    
+                    // Show User Location
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(.blue)
+                        VStack(alignment: .leading) {
+                            Text("Kullanıcı Konumunu Göster")
+                                .font(.headline)
+                            Text("Haritada mavi nokta göster")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.showUserLocation)
+                    }
+                    
+                    // Enable Pitch
+                    HStack {
+                        Image(systemName: "rotate.3d")
+                            .foregroundColor(.gray)
+                        VStack(alignment: .leading) {
+                            Text("3D Eğim")
+                                .font(.headline)
+                            Text("Harita eğimini etkinleştir")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.enablePitch)
+                    }
+                    
+                    // Enable Rotation
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                            .foregroundColor(.gray)
+                        VStack(alignment: .leading) {
+                            Text("Harita Döndürme")
+                                .font(.headline)
+                            Text("Harita döndürmeyi etkinleştir")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.enableRotation)
+                    }
+                    
+                } header: {
+                    Label("Harita Ayarları", systemImage: "map.fill")
+                }
+                
+                // MARK: - Privacy Section
+                Section {
+                    // Enable Geocoding
+                    HStack {
+                        Image(systemName: "globe")
+                            .foregroundColor(.green)
+                        VStack(alignment: .leading) {
+                            Text("Coğrafi Kodlama")
+                                .font(.headline)
+                            Text("Şehir/ülke bilgilerini al")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.enableGeocoding)
+                    }
+                    
+                    // Offline Mode
+                    HStack {
+                        Image(systemName: "airplane")
+                            .foregroundColor(.orange)
+                        VStack(alignment: .leading) {
+                            Text("Çevrimdışı Mod")
+                                .font(.headline)
+                            Text("İnternet bağlantısı kullanma")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.offlineMode)
+                    }
+                    
+                } header: {
+                    Label("Gizlilik", systemImage: "lock.shield")
+                }
+                
+                // MARK: - Performance Section
+                Section {
+                    // Max Regions in Memory
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "memorychip")
+                                .foregroundColor(.red)
+                            Text("Bellekteki Maksimum Bölge")
+                                .font(.headline)
+                        }
+                        
+                        HStack {
+                            Text("100")
+                                .font(.caption)
+                            Slider(value: Binding(
+                                get: { Double(settings.maxRegionsInMemory) },
+                                set: { settings.maxRegionsInMemory = Int($0) }
+                            ), in: 100...5000, step: 100)
+                            Text("5000")
+                                .font(.caption)
+                        }
+                        
+                        Text("Mevcut: \(settings.maxRegionsInMemory) bölge")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Background Processing
+                    HStack {
+                        Image(systemName: "gearshape.2")
+                            .foregroundColor(.purple)
+                        VStack(alignment: .leading) {
+                            Text("Arka Plan İşleme")
+                                .font(.headline)
+                            Text("Arka planda veri işle")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.backgroundProcessing)
+                    }
+                    
+                } header: {
+                    Label("Performans", systemImage: "speedometer")
+                }
+                
+                // MARK: - Reset Section
+                Section {
+                    Button(action: {
+                        showingDataResetAlert = true
+                    }) {
+                        HStack {
+                            Image(systemName: "trash.fill")
+                                .foregroundColor(.red)
+                            Text("Tüm Keşif Verilerini Sil")
+                                .foregroundColor(.red)
+                        }
+                    }
+                    
+                    Button(action: {
+                        showingResetAlert = true
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                                .foregroundColor(.orange)
+                            Text("Varsayılan Ayarlara Sıfırla")
+                                .foregroundColor(.orange)
+                        }
+                    }
+                } header: {
+                    Label("Sıfırlama", systemImage: "trash")
+                }
+            }
+            .navigationTitle("Ayarlar")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Tamam") {
+                        dismiss()
+                    }
+                }
+            }
+            .alert("Ayarları Sıfırla", isPresented: $showingResetAlert) {
+                Button("Sıfırla", role: .destructive) {
+                    settings.resetToDefaults()
+                }
+                Button("İptal", role: .cancel) { }
+            } message: {
+                Text("Tüm ayarlar varsayılan değerlerine sıfırlanacak. Bu işlem geri alınamaz.")
+            }
+            .alert("Keşif Verilerini Sil", isPresented: $showingDataResetAlert) {
+                Button("Sil", role: .destructive) {
+                    clearAllData()
+                }
+                Button("İptal", role: .cancel) { }
+            } message: {
+                Text("Tüm keşfedilen bölgeler ve SQLite veritabanı silinecek. Bu işlem geri alınamaz.")
+            }
+        }
+    }
+    
+    private func clearAllData() {
+        // VisitedRegionManager'dan tüm verileri sil
+        VisitedRegionManager.shared.clearAllData()
+        
+        // GridHashManager'dan tüm verileri sil
+        GridHashManager.shared.clearAll()
+        
+        // ExploredCirclesManager instance-based olduğu için burada sıfırlamaya gerek yok
+        // Sadece VisitedRegionManager ve GridHashManager yeterli
+        
+        print("🗑️ All exploration data cleared successfully")
+    }
+}
+
+// MARK: - Preview
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView()
+    }
+} 

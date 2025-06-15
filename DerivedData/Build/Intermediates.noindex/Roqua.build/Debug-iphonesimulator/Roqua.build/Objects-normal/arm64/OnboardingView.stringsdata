@@ -1,0 +1,208 @@
+{
+  "source": "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/OnboardingView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Roqua",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kendi dünyeni keşfet",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gezdiğin her yer, haritanda aydınlanır",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Başla",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Roqua Nasıl Çalışır?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 154
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sade, güvenli ve tamamen senin",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 160
+        }
+      },
+      {
+        "comment": "",
+        "key": "Devam Et",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gizliliğin Öncelik",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 252
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sadece konumun gerekli, o da sadece cihazında",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 283
+        }
+      },
+      {
+        "comment": "",
+        "key": "Güvenli, Devam Et",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konum İzni",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gezdiğin yerleri takip edebilmek için konum izni gerekli",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 359
+        }
+      },
+      {
+        "comment": "",
+        "key": "İzin isteniyor...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "İzin Verildi, Devam Et",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sürekli İzin Verildi, Devam Et",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 414
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konum izni reddedildi",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 425
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ayarlara Git",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 429
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konum İzni Ver",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sürekli Takip",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 475
+        }
+      },
+      {
+        "comment": "",
+        "key": "Uygulamayı kapatsan bile keşifler devam etsin",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 480
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sürekli izin isteniyor...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tamamlandı! Roqua'ya Başla",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 522
+        }
+      },
+      {
+        "comment": "",
+        "key": "Şimdilik Atla",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 552
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sürekli İzin Ver",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 541
+        }
+      },
+      {
+        "comment": "",
+        "key": "Roqua'ya Başla",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 561
+        }
+      }
+    ]
+  },
+  "version": 1
+}

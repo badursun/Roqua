@@ -1,0 +1,18 @@
+{
+  "" : {
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests-master.dia",
+    "emit-module-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests-master-emit-module.dia",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests-master.swiftdeps"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/RoquaTests/RoquaTests.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/RoquaTests.build/Objects-normal/arm64/RoquaTests~partial.swiftmodule"
+  }
+}
