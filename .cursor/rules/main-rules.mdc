@@ -6,9 +6,11 @@ alwaysApply: false
 # Genel Kurallar
 - Ürün İsmi: Roqua
 - Github Repo: https://github.com/badursun/Roqua
+- Bundle ID: `com.adjans.roqua.Roqua`
 - "Push Et" komutunu kullanıcıdan almadan asla push etme
 - `prd.md` ve `main-todo-list.md` kurallarına ve akışına sadık kal
-- Her zaman `iPhone 16 Pro` ile build al.
+- Her zaman `iPhone 16 Pro` ile build al, test et.
+- Bir kod değişiklik kümesini tamamladığında build ediliyormu erken test yap
 
 # Yazılım Kodlama Standartları
 - Yazılım Dili: Swift + SwiftUI

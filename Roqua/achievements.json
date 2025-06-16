@@ -1,0 +1,230 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-01-15T00:00:00Z",
+  "achievements": [
+    {
+      "id": "first_steps",
+      "category": "firstSteps",
+      "type": "milestone",
+      "title": "İlk Adımlar",
+      "description": "İlk 10 bölgeyi keşfet",
+      "iconName": "figure.walk",
+      "target": 10,
+      "isHidden": false,
+      "rarity": "common",
+      "calculator": "milestone",
+      "params": null
+    },
+    {
+      "id": "explorer_100",
+      "category": "explorer",
+      "type": "milestone",
+      "title": "Kaşif",
+      "description": "100 bölge keşfet",
+      "iconName": "binoculars.fill",
+      "target": 100,
+      "isHidden": false,
+      "rarity": "common",
+      "calculator": "milestone",
+      "params": null
+    },
+    {
+      "id": "adventurer_1000",
+      "category": "adventurer",
+      "type": "milestone",
+      "title": "Maceracı",
+      "description": "1000 bölge keşfet",
+      "iconName": "backpack.fill",
+      "target": 1000,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "milestone",
+      "params": null
+    },
+    {
+      "id": "world_traveler_10000",
+      "category": "worldTraveler",
+      "type": "milestone",
+      "title": "Dünya Gezgini",
+      "description": "10000 bölge keşfet",
+      "iconName": "airplane.departure",
+      "target": 10000,
+      "isHidden": false,
+      "rarity": "legendary",
+      "calculator": "milestone",
+      "params": null
+    },
+    {
+      "id": "istanbul_master",
+      "category": "cityMaster",
+      "type": "geographic",
+      "title": "İstanbul Ustası",
+      "description": "İstanbul'da 50+ bölge keşfet",
+      "iconName": "building.2.fill",
+      "target": 50,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "city",
+      "params": {
+        "cityName": "İstanbul"
+      }
+    },
+    {
+      "id": "ankara_master",
+      "category": "cityMaster",
+      "type": "geographic",
+      "title": "Ankara Uzmanı",
+      "description": "Ankara'da 30+ bölge keşfet",
+      "iconName": "building.columns.fill",
+      "target": 30,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "city",
+      "params": {
+        "cityName": "Ankara"
+      }
+    },
+    {
+      "id": "district_explorer_10",
+      "category": "districtExplorer",
+      "type": "geographic",
+      "title": "İlçe Kaşifi",
+      "description": "10+ farklı ilçe keşfet",
+      "iconName": "map.fill",
+      "target": 10,
+      "isHidden": false,
+      "rarity": "common",
+      "calculator": "district",
+      "params": null
+    },
+    {
+      "id": "district_explorer_25",
+      "category": "districtExplorer",
+      "type": "geographic",
+      "title": "İlçe Uzmanı",
+      "description": "25+ farklı ilçe keşfet",
+      "iconName": "map.circle.fill",
+      "target": 25,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "district",
+      "params": null
+    },
+    {
+      "id": "country_collector_5",
+      "category": "countryCollector",
+      "type": "geographic",
+      "title": "Dünya Gezgini",
+      "description": "5+ ülke ziyaret et",
+      "iconName": "globe.europe.africa.fill",
+      "target": 5,
+      "isHidden": false,
+      "rarity": "epic",
+      "calculator": "country",
+      "params": null
+    },
+    {
+      "id": "country_collector_10",
+      "category": "countryCollector",
+      "type": "geographic",
+      "title": "Kıta Aşan",
+      "description": "10+ ülke ziyaret et",
+      "iconName": "globe.americas.fill",
+      "target": 10,
+      "isHidden": false,
+      "rarity": "legendary",
+      "calculator": "country",
+      "params": null
+    },
+    {
+      "id": "area_explorer_1km",
+      "category": "areaExplorer",
+      "type": "exploration",
+      "title": "Alan Kaşifi",
+      "description": "1 km² alan keşfet",
+      "iconName": "square.grid.3x3.fill",
+      "target": 1000000,
+      "isHidden": false,
+      "rarity": "common",
+      "calculator": "area",
+      "params": {
+        "unit": "square_meters"
+      }
+    },
+    {
+      "id": "area_explorer_10km",
+      "category": "areaExplorer",
+      "type": "exploration",
+      "title": "Alan Ustası",
+      "description": "10 km² alan keşfet",
+      "iconName": "square.grid.4x3.fill",
+      "target": 10000000,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "area",
+      "params": {
+        "unit": "square_meters"
+      }
+    },
+    {
+      "id": "percentage_001",
+      "category": "percentageMilestone",
+      "type": "exploration",
+      "title": "Dünya'nın Binde Biri",
+      "description": "Dünya'nın %0.001'ini keşfet",
+      "iconName": "percent",
+      "target": 1,
+      "isHidden": false,
+      "rarity": "epic",
+      "calculator": "percentage",
+      "params": {
+        "multiplier": 1000
+      }
+    },
+    {
+      "id": "percentage_01",
+      "category": "percentageMilestone",
+      "type": "exploration",
+      "title": "Dünya'nın Yüzde Biri",
+      "description": "Dünya'nın %0.01'ini keşfet",
+      "iconName": "globe.central.south.asia.fill",
+      "target": 10,
+      "isHidden": false,
+      "rarity": "legendary",
+      "calculator": "percentage",
+      "params": {
+        "multiplier": 1000
+      }
+    },
+    {
+      "id": "daily_explorer_7",
+      "category": "dailyExplorer",
+      "type": "temporal",
+      "title": "Günlük Kaşif",
+      "description": "7 gün üst üste keşif yap",
+      "iconName": "calendar.badge.checkmark",
+      "target": 7,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "daily_streak",
+      "params": {
+        "type": "consecutive_days"
+      }
+    },
+    {
+      "id": "weekend_warrior",
+      "category": "weekendWarrior",
+      "type": "temporal",
+      "title": "Hafta Sonu Savaşçısı",
+      "description": "4 hafta sonu üst üste keşif yap",
+      "iconName": "sun.max.fill",
+      "target": 4,
+      "isHidden": false,
+      "rarity": "rare",
+      "calculator": "weekend_streak",
+      "params": {
+        "type": "consecutive_weekends"
+      }
+    }
+  ]
+} 

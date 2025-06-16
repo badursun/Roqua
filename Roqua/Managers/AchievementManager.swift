@@ -98,6 +98,7 @@ class AchievementManager: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var needsSave = false
     private var saveTimer: Timer?
+    private var achievementDefinitions: [AchievementDefinition] = []
     
     private init() {
         setupAchievements()
@@ -110,203 +111,40 @@ class AchievementManager: ObservableObject {
     // MARK: - Setup
     
     private func setupAchievements() {
-        achievements = [
-            // Geographic Achievements
-            Achievement(
-                id: "istanbul_master",
-                category: .cityMaster,
-                type: .geographic,
-                title: "İstanbul Ustası",
-                description: "İstanbul'da 50+ bölge keşfet",
-                iconName: "building.2.fill",
-                target: 50,
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "ankara_master",
-                category: .cityMaster,
-                type: .geographic,
-                title: "Ankara Uzmanı",
-                description: "Ankara'da 30+ bölge keşfet",
-                iconName: "building.columns.fill",
-                target: 30,
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "district_explorer_10",
-                category: .districtExplorer,
-                type: .geographic,
-                title: "İlçe Kaşifi",
-                description: "10+ farklı ilçe keşfet",
-                iconName: "map.fill",
-                target: 10,
-                isHidden: false,
-                rarity: .common
-            ),
-            
-            Achievement(
-                id: "district_explorer_25",
-                category: .districtExplorer,
-                type: .geographic,
-                title: "İlçe Uzmanı",
-                description: "25+ farklı ilçe keşfet",
-                iconName: "map.circle.fill",
-                target: 25,
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "country_collector_5",
-                category: .countryCollector,
-                type: .geographic,
-                title: "Dünya Gezgini",
-                description: "5+ ülke ziyaret et",
-                iconName: "globe.europe.africa.fill",
-                target: 5,
-                isHidden: false,
-                rarity: .epic
-            ),
-            
-            Achievement(
-                id: "country_collector_10",
-                category: .countryCollector,
-                type: .geographic,
-                title: "Kıta Aşan",
-                description: "10+ ülke ziyaret et",
-                iconName: "globe.americas.fill",
-                target: 10,
-                isHidden: false,
-                rarity: .legendary
-            ),
-            
-            // Exploration Achievements
-            Achievement(
-                id: "area_explorer_1km",
-                category: .areaExplorer,
-                type: .exploration,
-                title: "Alan Kaşifi",
-                description: "1 km² alan keşfet",
-                iconName: "square.grid.3x3.fill",
-                target: 1000000, // 1 km² in m²
-                isHidden: false,
-                rarity: .common
-            ),
-            
-            Achievement(
-                id: "area_explorer_10km",
-                category: .areaExplorer,
-                type: .exploration,
-                title: "Alan Ustası",
-                description: "10 km² alan keşfet",
-                iconName: "square.grid.4x3.fill",
-                target: 10000000, // 10 km² in m²
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "percentage_001",
-                category: .percentageMilestone,
-                type: .exploration,
-                title: "Dünya'nın Binde Biri",
-                description: "Dünya'nın %0.001'ini keşfet",
-                iconName: "percent",
-                target: 1, // 0.001% * 1000 for easier calculation
-                isHidden: false,
-                rarity: .epic
-            ),
-            
-            Achievement(
-                id: "percentage_01",
-                category: .percentageMilestone,
-                type: .exploration,
-                title: "Dünya'nın Yüzde Biri",
-                description: "Dünya'nın %0.01'ini keşfet",
-                iconName: "globe.central.south.asia.fill",
-                target: 10, // 0.01% * 1000
-                isHidden: false,
-                rarity: .legendary
-            ),
-            
-            // Milestone Achievements
-            Achievement(
-                id: "first_steps",
-                category: .firstSteps,
-                type: .milestone,
-                title: "İlk Adımlar",
-                description: "İlk 10 bölgeyi keşfet",
-                iconName: "figure.walk",
-                target: 10,
-                isHidden: false,
-                rarity: .common
-            ),
-            
-            Achievement(
-                id: "explorer_100",
-                category: .explorer,
-                type: .milestone,
-                title: "Kaşif",
-                description: "100 bölge keşfet",
-                iconName: "binoculars.fill",
-                target: 100,
-                isHidden: false,
-                rarity: .common
-            ),
-            
-            Achievement(
-                id: "adventurer_1000",
-                category: .adventurer,
-                type: .milestone,
-                title: "Maceracı",
-                description: "1000 bölge keşfet",
-                iconName: "backpack.fill",
-                target: 1000,
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "world_traveler_10000",
-                category: .worldTraveler,
-                type: .milestone,
-                title: "Dünya Gezgini",
-                description: "10000 bölge keşfet",
-                iconName: "airplane.departure",
-                target: 10000,
-                isHidden: false,
-                rarity: .legendary
-            ),
-            
-            // Temporal Achievements
-            Achievement(
-                id: "daily_explorer_7",
-                category: .dailyExplorer,
-                type: .temporal,
-                title: "Günlük Kaşif",
-                description: "7 gün üst üste keşif yap",
-                iconName: "calendar.badge.checkmark",
-                target: 7,
-                isHidden: false,
-                rarity: .rare
-            ),
-            
-            Achievement(
-                id: "weekend_warrior",
-                category: .weekendWarrior,
-                type: .temporal,
-                title: "Hafta Sonu Savaşçısı",
-                description: "4 hafta sonu üst üste keşif yap",
-                iconName: "sun.max.fill",
-                target: 4,
-                isHidden: false,
-                rarity: .rare
-            )
-        ]
+        loadAchievementsFromJSON()
+    }
+    
+    private func loadAchievementsFromJSON() {
+        guard let url = Bundle.main.url(forResource: "achievements", withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
+            print("❌ Failed to load achievements.json")
+            achievements = [] // Fallback to empty
+            return
+        }
+        
+        do {
+            let config = try JSONDecoder().decode(AchievementConfig.self, from: data)
+            achievementDefinitions = config.achievements
+            achievements = achievementDefinitions.map { convertToAchievement($0) }
+            print("✅ Loaded \(achievements.count) achievements from JSON")
+        } catch {
+            print("❌ JSON parsing error: \(error)")
+            achievements = [] // Fallback
+        }
+    }
+    
+    private func convertToAchievement(_ def: AchievementDefinition) -> Achievement {
+        return Achievement(
+            id: def.id,
+            category: AchievementCategory(rawValue: def.category) ?? .firstSteps,
+            type: AchievementType(rawValue: def.type) ?? .milestone,
+            title: def.title,
+            description: def.description,
+            iconName: def.iconName,
+            target: def.target,
+            isHidden: def.isHidden,
+            rarity: Achievement.AchievementRarity(rawValue: def.rarity) ?? .common
+        )
     }
     
     private func setupEventListeners() {
@@ -341,26 +179,15 @@ class AchievementManager: ObservableObject {
     }
     
     private func calculateProgress(for achievement: Achievement, with regions: [VisitedRegion]) -> AchievementProgress {
+        // Use Calculator Factory with dynamic achievement definition
         let currentProgress: Int
         
-        switch achievement.category {
-        case .cityMaster:
-            currentProgress = calculateCityMasterProgress(achievement: achievement, regions: regions)
-        case .districtExplorer:
-            currentProgress = calculateDistrictExplorerProgress(regions: regions)
-        case .countryCollector:
-            currentProgress = calculateCountryCollectorProgress(regions: regions)
-        case .areaExplorer:
-            currentProgress = calculateAreaExplorerProgress(regions: regions)
-        case .percentageMilestone:
-            currentProgress = calculatePercentageMilestoneProgress()
-        case .firstSteps, .explorer, .adventurer, .worldTraveler:
-            currentProgress = regions.count
-        case .dailyExplorer:
-            currentProgress = calculateDailyStreakProgress(regions: regions)
-        case .weekendWarrior:
-            currentProgress = calculateWeekendWarriorProgress(regions: regions)
-        default:
+        if let definition = achievementDefinitions.first(where: { $0.id == achievement.id }) {
+            let calculator = CalculatorFactory.getCalculator(for: definition.calculator)
+            let params = definition.params?.mapValues { $0.value }
+            currentProgress = calculator.calculate(regions: regions, params: params)
+        } else {
+            print("⚠️ No definition found for achievement: \(achievement.id)")
             currentProgress = 0
         }
         
@@ -378,91 +205,7 @@ class AchievementManager: ObservableObject {
         )
     }
     
-    // MARK: - Specific Progress Calculations
-    
-    private func calculateCityMasterProgress(achievement: Achievement, regions: [VisitedRegion]) -> Int {
-        let cityName: String
-        
-        switch achievement.id {
-        case "istanbul_master":
-            cityName = "İstanbul"
-        case "ankara_master":
-            cityName = "Ankara"
-        default:
-            return 0
-        }
-        
-        return regions.filter { $0.city?.contains(cityName) == true }.count
-    }
-    
-    private func calculateDistrictExplorerProgress(regions: [VisitedRegion]) -> Int {
-        let uniqueDistricts = Set(regions.compactMap { $0.district })
-        return uniqueDistricts.count
-    }
-    
-    private func calculateCountryCollectorProgress(regions: [VisitedRegion]) -> Int {
-        let uniqueCountries = Set(regions.compactMap { $0.country })
-        return uniqueCountries.count
-    }
-    
-    private func calculateAreaExplorerProgress(regions: [VisitedRegion]) -> Int {
-        let totalArea = regions.reduce(0.0) { total, region in
-            let areaInSquareMeters = Double(region.radius * region.radius) * .pi
-            return total + areaInSquareMeters
-        }
-        return Int(totalArea)
-    }
-    
-    private func calculatePercentageMilestoneProgress() -> Int {
-        let percentage = GridHashManager.shared.explorationPercentage
-        return Int(percentage * 1000) // Convert to easier integer calculation
-    }
-    
-    private func calculateDailyStreakProgress(regions: [VisitedRegion]) -> Int {
-        // Calculate consecutive days with exploration
-        let calendar = Calendar.current
-        let sortedDates = regions
-            .map { calendar.startOfDay(for: $0.timestampStart) }
-            .sorted()
-        
-        guard !sortedDates.isEmpty else { return 0 }
-        
-        var maxStreak = 1
-        var currentStreak = 1
-        
-        for i in 1..<sortedDates.count {
-            let daysDifference = calendar.dateComponents([.day], from: sortedDates[i-1], to: sortedDates[i]).day ?? 0
-            
-            if daysDifference == 1 {
-                currentStreak += 1
-                maxStreak = max(maxStreak, currentStreak)
-            } else if daysDifference > 1 {
-                currentStreak = 1
-            }
-        }
-        
-        return maxStreak
-    }
-    
-    private func calculateWeekendWarriorProgress(regions: [VisitedRegion]) -> Int {
-        let calendar = Calendar.current
-        let weekendRegions = regions.filter { region in
-            let weekday = calendar.component(.weekday, from: region.timestampStart)
-            return weekday == 1 || weekday == 7 // Sunday or Saturday
-        }
-        
-        // Group by weekend and count consecutive weekends
-        let weekendDates = weekendRegions
-            .map { calendar.startOfDay(for: $0.timestampStart) }
-            .sorted()
-        
-        // Simplified calculation - count unique weekends
-        let uniqueWeekends = Set(weekendDates.map { date in
-            calendar.dateInterval(of: .weekOfYear, for: date)?.start ?? date
-        })
-        
-        return uniqueWeekends.count
-    }
+
     
     // MARK: - Progress Management
     
@@ -844,43 +587,40 @@ class AchievementManager: ObservableObject {
     // MARK: - Smart Achievement Checkers
     
     private func checkMilestoneAchievements() {
-        let regionCount = visitedRegionManager.visitedRegions.count
         let milestoneAchievements = achievements.filter { 
             $0.category == .firstSteps || $0.category == .explorer || 
             $0.category == .adventurer || $0.category == .worldTraveler 
         }
         
         for achievement in milestoneAchievements {
-            if regionCount >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: regionCount)
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
     
     private func checkAreaAchievements() {
-        let totalArea = visitedRegionManager.visitedRegions.reduce(0.0) { total, region in
-            total + region.areaSquareMeters
-        }
-        
         let areaAchievements = achievements.filter { $0.category == .areaExplorer }
         
         for achievement in areaAchievements {
-            let currentProgress = Int(totalArea)
-            if currentProgress >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: currentProgress)
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
     
     private func checkPercentageAchievements() {
-        let percentage = GridHashManager.shared.explorationPercentage
-        let percentageInt = Int(percentage * 1000) // Convert to easier integer calculation
-        
         let percentageAchievements = achievements.filter { $0.category == .percentageMilestone }
         
         for achievement in percentageAchievements {
-            if percentageInt >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: percentageInt)
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
@@ -889,38 +629,35 @@ class AchievementManager: ObservableObject {
         let cityAchievements = achievements.filter { $0.category == .cityMaster }
         
         for achievement in cityAchievements {
-            let cityRegions = visitedRegionManager.visitedRegions.filter { 
-                $0.city?.contains(getCityNameForAchievement(achievement.id)) == true 
-            }
+            // Use dynamic calculation with JSON parameters
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
             
-            if cityRegions.count >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: cityRegions.count)
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
     
     private func checkDistrictAchievements() {
-        let uniqueDistricts = Set(visitedRegionManager.visitedRegions.compactMap { $0.district })
-        let districtCount = uniqueDistricts.count
-        
         let districtAchievements = achievements.filter { $0.category == .districtExplorer }
         
         for achievement in districtAchievements {
-            if districtCount >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: districtCount)
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
     
     private func checkCountryAchievements() {
-        let uniqueCountries = Set(visitedRegionManager.visitedRegions.compactMap { $0.country })
-        let countryCount = uniqueCountries.count
-        
         let countryAchievements = achievements.filter { $0.category == .countryCollector }
         
         for achievement in countryAchievements {
-            if countryCount >= achievement.target {
-                checkAndUnlockAchievement(achievement, currentProgress: countryCount)
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
             }
         }
     }
@@ -947,14 +684,5 @@ class AchievementManager: ObservableObject {
         }
     }
     
-    private func getCityNameForAchievement(_ achievementId: String) -> String {
-        switch achievementId {
-        case "istanbul_master":
-            return "İstanbul"
-        case "ankara_master":
-            return "Ankara"
-        default:
-            return ""
-        }
-    }
+
 } 

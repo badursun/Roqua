@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roqua Achievement Configurator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏆 Roqua Achievement Configurator</h1>
+            <div class="header-actions">
+                <button id="import-btn" class="btn btn-secondary">📁 JSON İçe Aktar</button>
+                <button id="export-btn" class="btn btn-secondary">💾 JSON Dışa Aktar</button>
+                <button id="add-btn" class="btn btn-primary">+ Yeni Başarım</button>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Toplam Başarım</span>
+                <span id="total-count" class="stat-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Kategoriler</span>
+                <span id="category-count" class="stat-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Calculator Türleri</span>
+                <span id="calculator-count" class="stat-value">0</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <h3>Filtreler</h3>
+                    <div class="filter-group">
+                        <label for="category-filter">Kategori</label>
+                        <select id="category-filter">
+                            <option value="">Tümü</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="rarity-filter">Nadir</label>
+                        <select id="rarity-filter">
+                            <option value="">Tümü</option>
+                            <option value="common">Common</option>
+                            <option value="rare">Rare</option>
+                            <option value="epic">Epic</option>
+                            <option value="legendary">Legendary</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="calculator-filter">Calculator</label>
+                        <select id="calculator-filter">
+                            <option value="">Tümü</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button id="clear-filters" class="btn btn-text">Filtreleri Temizle</button>
+                    </div>
+                </div>
+
+                <div class="group-section">
+                    <h3>Gruplar</h3>
+                    <div id="category-groups"></div>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="content-header">
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Başarım ara...">
+                        <button id="search-btn">🔍</button>
+                    </div>
+                    <div class="view-toggle">
+                        <button id="grid-view" class="view-btn active">⊞ Grid</button>
+                        <button id="list-view" class="view-btn">☰ Liste</button>
+                    </div>
+                </div>
+
+                <div id="achievements-container" class="achievements-grid">
+                    <!-- Achievement cards will be populated here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Achievement Form Modal -->
+    <div id="achievement-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Yeni Başarım</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="achievement-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="achievement-id">ID *</label>
+                        <input type="text" id="achievement-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievement-category">Kategori *</label>
+                        <input type="text" id="achievement-category" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="achievement-title">Başlık *</label>
+                        <input type="text" id="achievement-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievement-type">Tür</label>
+                        <select id="achievement-type">
+                            <option value="geographic">Geographic</option>
+                            <option value="milestone">Milestone</option>
+                            <option value="exploration">Exploration</option>
+                            <option value="temporal">Temporal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-description">Açıklama *</label>
+                    <textarea id="achievement-description" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="achievement-icon">İkon</label>
+                        <input type="text" id="achievement-icon" placeholder="figure.walk">
+                    </div>
+                    <div class="form-group">
+                        <label for="achievement-target">Hedef *</label>
+                        <input type="number" id="achievement-target" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="achievement-rarity">Nadir</label>
+                        <select id="achievement-rarity">
+                            <option value="common">Common</option>
+                            <option value="rare">Rare</option>
+                            <option value="epic">Epic</option>
+                            <option value="legendary">Legendary</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievement-calculator">Calculator *</label>
+                        <select id="achievement-calculator" required>
+                            <option value="milestone">Milestone</option>
+                            <option value="city">City</option>
+                            <option value="district">District</option>
+                            <option value="country">Country</option>
+                            <option value="area">Area</option>
+                            <option value="percentage">Percentage</option>
+                            <option value="daily_streak">Daily Streak</option>
+                            <option value="weekend_streak">Weekend Streak</option>
+                            <option value="multi_city">Multi City</option>
+                            <option value="time_range">Time Range</option>
+                            <option value="conditional">Conditional</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-params">Parametreler (JSON)</label>
+                    <textarea id="achievement-params" placeholder='{"cityName": "İstanbul"}'></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="achievement-hidden">
+                        Gizli Başarım
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-btn">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Başarımı Sil</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <p>Bu başarımı silmek istediğinizden emin misiniz?</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-delete">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".json" style="display: none;">
+
+    <script src="achievement-manager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
