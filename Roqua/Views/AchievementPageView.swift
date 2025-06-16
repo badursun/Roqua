@@ -1,9 +1,23 @@
 import SwiftUI
 
+// MARK: - Achievement Filter Options
+enum AchievementFilter: String, CaseIterable {
+    case all = "Hepsi"
+    case unlocked = "Kazanılanlar"
+    
+    var icon: String {
+        switch self {
+        case .all: return "list.bullet"
+        case .unlocked: return "trophy.fill"
+        }
+    }
+}
+
 // MARK: - Main Achievement Page
 struct AchievementPageView: View {
     @StateObject private var achievementManager = AchievementManager.shared
-    @State private var selectedTab = 0
+    @State private var selectedFilter: AchievementFilter = .all
+    @State private var selectedAchievement: Achievement?
     
     var body: some View {
         ZStack {
@@ -16,41 +30,45 @@ struct AchievementPageView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Compact Header Summary
-                CompactAchievementSummary()
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
+                // Full Page Scroll Content
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Compact Header Summary
+                        CompactAchievementSummary()
+                            .padding(.horizontal)
+                        
+                        // Content Based on Filter
+                        AchievementContentView(filter: selectedFilter, selectedAchievement: $selectedAchievement)
+                            .padding(.bottom, 100) // Space for footer buttons
+                    }
+                }
                 
-                // Enhanced Tab View with better visibility
+                // Footer Filter Buttons
                 VStack(spacing: 0) {
-                    // Custom Tab Bar
+                    // Subtle divider
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, .white.opacity(0.1), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 1)
+                    
                     HStack(spacing: 12) {
-                        TabButton(
-                            title: "Ödüllerim",
-                            icon: "trophy.fill",
-                            isSelected: selectedTab == 0,
-                            action: { selectedTab = 0 }
-                        )
-                        
-                        TabButton(
-                            title: "Tüm Ödüller",
-                            icon: "list.bullet",
-                            isSelected: selectedTab == 1,
-                            action: { selectedTab = 1 }
-                        )
+                        ForEach(AchievementFilter.allCases, id: \.rawValue) { filter in
+                            FilterButton(
+                                title: filter.rawValue,
+                                icon: filter.icon,
+                                isSelected: selectedFilter == filter,
+                                action: { selectedFilter = filter }
+                            )
+                        }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 12)
-                    
-                    // Tab Content
-                    TabView(selection: $selectedTab) {
-                        MyAchievementsView()
-                            .tag(0)
-                        
-                        AllAchievementsView()
-                            .tag(1)
-                    }
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .padding(.vertical, 12)
+                    .background(.ultraThinMaterial)
                 }
             }
         }
@@ -60,11 +78,17 @@ struct AchievementPageView: View {
         .onAppear {
             achievementManager.refreshProgress()
         }
+        .sheet(item: $selectedAchievement) { achievement in
+            AchievementDetailSheet(
+                achievement: achievement,
+                progress: achievementManager.getProgress(for: achievement.id)
+            )
+        }
     }
 }
 
-// MARK: - Custom Tab Button
-struct TabButton: View {
+// MARK: - Filter Button
+struct FilterButton: View {
     let title: String
     let icon: String
     let isSelected: Bool
@@ -87,7 +111,7 @@ struct TabButton: View {
                 
                 Spacer()
             }
-            .frame(height: 60)
+            .frame(height: 50)
             .background(
                 Group {
                     if isSelected {
@@ -470,7 +494,145 @@ struct IndividualStatCard: View {
     }
 }
 
-// MARK: - My Achievements Tab
+// MARK: - Achievement Content View (No Internal Scroll)
+struct AchievementContentView: View {
+    let filter: AchievementFilter
+    @Binding var selectedAchievement: Achievement?
+    @StateObject private var achievementManager = AchievementManager.shared
+    
+    var body: some View {
+        if filteredAchievements.isEmpty {
+            // Empty State
+            VStack(spacing: 20) {
+                Image(systemName: filter == .unlocked ? "trophy" : "list.bullet")
+                    .font(.system(size: 60))
+                    .foregroundColor(.gray)
+                
+                Text(filter == .unlocked ? "Henüz Ödül Yok" : "Ödül Bulunamadı")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+                
+                Text(filter == .unlocked ? 
+                     "Keşfetmeye başlayarak ilk ödülünü kazan!" : 
+                     "Henüz hiç ödül yok.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.top, 40)
+        } else {
+            if filter == .unlocked {
+                // Medal Grid for Unlocked Achievements
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: 4),
+                    GridItem(.flexible(), spacing: 4)
+                ], spacing: 8) {
+                    ForEach(filteredAchievements) { achievement in
+                        AchievementMedalCard(
+                            achievement: achievement,
+                            progress: achievementManager.getProgress(for: achievement.id)
+                        )
+                        .onTapGesture {
+                            selectedAchievement = achievement
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            } else {
+                // Category List for All Achievements (Enhanced Grouping)
+                LazyVStack(spacing: 24) {
+                    // Regular Achievements by Category (Sorted by target)
+                    ForEach(sortedCategories, id: \.self) { category in
+                        CategoryListSection(
+                            category: category,
+                            achievements: sortedAchievements(for: category),
+                            onAchievementTap: { achievement in
+                                selectedAchievement = achievement
+                            }
+                        )
+                    }
+                    
+                    // Hidden Achievements (if any unlocked)
+                    if !unlockedHiddenAchievements.isEmpty {
+                        HiddenAchievementsSection(
+                            achievements: unlockedHiddenAchievements,
+                            onAchievementTap: { achievement in
+                                selectedAchievement = achievement
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+    
+    private var filteredAchievements: [Achievement] {
+        switch filter {
+        case .all:
+            return achievementManager.achievements
+        case .unlocked:
+            return achievementManager.getUnlockedAchievements()
+                .sorted { achievement1, achievement2 in
+                    let progress1 = achievementManager.getProgress(for: achievement1.id)
+                    let progress2 = achievementManager.getProgress(for: achievement2.id)
+                    
+                    // Most recently unlocked first
+                    let date1 = progress1?.unlockedAt ?? Date.distantPast
+                    let date2 = progress2?.unlockedAt ?? Date.distantPast
+                    return date1 > date2
+                }
+        }
+    }
+    
+    private var groupedAchievements: [AchievementCategory: [Achievement]] {
+        let regularAchievements = filteredAchievements.filter { !$0.isHidden }
+        return Dictionary(grouping: regularAchievements) { $0.category }
+    }
+    
+    // Enhanced sorting: Category alphabetically, then by target value
+    private var sortedCategories: [AchievementCategory] {
+        return Array(groupedAchievements.keys).sorted { category1, category2 in
+            category1.rawValue < category2.rawValue
+        }
+    }
+    
+    private func sortedAchievements(for category: AchievementCategory) -> [Achievement] {
+        let categoryAchievements = groupedAchievements[category] ?? []
+        return categoryAchievements.sorted { achievement1, achievement2 in
+            let progress1 = achievementManager.getProgress(for: achievement1.id)
+            let progress2 = achievementManager.getProgress(for: achievement2.id)
+            
+            // Sort by target progress (ascending), then by unlock status
+            if progress1?.targetProgress != progress2?.targetProgress {
+                return (progress1?.targetProgress ?? 0) < (progress2?.targetProgress ?? 0)
+            }
+            
+            // If same target, unlocked ones first
+            let unlocked1 = progress1?.isUnlocked ?? false
+            let unlocked2 = progress2?.isUnlocked ?? false
+            if unlocked1 != unlocked2 {
+                return unlocked1 && !unlocked2
+            }
+            
+            // Then by title
+            return achievement1.title < achievement2.title
+        }
+    }
+    
+    private var unlockedHiddenAchievements: [Achievement] {
+        achievementManager.achievements
+            .filter { $0.isHidden }
+            .filter { achievement in
+                achievementManager.getProgress(for: achievement.id)?.isUnlocked == true
+            }
+    }
+}
+
+
+
+// MARK: - My Achievements Tab (DEPRECATED - Keeping for reference)
 struct MyAchievementsView: View {
     @StateObject private var achievementManager = AchievementManager.shared
     @State private var selectedAchievement: Achievement?

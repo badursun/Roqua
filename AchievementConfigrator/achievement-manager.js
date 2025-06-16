@@ -384,20 +384,20 @@ class AchievementManager {
     getIconDisplay(iconName) {
         if (!iconName) return '<span class="sf-icon">🏆</span>';
         
-        // SF Symbols to Unicode mapping for web compatibility
+        // SF Symbols to Unicode/Emoji mapping for web compatibility
         const sfSymbolsToUnicode = {
             // Hareket & Aktivite
-            'figure.walk': '🚶',
-            'figure.run': '🏃',
+            'figure.walk': '🚶‍♂️',
+            'figure.run': '🏃‍♂️',
             'figure.hiking': '🥾',
-            'figure.cycling': '🚴',
+            'figure.cycling': '🚴‍♂️',
             'bicycle': '🚲',
             'car.fill': '🚗',
             'bus.fill': '🚌',
             'tram.fill': '🚊',
-            'train.side.front.car': '🚂',
+            'train.side.front.car': '🚆',
             'airplane': '✈️',
-            'airplane.departure': '✈️',
+            'airplane.departure': '🛫',
             'airplane.arrival': '🛬',
             'ferry.fill': '⛴️',
             'sailboat.fill': '⛵',
@@ -405,20 +405,20 @@ class AchievementManager {
             // Lokasyon & Yerler
             'location.fill': '📍',
             'mappin': '📌',
-            'mappin.and.ellipse': '📍',
-            'mappin.circle.fill': '📍',
+            'mappin.and.ellipse': '🎯',
+            'mappin.circle.fill': '🔴',
             'pin.fill': '📌',
-            'signpost.left.fill': '🪧',
-            'signpost.right.fill': '🪧',
+            'signpost.left.fill': '↖️',
+            'signpost.right.fill': '↗️',
             
             // Yapılar & Binalar
             'house.fill': '🏠',
             'building.fill': '🏢',
-            'building.2.fill': '🏢',
+            'building.2.fill': '🏬',
             'building.columns.fill': '🏛️',
             'house.and.flag.fill': '🏛️',
             'hospital.fill': '🏥',
-            'cross.case.fill': '🏥',
+            'cross.case.fill': '⚕️',
             'graduationcap.fill': '🎓',
             'book.closed.fill': '📚',
             'storefront.fill': '🏪',
@@ -429,13 +429,13 @@ class AchievementManager {
             
             // Harita & Coğrafya
             'map.fill': '🗺️',
-            'map.circle.fill': '🗺️',
+            'map.circle.fill': '🌐',
             'globe': '🌍',
             'globe.europe.africa.fill': '🌍',
             'globe.americas.fill': '🌎',
             'globe.central.south.asia.fill': '🌏',
             'compass.drawing': '🧭',
-            'location.north.fill': '🧭',
+            'location.north.fill': '⬆️',
             'scope': '🔍',
             
             // Doğa & Çevre
@@ -451,11 +451,11 @@ class AchievementManager {
             'flame.fill': '🔥',
             
             // Zaman & Takvim
-            'clock.fill': '🕐',
+            'clock.fill': '🕰️',
             'timer': '⏲️',
             'stopwatch.fill': '⏱️',
             'calendar': '📅',
-            'calendar.badge.checkmark': '📅',
+            'calendar.badge.checkmark': '✅',
             'hourglass': '⏳',
             'alarm.fill': '⏰',
             
@@ -484,20 +484,20 @@ class AchievementManager {
             // Sayılar & İstatistik
             'chart.bar.fill': '📊',
             'chart.pie.fill': '📈',
-            'chart.line.uptrend.xyaxis': '📈',
-            'percent': '%',
-            'number': '#',
+            'chart.line.uptrend.xyaxis': '📉',
+            'percent': '💯',
+            'number': '#️⃣',
             'plus.circle.fill': '➕',
             'minus.circle.fill': '➖',
             'multiply.circle.fill': '✖️',
-            'speedometer': '⚡',
+            'speedometer': '🏃‍♂️',
             
             // Grid & Alan
-            'square.grid.3x3.fill': '⊞',
-            'square.grid.4x3.fill': '⊟',
-            'grid': '▦',
+            'square.grid.3x3.fill': '⚏',
+            'square.grid.4x3.fill': '⚏',
+            'grid': '⚏',
             'rectangle.grid.1x2.fill': '▬',
-            'rectangle.grid.2x2.fill': '▦',
+            'rectangle.grid.2x2.fill': '⚏',
             'square.fill': '⬛',
             'circle.fill': '⚫',
             'triangle.fill': '🔺',
@@ -516,7 +516,7 @@ class AchievementManager {
             'laptopcomputer': '💻',
             'wifi': '📶',
             'antenna.radiowaves.left.and.right': '📡',
-            'qrcode': '▦',
+            'qrcode': '⬜',
             'link': '🔗'
         };
         
