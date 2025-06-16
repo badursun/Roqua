@@ -8,12 +8,12 @@ struct AchievementIconView: View {
     
     var body: some View {
         if achievement.isCustomImage {
-            // Custom Image from Assets
+            // Custom Image from Assets - Circular clipped to medal size
             Image(achievement.displayIcon)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: size, height: size)
-                .foregroundColor(.white)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: medalFrameSize, height: medalFrameSize)
+                .clipShape(Circle())
                 .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
         } else {
             // SF Symbol
@@ -21,6 +21,17 @@ struct AchievementIconView: View {
                 .font(.system(size: size, weight: weight))
                 .foregroundColor(.white)
                 .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+        }
+    }
+    
+    // Calculate medal frame size based on icon size
+    private var medalFrameSize: CGFloat {
+        switch size {
+        case 20: return 32  // small -> fits in small medal
+        case 30: return 50  // medium -> fits in 50x50 medal (main cards)
+        case 40: return 120 // large -> fits in 120x120 medal (detail sheet)
+        case 60: return 160 // extraLarge -> fits in very large medal
+        default: return size * 1.67 // General ratio
         }
     }
 }
