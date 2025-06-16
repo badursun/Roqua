@@ -6,5 +6,29 @@
 	<array>
 		<string>location</string>
 	</array>
+	
+	<!-- Location Usage Descriptions -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Roqua, gezdiğiniz yerleri haritalamak ve POI'leri tespit etmek için konum bilginizi kullanır.</string>
+	
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Roqua, gezdiğiniz yerleri haritalamak ve POI'leri tespit etmek için konum bilginizi kullanır.</string>
+	
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Roqua, arka planda da gezdiğiniz yerleri takip etmek için konum bilginizi kullanır.</string>
+	
+	<!-- Network Usage Description for MapKit -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	
+	<!-- Privacy Usage Descriptions -->
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>POISearch</key>
+		<string>Roqua, yakınınızdaki önemli yerleri (POI) bulmak için MapKit arama yapar.</string>
+	</dict>
 </dict>
 </plist>

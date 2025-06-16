@@ -65,6 +65,9 @@ class SQLiteManager {
                 country_code TEXT,
                 geohash TEXT,
                 accuracy REAL,
+                poi_name TEXT,
+                poi_category TEXT,
+                poi_type TEXT,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
@@ -98,12 +101,13 @@ class SQLiteManager {
     // MARK: - CRUD Operations
     func insertVisitedRegion(_ region: VisitedRegion) -> Int64? {
         return dbQueue.sync {
-            let insertSQL = """
-                INSERT INTO visited_regions 
-                (latitude, longitude, radius, timestamp_start, timestamp_end, visit_count, 
-                 city, district, country, country_code, geohash, accuracy, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-            """
+                    let insertSQL = """
+            INSERT INTO visited_regions 
+            (latitude, longitude, radius, timestamp_start, timestamp_end, visit_count, 
+             city, district, country, country_code, geohash, accuracy, 
+             poi_name, poi_category, poi_type, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
             
             var statement: OpaquePointer?
             
@@ -135,8 +139,13 @@ class SQLiteManager {
                 sqlite3_bind_null(statement, 12)
             }
             
+                        // POI fields - NEW  
+            bindOptionalText(statement, 13, region.poiName)
+            bindOptionalText(statement, 14, region.poiCategory)
+            bindOptionalText(statement, 15, region.poiType)
+            
             // Bind current timestamp manually
-            sqlite3_bind_text(statement, 13, Date().iso8601String, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            sqlite3_bind_text(statement, 16, Date().iso8601String, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
             
             if sqlite3_step(statement) == SQLITE_DONE {
                 let insertedId = sqlite3_last_insert_rowid(db)
@@ -220,6 +229,7 @@ class SQLiteManager {
                 UPDATE visited_regions SET 
                 latitude = ?, longitude = ?, radius = ?, timestamp_end = ?, visit_count = ?,
                 city = ?, district = ?, country = ?, country_code = ?, geohash = ?, accuracy = ?,
+                poi_name = ?, poi_category = ?, poi_type = ?,
                 updated_at = ?
                 WHERE id = ?;
             """
@@ -251,10 +261,15 @@ class SQLiteManager {
                 sqlite3_bind_null(statement, 11)
             }
             
-            // Bind current timestamp manually
-            sqlite3_bind_text(statement, 12, Date().iso8601String, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            // POI fields - UPDATE
+            bindOptionalText(statement, 12, region.poiName)
+            bindOptionalText(statement, 13, region.poiCategory)
+            bindOptionalText(statement, 14, region.poiType)
             
-            sqlite3_bind_int64(statement, 13, id)
+            // Bind current timestamp manually
+            sqlite3_bind_text(statement, 15, Date().iso8601String, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            
+            sqlite3_bind_int64(statement, 16, id)
             
             if sqlite3_step(statement) == SQLITE_DONE {
                 print("🗄️ VisitedRegion updated successfully")
@@ -326,6 +341,11 @@ class SQLiteManager {
             accuracy = sqlite3_column_double(statement, 12)
         }
         
+        // POI fields - NEW
+        let poiName = sqlite3_column_text(statement, 13).map { String(cString: $0) }
+        let poiCategory = sqlite3_column_text(statement, 14).map { String(cString: $0) }
+        let poiType = sqlite3_column_text(statement, 15).map { String(cString: $0) }
+        
         return VisitedRegion(
             id: id,
             latitude: latitude,
@@ -338,6 +358,9 @@ class SQLiteManager {
             district: district,
             country: country,
             countryCode: countryCode,
+            poiName: poiName,
+            poiCategory: poiCategory,
+            poiType: poiType,
             geohash: geohash,
             accuracy: accuracy
         )

@@ -24,6 +24,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3636BD542E00859D003F1D36 /* test-3.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "test-3.gpx"; path = "gpx_files/test-3.gpx"; sourceTree = "<group>"; };
+		3636BD552E00859D003F1D36 /* istanbul_gezi_rotasi.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = istanbul_gezi_rotasi.gpx; path = gpx_files/istanbul_gezi_rotasi.gpx; sourceTree = "<group>"; };
+		3636BD562E00859D003F1D36 /* test-ofis-cevresi-2.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "test-ofis-cevresi-2.gpx"; path = "gpx_files/test-ofis-cevresi-2.gpx"; sourceTree = "<group>"; };
+		3636BD572E00859D003F1D36 /* yuruyerek_mezarlik_1.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = yuruyerek_mezarlik_1.gpx; path = gpx_files/yuruyerek_mezarlik_1.gpx; sourceTree = "<group>"; };
+		3636BD582E00859D003F1D36 /* yuruyerek_cami_1.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = yuruyerek_cami_1.gpx; path = gpx_files/yuruyerek_cami_1.gpx; sourceTree = "<group>"; };
+		3636BD592E00859D003F1D36 /* test-2.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "test-2.gpx"; path = "gpx_files/test-2.gpx"; sourceTree = "<group>"; };
+		3636BD5A2E00859D003F1D36 /* test-ofis-cevresi-1.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "test-ofis-cevresi-1.gpx"; path = "gpx_files/test-ofis-cevresi-1.gpx"; sourceTree = "<group>"; };
+		3636BD5B2E00859D003F1D36 /* yuruyerek_kilise_1.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = yuruyerek_kilise_1.gpx; path = gpx_files/yuruyerek_kilise_1.gpx; sourceTree = "<group>"; };
+		3636BD5C2E00A488003F1D36 /* kilise-taksim.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "kilise-taksim.gpx"; path = "gpx_files/kilise-taksim.gpx"; sourceTree = "<group>"; };
 		367BBF782DFEACA60020D657 /* Roqua.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Roqua.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		367BBF872DFEACA70020D657 /* RoquaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoquaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		367BBF912DFEACA70020D657 /* RoquaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoquaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +98,15 @@
 		367BBF6F2DFEACA60020D657 = {
 			isa = PBXGroup;
 			children = (
+				3636BD5C2E00A488003F1D36 /* kilise-taksim.gpx */,
+				3636BD552E00859D003F1D36 /* istanbul_gezi_rotasi.gpx */,
+				3636BD592E00859D003F1D36 /* test-2.gpx */,
+				3636BD542E00859D003F1D36 /* test-3.gpx */,
+				3636BD5A2E00859D003F1D36 /* test-ofis-cevresi-1.gpx */,
+				3636BD562E00859D003F1D36 /* test-ofis-cevresi-2.gpx */,
+				3636BD582E00859D003F1D36 /* yuruyerek_cami_1.gpx */,
+				3636BD5B2E00859D003F1D36 /* yuruyerek_kilise_1.gpx */,
+				3636BD572E00859D003F1D36 /* yuruyerek_mezarlik_1.gpx */,
 				367BC0262DFEBC640020D657 /* 40kmh.gpx */,
 				367BBF7A2DFEACA60020D657 /* Roqua */,
 				367BBF8A2DFEACA70020D657 /* RoquaTests */,

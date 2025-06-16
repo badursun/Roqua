@@ -23,6 +23,7 @@ struct ContentView: View {
     @State private var navigationPath = NavigationPath()
     @State private var hasInitialized = false
     @State private var currentZoomLevel: String = "1:200m"
+    @State private var lastPOIDetection: (name: String, category: String)? = nil
     
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
@@ -97,6 +98,11 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
+                
+                // POI Detection Bar
+                POIDetectionBar(lastPOIDetection: lastPOIDetection)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
                 
                 Spacer()
             }
@@ -178,16 +184,28 @@ struct ContentView: View {
         }
         .onChange(of: locationManager.significantLocationChange) { _, newLocation in
             if let location = newLocation {
+                print("🔥 CONTENTVIEW: Significant location change detected!")
+                print("🔥 CONTENTVIEW: Location: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude))")
+                
                 // 1. ExploredCirclesManager - Fog of War için
                 exploredCirclesManager.addLocation(location)
                 
                 // 2. VisitedRegionManager - Database ve achievement için
+                print("🔥 CONTENTVIEW: Calling visitedRegionManager.processNewLocation")
                 visitedRegionManager.processNewLocation(location)
                 
                 // 3. ReverseGeocoder - Ana sayfa konum bilgisi için
                 reverseGeocoder.geocodeLocation(location)
                 
                 print("🎯 Processing location: \(location.coordinate) - All systems active")
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .newPOIDiscovered)) { notification in
+            if let userInfo = notification.userInfo,
+               let name = userInfo["name"] as? String,
+               let category = userInfo["category"] as? String {
+                print("🔥 CONTENTVIEW: POI detected - \(name) (\(category))")
+                lastPOIDetection = (name: name, category: category)
             }
         }
         .onChange(of: locationManager.currentLocation) { _, newLocation in
@@ -262,6 +280,9 @@ struct BottomControlPanel: View {
     // Settings entegrasyonu
     private let settings = AppSettings.shared
     
+    // POI Debug state
+    @StateObject private var visitedRegionManager = VisitedRegionManager.shared
+    
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
     }
@@ -272,6 +293,16 @@ struct BottomControlPanel: View {
         } else {
             return String(format: "%.0f m²", area)
         }
+    }
+    
+    // POI Detection Status
+    private var lastPOIDetection: (name: String, category: String)? {
+        guard let lastRegion = visitedRegionManager.visitedRegions.last,
+              let poiName = lastRegion.poiName,
+              let poiCategory = lastRegion.poiCategory else {
+            return nil
+        }
+        return (name: poiName, category: poiCategory)
     }
     
     var body: some View {
@@ -394,7 +425,7 @@ struct BottomControlPanel: View {
                 }
             }
             
-            // Bilgi Çubuğu (Alt kısım)
+            // Bilgi Çubuğu (Alt kısım) - POI göstergesi eklendi
             HStack(spacing: 16) {
                 // Konum Bilgisi
                 HStack(spacing: 6) {
@@ -407,6 +438,8 @@ struct BottomControlPanel: View {
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                 }
+                
+
                 
                 // Zoom Seviyesi
                 HStack(spacing: 6) {
@@ -441,6 +474,372 @@ struct BottomControlPanel: View {
                     .fill(.ultraThinMaterial)
                     .opacity(0.8)
             )
+        }
+    }
+    
+
+}
+
+// POI Detection Bar Component
+struct POIDetectionBar: View {
+    let lastPOIDetection: (name: String, category: String)?
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // POI Icon
+            if let poiInfo = lastPOIDetection {
+                Image(systemName: poiCategoryIcon(poiInfo.category))
+                    .font(.title3)
+                    .foregroundStyle(poiCategoryColor(poiInfo.category))
+                    .frame(width: 24, height: 24)
+            } else {
+                Image(systemName: "location.magnifyingglass")
+                    .font(.title3)
+                    .foregroundStyle(.gray)
+                    .frame(width: 24, height: 24)
+            }
+            
+            // POI Information
+            VStack(alignment: .leading, spacing: 2) {
+                if let poiInfo = lastPOIDetection {
+                    Text(poiInfo.name.count > 25 ? String(poiInfo.name.prefix(25)) + "..." : poiInfo.name)
+                        .font(.callout)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    
+                    Text(poiCategoryDisplayName(poiInfo.category))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else {
+                    Text("Konum analiz ediliyor...")
+                        .font(.callout)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    
+                    Text("Yakındaki özel yerler aranıyor")
+                        .font(.caption)
+                        .foregroundStyle(.gray)
+                        .lineLimit(1)
+                }
+            }
+            
+            Spacer()
+            
+            // Status Indicator
+            if lastPOIDetection != nil {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 8, height: 8)
+            } else {
+                Circle()
+                    .fill(.orange)
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(1.0)
+                    .opacity(0.8)
+                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: lastPOIDetection == nil)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+                .opacity(0.9)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(lastPOIDetection != nil ? poiCategoryColor(lastPOIDetection!.category).opacity(0.3) : .gray.opacity(0.2), lineWidth: 1)
+        )
+    }
+    
+    // POI kategori ikonları - Tüm MapKit kategorileri
+    private func poiCategoryIcon(_ category: String) -> String {
+        switch category.lowercased() {
+        // Religious sites
+        case "mosque": return "moon.stars.fill"
+        case "church": return "cross.circle.fill"
+        case "synagogue": return "star.of.david.fill"
+        case "religioussite": return "building.columns.fill"
+        
+        // Healthcare
+        case "hospital": return "cross.fill"
+        case "pharmacy": return "pills.fill"
+        
+        // Education
+        case "school": return "graduationcap.fill"
+        case "university": return "graduationcap.fill"
+        case "library": return "book.fill"
+        
+        // Food & Dining
+        case "restaurant": return "fork.knife"
+        case "cafe": return "cup.and.saucer.fill"
+        case "bakery": return "birthday.cake.fill"
+        case "brewery": return "cup.and.saucer.fill"
+        case "winery": return "wineglass.fill"
+        
+        // Shopping & Services
+        case "store": return "bag.fill"
+        case "bank": return "dollarsign.circle.fill"
+        case "atm": return "creditcard.fill"
+        case "postoffice": return "envelope.fill"
+        case "mailbox": return "envelope.fill"
+        case "laundry": return "washer.fill"
+        case "beauty": return "sparkles"
+        
+        // Transportation
+        case "airport": return "airplane"
+        case "airportgate": return "airplane.departure"
+        case "airportterminal": return "airplane.arrival"
+        case "publictransport": return "bus.fill"
+        case "gasstation": return "fuelpump.fill"
+        case "evcharger": return "bolt.car.fill"
+        case "parking": return "parkingsign"
+        case "carrental": return "car.fill"
+        
+        // Entertainment & Recreation
+        case "museum": return "building.columns.fill"
+        case "theater": return "theatermasks.fill"
+        case "movietheater": return "tv.fill"
+        case "amusementpark": return "gamecontroller.fill"
+        case "park": return "tree.fill"
+        case "nationalpark": return "mountain.2.fill"
+        case "playground": return "figure.and.child.holdinghands"
+        case "zoo": return "pawprint.fill"
+        case "aquarium": return "fish.fill"
+        case "beach": return "sun.max.fill"
+        
+        // Sports & Fitness
+        case "fitnescenter": return "figure.run"
+        case "golf": return "figure.golf"
+        case "tennis": return "tennisball.fill"
+        case "basketball": return "basketball.fill"
+        case "baseball": return "baseball.fill"
+        case "soccer": return "soccerball"
+        case "swimming": return "figure.pool.swim"
+        case "skiing": return "figure.skiing.downhill"
+        case "hiking": return "figure.hiking"
+        case "rockclimbing": return "mountain.2.fill"
+        case "fishing": return "fish.fill"
+        case "surfing": return "figure.surfing"
+        case "volleyball": return "volleyball.fill"
+        case "bowling": return "bowling.ball"
+        case "skating": return "figure.skating"
+        case "minigolf": return "figure.golf"
+        case "gokart": return "car.fill"
+        
+        // Accommodation
+        case "hotel": return "bed.double.fill"
+        case "campground": return "tent.fill"
+        case "rvpark": return "car.fill"
+        
+        // Emergency & Public Services
+        case "firestation": return "flame.fill"
+        case "police": return "shield.fill"
+        case "restroom": return "figure.walk"
+        
+        // Landmarks & Culture
+        case "landmark": return "star.fill"
+        case "castle": return "building.columns.fill"
+        case "fortress": return "building.columns.fill"
+        case "nationalmonument": return "building.columns.fill"
+        case "conventionCenter": return "building.fill"
+        
+        // Other
+        case "marina": return "sailboat.fill"
+        case "fairground": return "gamecontroller.fill"
+        case "distillery": return "drop.fill"
+        case "spa": return "leaf.fill"
+        case "stadium": return "building.fill"
+        case "musicvenue": return "music.note"
+        case "nightlife": return "moon.stars.fill"
+        case "planetarium": return "globe"
+        case "animalservice": return "pawprint.fill"
+        case "automotiverepair": return "wrench.fill"
+        case "foodmarket": return "cart.fill"
+        case "skatepakr": return "figure.skating"
+        case "kayaking": return "kayak"
+        
+        default: return "mappin.circle.fill"
+        }
+    }
+    
+    // POI kategori renkleri - Kategoriye göre mantıklı renkler
+    private func poiCategoryColor(_ category: String) -> Color {
+        switch category.lowercased() {
+        // Religious sites - Yeşil tonları
+        case "mosque": return .green
+        case "church": return .purple
+        case "synagogue": return .blue
+        case "religioussite": return .indigo
+        
+        // Healthcare - Kırmızı/Pembe tonları
+        case "hospital": return .red
+        case "pharmacy": return .mint
+        
+        // Education - Turuncu tonları
+        case "school", "university", "library": return .orange
+        
+        // Food & Dining - Sarı/Kahverengi tonları
+        case "restaurant", "cafe", "bakery", "brewery", "winery": return .yellow
+        
+        // Shopping & Services - Yeşil tonları
+        case "store", "bank", "atm": return .green
+        case "postoffice", "mailbox": return .blue
+        case "laundry", "beauty": return .pink
+        
+        // Transportation - Mavi tonları
+        case "airport", "airportgate", "airportterminal", "publictransport": return .blue
+        case "gasstation", "evcharger", "parking", "carrental": return .cyan
+        
+        // Entertainment & Recreation - Mor tonları
+        case "museum", "theater", "movietheater": return .purple
+        case "amusementpark", "zoo", "aquarium": return .pink
+        case "park", "nationalpark", "playground", "beach": return .green
+        
+        // Sports & Fitness - Turuncu/Kırmızı tonları
+        case "fitnesscenter", "golf", "tennis", "basketball", "baseball", "soccer": return .orange
+        case "swimming", "skiing", "hiking", "rockclimbing", "fishing", "surfing": return .cyan
+        case "volleyball", "bowling", "skating", "minigolf", "gokart": return .red
+        
+        // Accommodation - Kahverengi tonları
+        case "hotel", "campground", "rvpark": return .brown
+        
+        // Emergency & Public Services - Kırmızı tonları
+        case "firestation", "police": return .red
+        case "restroom": return .gray
+        
+        // Landmarks & Culture - Altın/Sarı tonları
+        case "landmark", "castle", "fortress", "nationalmonument", "conventioncenter": return .yellow
+        
+        // Other - Karma renkler
+        case "marina": return .blue
+        case "fairground": return .pink
+        case "distillery": return .brown
+        case "spa": return .mint
+        case "stadium": return .red
+        case "musicvenue", "nightlife": return .purple
+        case "planetarium": return .indigo
+        case "animalservice": return .green
+        case "automotiverepair": return .gray
+        case "foodmarket": return .orange
+        case "skatepark": return .orange
+        case "kayaking": return .cyan
+        
+        default: return .gray
+        }
+    }
+    
+    // POI kategori görünen adları - Tüm MapKit kategorileri
+    private func poiCategoryDisplayName(_ category: String) -> String {
+        switch category.lowercased() {
+        // Religious sites
+        case "mosque": return "Camii"
+        case "church": return "Kilise"
+        case "synagogue": return "Sinagog"
+        case "religioussite": return "Dini Mekan"
+        
+        // Healthcare
+        case "hospital": return "Hastane"
+        case "pharmacy": return "Eczane"
+        
+        // Education
+        case "school": return "Okul"
+        case "university": return "Üniversite"
+        case "library": return "Kütüphane"
+        
+        // Food & Dining
+        case "restaurant": return "Restoran"
+        case "cafe": return "Kafe"
+        case "bakery": return "Fırın"
+        case "brewery": return "Bira Fabrikası"
+        case "winery": return "Şaraphane"
+        
+        // Shopping & Services
+        case "store": return "Mağaza"
+        case "bank": return "Banka"
+        case "atm": return "ATM"
+        case "postoffice": return "Postane"
+        case "mailbox": return "Posta Kutusu"
+        case "laundry": return "Çamaşırhane"
+        case "beauty": return "Güzellik Salonu"
+        
+        // Transportation
+        case "airport": return "Havalimanı"
+        case "airportgate": return "Havalimanı Kapısı"
+        case "airportterminal": return "Havalimanı Terminali"
+        case "publictransport": return "Toplu Taşıma"
+        case "gasstation": return "Benzin İstasyonu"
+        case "evcharger": return "Elektrikli Araç Şarj"
+        case "parking": return "Otopark"
+        case "carrental": return "Araç Kiralama"
+        
+        // Entertainment & Recreation
+        case "museum": return "Müze"
+        case "theater": return "Tiyatro"
+        case "movietheater": return "Sinema"
+        case "amusementpark": return "Lunapark"
+        case "park": return "Park"
+        case "nationalpark": return "Milli Park"
+        case "playground": return "Oyun Parkı"
+        case "zoo": return "Hayvanat Bahçesi"
+        case "aquarium": return "Akvaryum"
+        case "beach": return "Plaj"
+        
+        // Sports & Fitness
+        case "fitnesscenter": return "Spor Salonu"
+        case "golf": return "Golf Sahası"
+        case "tennis": return "Tenis Kortu"
+        case "basketball": return "Basketbol Sahası"
+        case "baseball": return "Beyzbol Sahası"
+        case "soccer": return "Futbol Sahası"
+        case "swimming": return "Yüzme Havuzu"
+        case "skiing": return "Kayak Pisti"
+        case "hiking": return "Yürüyüş Parkuru"
+        case "rockclimbing": return "Kaya Tırmanışı"
+        case "fishing": return "Balık Tutma"
+        case "surfing": return "Sörf"
+        case "volleyball": return "Voleybol Sahası"
+        case "bowling": return "Bowling"
+        case "skating": return "Paten Pisti"
+        case "minigolf": return "Mini Golf"
+        case "gokart": return "Go-Kart"
+        
+        // Accommodation
+        case "hotel": return "Otel"
+        case "campground": return "Kamp Alanı"
+        case "rvpark": return "Karavan Parkı"
+        
+        // Emergency & Public Services
+        case "firestation": return "İtfaiye"
+        case "police": return "Polis"
+        case "restroom": return "Tuvalet"
+        
+        // Landmarks & Culture
+        case "landmark": return "Önemli Yer"
+        case "castle": return "Kale"
+        case "fortress": return "Hisar"
+        case "nationalmonument": return "Milli Anıt"
+        case "conventioncenter": return "Kongre Merkezi"
+        
+        // Other
+        case "marina": return "Marina"
+        case "fairground": return "Fuar Alanı"
+        case "distillery": return "Damıtımevi"
+        case "spa": return "Spa"
+        case "stadium": return "Stadyum"
+        case "musicvenue": return "Müzik Mekanı"
+        case "nightlife": return "Gece Hayatı"
+        case "planetarium": return "Planetaryum"
+        case "animalservice": return "Veteriner"
+        case "automotiverepair": return "Oto Tamir"
+        case "foodmarket": return "Market"
+        case "skatepark": return "Kaykay Parkı"
+        case "kayaking": return "Kano"
+        
+        default: return "Özel Yer"
         }
     }
 }

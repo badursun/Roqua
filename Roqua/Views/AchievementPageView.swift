@@ -1124,6 +1124,8 @@ struct CategoryListSection: View {
         case .distanceWalker: return "Mesafe Yürüyüşçüsü"
         case .gridMaster: return "Grid Ustası"
         case .monthlyChallenger: return "Aylık Meydan Okuyucu"
+        case .religiousVisitor: return "Dini Mekan Ziyaretçisi"
+        case .poiExplorer: return "Özel Mekan Kaşifi"
         }
     }
     
@@ -1143,6 +1145,8 @@ struct CategoryListSection: View {
         case .distanceWalker: return "figure.walk.diamond"
         case .gridMaster: return "grid"
         case .monthlyChallenger: return "calendar.badge.clock"
+        case .religiousVisitor: return "building.columns"
+        case .poiExplorer: return "location.circle"
         }
     }
 }

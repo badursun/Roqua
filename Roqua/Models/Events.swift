@@ -29,6 +29,8 @@ enum AchievementEvent {
     case newCityDiscovered(String, region: VisitedRegion)
     case newDistrictDiscovered(String, region: VisitedRegion)
     case newCountryDiscovered(String, region: VisitedRegion)
+    case newReligiousSiteDiscovered(String, category: String, region: VisitedRegion)
+    case newPOIDiscovered(String, category: String, region: VisitedRegion) // NEW: General POI discovery
     case achievementUnlocked(Achievement, progress: AchievementProgress)
     case progressMilestone(Achievement, progress: AchievementProgress, milestone: Int)
 }
@@ -125,6 +127,10 @@ extension AchievementEvent: CustomStringConvertible {
             return "New district discovered: \(district)"
         case .newCountryDiscovered(let country, _):
             return "New country discovered: \(country)"
+        case .newReligiousSiteDiscovered(let name, let category, _):
+            return "New religious site discovered: \(name) (\(category))"
+        case .newPOIDiscovered(let name, let category, _):
+            return "New POI discovered: \(name) (\(category))"
         case .achievementUnlocked(let achievement, _):
             return "Achievement unlocked: \(achievement.title)"
         case .progressMilestone(let achievement, _, let milestone):

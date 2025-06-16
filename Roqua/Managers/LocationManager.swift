@@ -147,12 +147,15 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         
+        print("📱 RAW LOCATION UPDATE: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) - accuracy: \(Int(location.horizontalAccuracy))m")
+        
         Task { @MainActor in
             // Her zaman currentLocation'ı güncelle (UI için) - hızlı güncelleme
             currentLocation = location
             
             // Konum değişikliği kontrolü - sadece significant changes için
             let shouldProcess = shouldProcessLocation(location)
+            print("🔄 Should process location: \(shouldProcess)")
             
             if shouldProcess {
                 lastProcessedLocation = location
@@ -167,6 +170,15 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
     }
     
     private func shouldProcessLocation(_ location: CLLocation) -> Bool {
+        print("🔍 SHOULD PROCESS CHECK:")
+        print("  - backgroundProcessing: \(settings.backgroundProcessing)")
+        print("  - appState: \(UIApplication.shared.applicationState.rawValue)")
+        print("  - accuracy: \(location.horizontalAccuracy)m vs threshold: \(settings.accuracyThreshold)m")
+        
+        // DEBUG: Force allow for testing
+        print("  - FORCED: Returning true for debugging")
+        return true
+        
         // backgroundProcessing ayarı kontrolü
         if !settings.backgroundProcessing {
             // Background processing kapalıysa, sadece foreground'da işle
@@ -179,12 +191,14 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         
         // Accuracy kontrolü
         guard location.horizontalAccuracy <= settings.accuracyThreshold && location.horizontalAccuracy > 0 else {
+            print("🚫 Accuracy too low: \(location.horizontalAccuracy)m > \(settings.accuracyThreshold)m")
             return false
         }
         
         // Distance kontrolü
         if let lastLocation = lastProcessedLocation {
             let distance = location.distance(from: lastLocation)
+            print("  - distance from last: \(distance)m vs threshold: \(settings.locationTrackingDistance)m")
             return distance >= settings.locationTrackingDistance
         }
         

@@ -475,6 +475,325 @@
         "target": 5,
         "calculator": "milestone",
         "parameters": {}
+      },
+      {
+        "id": "religious_explorer",
+        "title": "Dini Mekanlar Gezgini",
+        "description": "5 farklı dini mekan ziyaret et",
+        "iconName": "building.columns.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "geographic",
+        "target": 5,
+        "calculator": "religious_visit",
+        "parameters": {
+          "visitType": "unique"
+        }
+      },
+      {
+        "id": "mosque_visitor",
+        "title": "Cami Ziyaretçisi",
+        "description": "3 farklı cami ziyaret et",
+        "iconName": "building.2.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "geographic",
+        "target": 3,
+        "calculator": "mosque_visit",
+        "parameters": {
+          "visitType": "unique"
+        }
+      },
+      {
+        "id": "istanbul_mosque_master",
+        "title": "İstanbul Cami Ustası",
+        "description": "İstanbul'da 10 farklı cami ziyaret et",
+        "iconName": "building.2.fill",
+        "imageName": null,
+        "rarity": "epic",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "geographic",
+        "target": 10,
+        "calculator": "mosque_visit",
+        "parameters": {
+          "visitType": "unique",
+          "cityName": "İstanbul"
+        }
+      },
+      {
+        "id": "church_visitor",
+        "title": "Kilise Ziyaretçisi",
+        "description": "2 farklı kilise ziyaret et",
+        "iconName": "cross.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "geographic",
+        "target": 2,
+        "calculator": "church_visit",
+        "parameters": {
+          "visitType": "unique"
+        }
+      },
+      {
+        "id": "interfaith_explorer",
+        "title": "Dinlerarası Gezgin",
+        "description": "En az 2 farklı dinden birer mekan ziyaret et",
+        "iconName": "globe.europe.africa.fill",
+        "imageName": null,
+        "rarity": "legendary",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "geographic",
+        "target": 1,
+        "calculator": "multi_religion",
+        "parameters": {
+          "requiredTypes": ["mosque", "church"],
+          "visitType": "all_required"
+        }
+      },
+      {
+        "id": "devoted_visitor",
+        "title": "Mümin Ziyaretçi",
+        "description": "Aynı dini mekana 5 kez git",
+        "iconName": "heart.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "religiousVisitor",
+        "type": "temporal",
+        "target": 5,
+        "calculator": "religious_visit",
+        "parameters": {
+          "visitType": "total"
+        }
+      },
+      {
+        "id": "healthcare_visitor",
+        "title": "Sağlık Gezgini",
+        "description": "3 farklı hastane ziyaret et",
+        "iconName": "cross.circle.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 3,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "hospital",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "education_enthusiast",
+        "title": "Eğitim Tutkunu",
+        "description": "5 farklı okul ziyaret et",
+        "iconName": "graduationcap.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 5,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "school",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "memorial_visitor",
+        "title": "Anı Ziyaretçisi",
+        "description": "2 farklı mezarlık ziyaret et",
+        "iconName": "leaf.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 2,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "cemetery",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "museum_enthusiast",
+        "title": "Müze Tutkunu",
+        "description": "10 farklı müze ziyaret et",
+        "iconName": "building.columns.fill",
+        "imageName": null,
+        "rarity": "epic",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 10,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "museum",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "university_explorer",
+        "title": "Üniversite Gezgini",
+        "description": "3 farklı üniversite ziyaret et",
+        "iconName": "graduationcap.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 3,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "university",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "library_lover",
+        "title": "Kütüphane Sevdalısı",
+        "description": "7 farklı kütüphane ziyaret et",
+        "iconName": "books.vertical.fill",
+        "imageName": null,
+        "rarity": "epic",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 7,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "library",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "restaurant_explorer",
+        "title": "Restoran Gezgini",
+        "description": "25 farklı restoran ziyaret et",
+        "iconName": "fork.knife",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 25,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "restaurant",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "cafe_lover",
+        "title": "Kafe Sevdalısı",
+        "description": "20 farklı kafe ziyaret et",
+        "iconName": "cup.and.saucer.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 20,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "cafe",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "shopping_explorer",
+        "title": "Alışveriş Gezgini",
+        "description": "15 farklı AVM ziyaret et",
+        "iconName": "bag.fill",
+        "imageName": null,
+        "rarity": "epic",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 15,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "shopping_mall",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "pharmacy_visitor",
+        "title": "Eczane Ziyaretçisi",
+        "description": "10 farklı eczane ziyaret et",
+        "iconName": "pills.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 10,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "pharmacy",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "stadium_visitor",
+        "title": "Stadyum Ziyaretçisi",
+        "description": "3 farklı stadyum ziyaret et",
+        "iconName": "sportscourt.fill",
+        "imageName": null,
+        "rarity": "rare",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 3,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "stadium",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "bank_visitor",
+        "title": "Banka Ziyaretçisi",
+        "description": "8 farklı banka şubesi ziyaret et",
+        "iconName": "building.columns.circle.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 8,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "bank",
+          "visitType": "count"
+        }
+      },
+      {
+        "id": "park_explorer",
+        "title": "Park Gezgini",
+        "description": "12 farklı park ziyaret et",
+        "iconName": "tree.fill",
+        "imageName": null,
+        "rarity": "common",
+        "isHidden": false,
+        "category": "poiExplorer",
+        "type": "geographic",
+        "target": 12,
+        "calculator": "poi",
+        "parameters": {
+          "poiCategory": "park",
+          "visitType": "count"
+        }
       }
     ]
   }

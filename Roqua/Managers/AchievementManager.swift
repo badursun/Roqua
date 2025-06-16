@@ -26,6 +26,8 @@ enum AchievementCategory: String, CaseIterable, Codable {
     case explorer = "explorer"
     case adventurer = "adventurer"
     case worldTraveler = "worldTraveler"
+    case religiousVisitor = "religiousVisitor"
+    case poiExplorer = "poiExplorer" // NEW: Din evi ziyaretçileri
 }
 
 struct Achievement: Identifiable, Codable {
@@ -516,6 +518,12 @@ class AchievementManager: ObservableObject {
         case .newCountryDiscovered(let country, let region):
             handleNewCountryDiscovered(country, region: region)
             
+        case .newReligiousSiteDiscovered(let name, let category, let region):
+            handleNewReligiousSiteDiscovered(name, category: category, region: region)
+            
+        case .newPOIDiscovered(let name, let category, let region):
+            handleNewPOIDiscovered(name, category: category, region: region)
+            
         case .achievementUnlocked(let achievement, let progress):
             // This is published by us, so we don't need to handle it
             break
@@ -595,6 +603,20 @@ class AchievementManager: ObservableObject {
         checkCountryAchievements()
     }
     
+    private func handleNewReligiousSiteDiscovered(_ name: String, category: String, region: VisitedRegion) {
+        print("🎯 Processing new religious site discovery: \(name) (\(category))")
+        
+        // Check religious visit achievements
+        checkReligiousVisitAchievements()
+    }
+    
+    private func handleNewPOIDiscovered(_ name: String, category: String, region: VisitedRegion) {
+        print("🎯 Processing new POI discovery: \(name) (\(category))")
+        
+        // Check POI-specific achievements
+        checkPOIAchievements(category: category)
+    }
+    
     // MARK: - Smart Achievement Checkers
     
     private func checkMilestoneAchievements() {
@@ -665,6 +687,40 @@ class AchievementManager: ObservableObject {
         let countryAchievements = achievements.filter { $0.category == .countryCollector }
         
         for achievement in countryAchievements {
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
+            }
+        }
+    }
+    
+    private func checkReligiousVisitAchievements() {
+        let religiousAchievements = achievements.filter { $0.category == .religiousVisitor }
+        
+        for achievement in religiousAchievements {
+            let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
+            
+            if progress.currentProgress >= achievement.target {
+                checkAndUnlockAchievement(achievement, currentProgress: progress.currentProgress)
+            }
+        }
+    }
+    
+    private func checkPOIAchievements(category: String) {
+        let poiAchievements = achievements.filter { $0.category == .poiExplorer }
+        
+        // Filter achievements that match this POI category
+        let relevantAchievements = poiAchievements.filter { achievement in
+            guard let calculatorType = achievementDefinitions.first(where: { $0.id == achievement.id })?.calculator else {
+                return false
+            }
+            
+            // Only check POI calculator achievements
+            return calculatorType == "poi"
+        }
+        
+        for achievement in relevantAchievements {
             let progress = calculateProgress(for: achievement, with: visitedRegionManager.visitedRegions)
             
             if progress.currentProgress >= achievement.target {

@@ -19,6 +19,11 @@ struct VisitedRegion: Identifiable, Codable {
     var country: String?              // Ülke
     var countryCode: String?          // TR, US, etc.
     
+    // POI (Point of Interest) enrichment - NEW
+    var poiName: String?              // POI adı (örn: "Sultanahmet Camii")
+    var poiCategory: String?          // POI kategorisi (örn: "mosque", "church", "hospital", "school", "cemetery")
+    var poiType: String?              // POI tipi (örn: "place_of_worship", "restaurant", "hospital")
+    
     // Optimization
     var geohash: String?              // 7-8 karakter grid
     var accuracy: Double?             // GPS accuracy
@@ -30,6 +35,20 @@ struct VisitedRegion: Identifiable, Codable {
     
     var isEnriched: Bool {
         city != nil && country != nil
+    }
+    
+    var isPOIEnriched: Bool {
+        poiCategory != nil
+    }
+    
+    // Helper methods for POI category checking
+    func isPOIOfCategory(_ category: String) -> Bool {
+        return poiCategory?.lowercased() == category.lowercased()
+    }
+    
+    func isPOIOfCategories(_ categories: [String]) -> Bool {
+        guard let poiCategory = poiCategory else { return false }
+        return categories.contains { poiCategory.lowercased() == $0.lowercased() }
     }
     
     // Initialize with defaults
@@ -45,6 +64,9 @@ struct VisitedRegion: Identifiable, Codable {
         district: String? = nil,
         country: String? = nil,
         countryCode: String? = nil,
+        poiName: String? = nil,
+        poiCategory: String? = nil,
+        poiType: String? = nil,
         geohash: String? = nil,
         accuracy: Double? = nil
     ) {
@@ -59,6 +81,9 @@ struct VisitedRegion: Identifiable, Codable {
         self.district = district
         self.country = country
         self.countryCode = countryCode
+        self.poiName = poiName
+        self.poiCategory = poiCategory
+        self.poiType = poiType
         self.geohash = geohash
         self.accuracy = accuracy
     }

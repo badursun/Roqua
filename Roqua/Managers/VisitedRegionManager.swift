@@ -17,6 +17,7 @@ class VisitedRegionManager: ObservableObject {
     private var previousCities: Set<String> = []
     private var previousDistricts: Set<String> = []
     private var previousCountries: Set<String> = []
+    private var previousReligiousSites: Set<String> = []
     private var previousExplorationPercentage: Double = 0.0
     
     private var lastProcessTime: Date?
@@ -48,9 +49,26 @@ class VisitedRegionManager: ObservableObject {
             DispatchQueue.main.async {
                 self?.visitedRegions = regionsToLoad
                 self?.isLoading = false
+                
+                // Previous discoveries için cache oluştur
+                let cities = Set(allRegions.compactMap { $0.city })
+                let districts = Set(allRegions.compactMap { $0.district })
+                let countries = Set(allRegions.compactMap { $0.country })
+                let religiousSites = Set(allRegions.filter { region in
+                    guard let poiCategory = region.poiCategory else { return false }
+                    let religiousCategories = ["mosque", "church", "synagogue", "temple"]
+                    return religiousCategories.contains(poiCategory.lowercased())
+                }.compactMap { $0.poiName })
+                
+                self?.previousCities = cities
+                self?.previousDistricts = districts  
+                self?.previousCountries = countries
+                self?.previousReligiousSites = religiousSites
+                
                 let explorationPercent = GridHashManager.shared.getExplorationPercentage(decimals: 6)
                 print("🗄️ Loaded \(regionsToLoad.count) visited regions from database (total: \(allRegions.count))")
                 print("🌍 Current exploration: \(explorationPercent)%")
+                print("🎯 Discovery cache: \(cities.count) cities, \(districts.count) districts, \(countries.count) countries, \(religiousSites.count) religious sites")
                 
                 if allRegions.count > memoryLimit {
                     print("📊 Memory optimization: Showing \(regionsToLoad.count)/\(allRegions.count) regions (limit: \(memoryLimit))")
@@ -61,6 +79,9 @@ class VisitedRegionManager: ObservableObject {
     
     // MARK: - Smart Location Processing
     func processNewLocation(_ location: CLLocation) {
+        print("🚀 VISITED REGION MANAGER: processNewLocation called!")
+        print("🚀 VISITED REGION MANAGER: Location: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude))")
+        
         // Timestamp kontrolü - çok sık işlem yapılmasını önle
         let now = Date()
         if let lastProcessTime = lastProcessTime, now.timeIntervalSince(lastProcessTime) < 5.0 {
@@ -79,6 +100,7 @@ class VisitedRegionManager: ObservableObject {
     
     private func processLocationInBackground(_ location: CLLocation) async {
         let accuracy = location.horizontalAccuracy
+        print("📍 PROCESSING LOCATION: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) - accuracy: \(Int(accuracy))m")
         
         // Settings'den accuracy threshold al
         let accuracyThreshold = await settings.accuracyThreshold
@@ -177,6 +199,14 @@ class VisitedRegionManager: ObservableObject {
             }
         }
         
+        // POI enrichment - Her zaman çalıştır (ziyaret sayısı için)
+        print("🕌 Starting POI enrichment for existing region (checking for POI visits)...")
+        POIEnrichmentManager.shared.enrichWithPOI(coordinate: location.coordinate) { [weak self] poiInfo in
+            Task { @MainActor in
+                await self?.handlePOIEnrichment(poiInfo: poiInfo, for: updatedRegion)
+            }
+        }
+        
         // Sadece önemli güncellemelerde log
         if updatedRegion.visitCount % 5 == 0 { // Her 5 ziyarette bir log
             print("🎯 Updated existing region: \(region.locationDescription) (visit #\(updatedRegion.visitCount))")
@@ -234,12 +264,23 @@ class VisitedRegionManager: ObservableObject {
             }
             
             // Reverse geocoding başlat (background'da)
-            if await settings.autoEnrichNewRegions {
+            let autoEnrich = await settings.autoEnrichNewRegions
+            print("🔧 autoEnrichNewRegions setting: \(autoEnrich)")
+            
+            if autoEnrich {
                 print("🌍 Starting reverse geocoding...")
                 await ReverseGeocoder.shared.enrichRegion(savedRegion) { [weak self] enrichedRegion in
                     Task { @MainActor in
                         await self?.handleEnrichedRegion(enrichedRegion, oldRegion: savedRegion)
                     }
+                }
+            }
+            
+            // POI enrichment - DEBUG: Always run for testing
+            print("🕌 Starting POI enrichment (DEBUG: always enabled)...")
+            POIEnrichmentManager.shared.enrichWithPOI(coordinate: location.coordinate) { [weak self] poiInfo in
+                Task { @MainActor in
+                    await self?.handlePOIEnrichment(poiInfo: poiInfo, for: savedRegion)
                 }
             }
             
@@ -276,6 +317,42 @@ class VisitedRegionManager: ObservableObject {
         }
     }
     
+    private func handlePOIEnrichment(poiInfo: POIInfo?, for region: VisitedRegion) async {
+        guard let poiInfo = poiInfo else {
+            print("📍 No POI found for region ID: \(region.id ?? -1)")
+            return
+        }
+        
+        print("🕌 POI enrichment completed for region ID: \(region.id ?? -1)")
+        print("🏷️ POI Details: '\(poiInfo.name)' - Category: \(poiInfo.categoryString) - Type: \(poiInfo.typeString)")
+        
+        // Update region with POI information
+        var enrichedRegion = region
+        enrichedRegion.poiName = poiInfo.name
+        enrichedRegion.poiCategory = poiInfo.categoryString  
+        enrichedRegion.poiType = poiInfo.typeString
+        
+        // Database'i güncelle
+        if sqliteManager.updateVisitedRegion(enrichedRegion) {
+            print("💾 POI enrichment saved to database")
+            
+            // Memory'de güncelle
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                if let index = self.visitedRegions.firstIndex(where: { $0.id == enrichedRegion.id }) {
+                    self.visitedRegions[index] = enrichedRegion
+                }
+                
+                // POI discovery events
+                self.checkPOIDiscoveries(enrichedRegion)
+            }
+            
+            print("🕌 POI enriched: \(poiInfo.name) (\(poiInfo.categoryString))")
+        } else {
+            print("❌ Failed to save POI enriched region to database")
+        }
+    }
+    
     @MainActor
     private func checkGeographicDiscoveries(_ region: VisitedRegion) {
         var discoveries: [String] = []
@@ -303,6 +380,45 @@ class VisitedRegionManager: ObservableObject {
         
         if !discoveries.isEmpty {
             print("🎉 New geographic discoveries: \(discoveries.joined(separator: ", "))")
+        }
+    }
+    
+    @MainActor
+    private func checkPOIDiscoveries(_ region: VisitedRegion) {
+        guard let poiName = region.poiName, let poiCategory = region.poiCategory else { return }
+        
+        var discoveries: [String] = []
+        
+        // Apple POI Categories - Religious sites
+        let religiousCategories = ["ReligiousSite", "mosque", "church", "synagogue", "temple", "religious_site"]
+        
+        // Religious site discovery
+        if religiousCategories.contains(poiCategory) || religiousCategories.contains(poiCategory.lowercased()) {
+            if !previousReligiousSites.contains(poiName) {
+                previousReligiousSites.insert(poiName)
+                eventBus.publish(achievementEvent: .newReligiousSiteDiscovered(poiName, category: poiCategory, region: region))
+                discoveries.append("religious site: \(poiName) (\(poiCategory))")
+            }
+        }
+        
+        // Other POI categories for future achievements
+        let healthcareCategories = ["Hospital", "Pharmacy"]
+        let educationCategories = ["School", "University", "Library"]
+        
+        // Healthcare discovery
+        if healthcareCategories.contains(poiCategory) {
+            eventBus.publish(achievementEvent: .newPOIDiscovered(poiName, category: poiCategory, region: region))
+            discoveries.append("healthcare: \(poiName) (\(poiCategory))")
+        }
+        
+        // Education discovery
+        if educationCategories.contains(poiCategory) {
+            eventBus.publish(achievementEvent: .newPOIDiscovered(poiName, category: poiCategory, region: region))
+            discoveries.append("education: \(poiName) (\(poiCategory))")
+        }
+        
+        if !discoveries.isEmpty {
+            print("🎯 POI discoveries: \(discoveries.joined(separator: ", "))")
         }
     }
     

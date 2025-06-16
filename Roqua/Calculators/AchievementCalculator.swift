@@ -21,6 +21,15 @@ class CalculatorFactory {
         case "daily_streak": return DailyStreakCalculator()
         case "weekend_streak": return WeekendStreakCalculator()
         
+        // Religious Visit Calculators - NEW
+        case "religious_visit": return ReligiousVisitCalculator()
+        case "mosque_visit": return MosqueVisitCalculator()
+        case "church_visit": return ChurchVisitCalculator()
+        case "multi_religion": return MultiReligionCalculator()
+        
+        // General POI Calculators - NEW
+        case "poi": return POICalculator()
+        
         // Default fallback
         default: return DefaultCalculator()
         }
