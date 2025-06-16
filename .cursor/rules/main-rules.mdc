@@ -4,7 +4,16 @@ globs:
 alwaysApply: false
 ---
 # Genel Kurallar
+- Ürün İsmi: Roqua
 - Github Repo: https://github.com/badursun/Roqua
 - "Push Et" komutunu kullanıcıdan almadan asla push etme
 - `prd.md` ve `main-todo-list.md` kurallarına ve akışına sadık kal
 - Her zaman `iPhone 16 Pro` ile build al.
+
+# Yazılım Kodlama Standartları
+- Yazılım Dili: Swift + SwiftUI
+- Feature-based modular yapı ve Single Responsibility prensibine sadık kalarak, her fonksiyonu ve sorumluluğu kendi dosyasına ayırarak yazılmış, loosely coupled, highly cohesive bir mimari olmalı.
+- **Feature-based modular:** Her özellik (örneğin MediaManager) kendi klasöründe toplanır.
+- **Single Responsibility:** Her dosya sadece tek bir iş yapar (upload işlemi ayrı, provider yönetimi ayrı vb.).
+- **Loosely coupled:** Dosyalar ve modüller birbirine sıkı sıkıya bağlı değildir. Birini değiştirince diğeri bozulmaz.
+- **Highly cohesive:** Her klasör/dosya sadece kendi işiyle ilgilenir, başka alanlara bulaşmaz.
