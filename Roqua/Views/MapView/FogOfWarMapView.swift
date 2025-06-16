@@ -6,9 +6,15 @@ import CoreLocation
 class FogOfWarOverlay: NSObject, MKOverlay {
     let coordinate: CLLocationCoordinate2D
     let boundingMapRect: MKMapRect
+    let exploredCircles: [CLLocationCoordinate2D]
+    let radius: Double
     
-    init(center: CLLocationCoordinate2D) {
-        self.coordinate = center
+    init(exploredCircles: [CLLocationCoordinate2D], radius: Double = 200.0) {
+        self.exploredCircles = exploredCircles
+        self.radius = radius
+        
+        // Merkez koordinat olarak ilk circle'ı kullan, yoksa varsayılan
+        self.coordinate = exploredCircles.first ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
         
         // Tüm dünyayı kaplayan bir rect oluştur
         self.boundingMapRect = MKMapRect.world
@@ -17,68 +23,53 @@ class FogOfWarOverlay: NSObject, MKOverlay {
 }
 
 class FogOfWarRenderer: MKOverlayRenderer {
-    let exploredCircles: [CLLocationCoordinate2D]
-    let circleRadius: Double
-    
-    init(overlay: FogOfWarOverlay, exploredCircles: [CLLocationCoordinate2D], radius: Double = 200.0) {
-        self.exploredCircles = exploredCircles
-        self.circleRadius = radius
-        super.init(overlay: overlay)
-        print("🎨 FogOfWarRenderer created with \(exploredCircles.count) explored circles, radius: \(radius)m")
-    }
-    
     override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        let drawRect = rect(for: mapRect)
-        print("🎨 Drawing fog overlay. MapRect: \(mapRect), DrawRect: \(drawRect), ZoomScale: \(zoomScale)")
-        print("🎨 Explored circles count: \(exploredCircles.count)")
+        guard let overlay = overlay as? FogOfWarOverlay else { return }
         
-        // Önce tüm alanı karanlık yap
-        context.setFillColor(UIColor.black.withAlphaComponent(0.85).cgColor)
+        let drawRect = rect(for: mapRect)
+        
+        // Sadece debug gerektiğinde log
+        if overlay.exploredCircles.count > 0 && Int(zoomScale * 100) % 50 == 0 { // Zoom değişimlerinde log
+            print("🎨 Drawing fog overlay - circles: \(overlay.exploredCircles.count), zoom: \(String(format: "%.2f", zoomScale)), radius: \(Int(overlay.radius))m")
+        }
+        
+        // Fog layer (karanlık katman)
+        context.setFillColor(UIColor.black.withAlphaComponent(0.7).cgColor)
         context.fill(drawRect)
         
-        // Keşfedilen alanları temizle (clear blend mode ile)
-        if !exploredCircles.isEmpty {
-            context.setBlendMode(.clear)
+        // Keşfedilen alanları temizle (şeffaf yap)
+        context.setBlendMode(.clear)
+        
+        for coordinate in overlay.exploredCircles {
+            let point = MKMapPoint(coordinate)
+            let pointRect = CGRect(
+                x: CGFloat(point.x - mapRect.origin.x) / CGFloat(mapRect.size.width) * drawRect.width + drawRect.origin.x,
+                y: CGFloat(point.y - mapRect.origin.y) / CGFloat(mapRect.size.height) * drawRect.height + drawRect.origin.y,
+                width: 0,
+                height: 0
+            )
             
-            for circleCenter in exploredCircles {
-                let mapPoint = MKMapPoint(circleCenter)
-                
-                // Sadece görünür alandaki circle'ları çiz
-                if mapRect.intersects(MKMapRect(
-                    origin: MKMapPoint(x: mapPoint.x - 1000, y: mapPoint.y - 1000),
-                    size: MKMapSize(width: 2000, height: 2000)
-                )) {
-                    let circlePoint = point(for: mapPoint)
-                    
-                    // Zoom seviyesine göre dinamik radius hesaplama
-                    let metersPerMapPoint = MKMapPointsPerMeterAtLatitude(circleCenter.latitude)
-                    let radiusInMapPoints = circleRadius * metersPerMapPoint
-                    let radiusInPoints = radiusInMapPoints * zoomScale
-                    
-                    // Zoom seviyesine göre minimum radius ayarı
-                    let zoomFactor = max(0.1, min(10.0, zoomScale))
-                    let dynamicMinRadius = max(8.0, 15.0 * zoomFactor) // Zoom-in'de daha büyük minimum
-                    let dynamicMaxRadius = min(2000.0, 500.0 / zoomFactor) // Zoom-out'ta daha büyük maksimum
-                    
-                    let finalRadius = max(dynamicMinRadius, min(dynamicMaxRadius, radiusInPoints))
-                    
-                    let circleRect = CGRect(
-                        x: circlePoint.x - finalRadius,
-                        y: circlePoint.y - finalRadius,
-                        width: finalRadius * 2,
-                        height: finalRadius * 2
-                    )
-                    
-                    // Circle çiz (keşfedilen alanı temizle)
-                    context.fillEllipse(in: circleRect)
-                    
-                    print("🎨 Drew circle at (\(circlePoint.x), \(circlePoint.y)) with radius \(finalRadius)")
-                }
-            }
+            // DOĞRU RADİUS HESAPLAMASI
+            let radiusInMeters = overlay.radius
             
-            // Blend mode'u normale döndür
-            context.setBlendMode(.normal)
+            // Metre'yi derece'ye çevir (latitude'a göre)
+            let metersPerMapPoint = MKMapPointsPerMeterAtLatitude(coordinate.latitude)
+            let radiusInMapPoints = radiusInMeters * metersPerMapPoint
+            
+            // Map point'i pixel'e çevir
+            let radiusInPixels = CGFloat(radiusInMapPoints) / CGFloat(mapRect.size.width) * drawRect.width
+            
+            let circleRect = CGRect(
+                x: pointRect.origin.x - radiusInPixels,
+                y: pointRect.origin.y - radiusInPixels,
+                width: radiusInPixels * 2,
+                height: radiusInPixels * 2
+            )
+            
+            context.fillEllipse(in: circleRect)
         }
+        
+        context.setBlendMode(.normal)
     }
 }
 
@@ -88,7 +79,6 @@ class FogOfWarRenderer: MKOverlayRenderer {
 struct FogOfWarMapView: UIViewRepresentable {
     @ObservedObject var locationManager: LocationManager
     @ObservedObject var exploredCirclesManager: ExploredCirclesManager
-    @ObservedObject var visitedRegionManager: VisitedRegionManager
     @ObservedObject var settings = AppSettings.shared
     @Binding var position: MapCameraPosition
     @Binding var currentZoomLevel: String
@@ -108,7 +98,7 @@ struct FogOfWarMapView: UIViewRepresentable {
         }
         
         mapView.showsUserLocation = settings.showUserLocation
-        mapView.userTrackingMode = .none // Kullanıcı takibini kapat - zoom sorununa neden oluyor
+        mapView.userTrackingMode = .none // Manuel kontrol - otomatik tracking kapatılıyor
         
         // Zoom ve pan kontrollerini settings'den al
         mapView.isZoomEnabled = !settings.preserveZoomPan // Ters mantık: preserve=true ise zoom disable
@@ -116,10 +106,15 @@ struct FogOfWarMapView: UIViewRepresentable {
         mapView.isRotateEnabled = settings.enableRotation
         mapView.isScrollEnabled = !settings.preserveZoomPan // Ters mantık: preserve=true ise scroll disable
         
-        // Standard map configuration - POI'leri kaldır
+        // Standard map configuration - POI'leri kaldır (PRD: sade, yazısız, ikon barındırmayan görünüm)
         let config = MKStandardMapConfiguration()
         config.pointOfInterestFilter = MKPointOfInterestFilter.excludingAll
+        config.showsTraffic = false // Trafik bilgilerini kapat
         mapView.preferredConfiguration = config
+        
+        // PRD: "şu anki konum" sade bir dot ile gösterilir
+        mapView.showsUserLocation = true
+        // userLocationDisplayType property'si mevcut değil - default dot zaten
         
         print("🗺️ MapView created with settings: mapType=\(settings.mapType), pitch=\(settings.enablePitch), rotation=\(settings.enableRotation)")
         
@@ -146,41 +141,55 @@ struct FogOfWarMapView: UIViewRepresentable {
             context.coordinator.addInitialOverlay(mapView: mapView)
         }
         
-        // Yeni konumu hem ExploredCircles hem de VisitedRegionManager'a ekle
+        // Real-time location tracking - currentLocation değişikliklerini dinle
         if let currentLocation = locationManager.currentLocation {
-            let oldCount = context.coordinator.lastKnownCircleCount
-            let newCoordinate = currentLocation.coordinate
-            
-            // Konum değişimi kontrolü - settings'den tracking distance al
-            if let lastLocation = context.coordinator.lastKnownLocation {
-                let distance = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
-                    .distance(from: currentLocation)
-                
-                // Settings'den tracking distance'ı al ve auto centering kontrol et
-                if distance > settings.locationTrackingDistance && settings.autoMapCentering {
-                    let currentRegion = mapView.region
-                    let newRegion = MKCoordinateRegion(
-                        center: newCoordinate,
-                        span: currentRegion.span // Mevcut zoom seviyesini koru
-                    )
-                    mapView.setRegion(newRegion, animated: true)
-                    context.coordinator.lastKnownLocation = newCoordinate
-                    print("🗺️ Map centered to new location - distance moved: \(Int(distance))m (threshold: \(Int(settings.locationTrackingDistance))m)")
+            // User location dot'unu güncelle
+            if settings.showUserLocation && settings.autoMapCentering {
+                // Sadece büyük mesafe değişikliklerinde center'la
+                if let lastLocation = context.coordinator.lastKnownLocation {
+                    let distance = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
+                        .distance(from: currentLocation)
+                    
+                    if distance > 100.0 { // 100m'den fazla hareket varsa center'la
+                        let currentRegion = mapView.region
+                        let newRegion = MKCoordinateRegion(
+                            center: currentLocation.coordinate,
+                            span: currentRegion.span
+                        )
+                        mapView.setRegion(newRegion, animated: true)
+                        context.coordinator.lastKnownLocation = currentLocation.coordinate
+                        print("🗺️ Map centered to current location")
+                    }
+                } else {
+                    // İlk konum set'i
+                    context.coordinator.lastKnownLocation = currentLocation.coordinate
                 }
             }
             
+            // ExploredCirclesManager'a konum ekle (ContentView'da da ekleniyor ama burada da olsun)
             exploredCirclesManager.addLocation(currentLocation)
-            visitedRegionManager.processNewLocation(currentLocation)
             
             // Koordinat sayısı değiştiyse overlay'i güncelle
-            let coordinates = visitedRegionManager.visitedRegions.isEmpty ? 
-                exploredCirclesManager.exploredCircles : 
-                visitedRegionManager.getCoordinatesForFogOfWar()
+            let coordinates = exploredCirclesManager.exploredCircles
             
-            if coordinates.count != oldCount {
-                context.coordinator.updateOverlay(mapView: mapView, exploredCircles: coordinates)
+            if coordinates.count != context.coordinator.lastKnownCircleCount {
                 context.coordinator.lastKnownCircleCount = coordinates.count
-                print("🗺️ Overlay updated - new circle count: \(coordinates.count)")
+                
+                // Overlay'i güncelle - settings'den radius al
+                mapView.removeOverlays(mapView.overlays)
+                
+                // Eğer koordinat yoksa (clearAllData sonrası) overlay ekleme
+                if coordinates.isEmpty {
+                    print("🗑️ Fog of War cleared - no overlays added")
+                } else {
+                    let overlay = FogOfWarOverlay(exploredCircles: coordinates, radius: settings.explorationRadius)
+                    mapView.addOverlay(overlay)
+                    
+                    // Sadece önemli değişikliklerde log
+                    if coordinates.count % 10 == 0 || coordinates.count < 10 {
+                        print("🗺️ Overlay updated - circles: \(coordinates.count), radius: \(Int(settings.explorationRadius))m")
+                    }
+                }
             }
         }
     }
@@ -230,7 +239,7 @@ struct FogOfWarMapView: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: FogOfWarMapView
-        private var fogOverlay: FogOfWarOverlay?
+        var fogOverlay: FogOfWarOverlay?
         var hasSetInitialRegion: Bool = false
         var lastKnownCircleCount: Int = 0
         var lastKnownLocation: CLLocationCoordinate2D?
@@ -240,11 +249,11 @@ struct FogOfWarMapView: UIViewRepresentable {
         }
         
         func addInitialOverlay(mapView: MKMapView) {
-            // İlk overlay'i ekle
-            let newOverlay = FogOfWarOverlay(center: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+            // İlk overlay'i ekle - settings'den radius al
+            let newOverlay = FogOfWarOverlay(exploredCircles: [], radius: parent.settings.explorationRadius)
             fogOverlay = newOverlay
             mapView.addOverlay(newOverlay)
-            print("🗺️ Initial fog overlay added")
+            print("🗺️ Initial fog overlay added with radius: \(Int(parent.settings.explorationRadius))m")
         }
         
         func updateOverlay(mapView: MKMapView, exploredCircles: [CLLocationCoordinate2D]) {
@@ -260,15 +269,8 @@ struct FogOfWarMapView: UIViewRepresentable {
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let fogOverlay = overlay as? FogOfWarOverlay {
-                // Koordinatları VisitedRegionManager'dan al, fallback olarak ExploredCircles kullan
-                let coordinates = parent.visitedRegionManager.visitedRegions.isEmpty ? 
-                    parent.exploredCirclesManager.exploredCircles : 
-                    parent.visitedRegionManager.getCoordinatesForFogOfWar()
-                
-                // Settings'den exploration radius'u al
-                let radius = parent.settings.explorationRadius
-                
-                return FogOfWarRenderer(overlay: fogOverlay, exploredCircles: coordinates, radius: radius)
+                // Koordinatlar zaten overlay içinde mevcut, renderer'a geçir
+                return FogOfWarRenderer(overlay: fogOverlay)
             }
             return MKOverlayRenderer(overlay: overlay)
         }
@@ -280,7 +282,7 @@ struct FogOfWarMapView: UIViewRepresentable {
             let span = region.span
             
             // Latitude span'dan yaklaşık zoom seviyesini hesapla
-            let zoomLevel = calculateZoomLevel(from: span.latitudeDelta)
+            let _ = calculateZoomLevel(from: span.latitudeDelta)
             let distanceText = formatZoomDistance(from: span.latitudeDelta)
             
             DispatchQueue.main.async {

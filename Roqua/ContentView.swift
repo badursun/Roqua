@@ -11,13 +11,15 @@ import CoreLocation
 
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
-    @StateObject private var exploredCirclesManager = ExploredCirclesManager()
+    @StateObject private var exploredCirclesManager = ExploredCirclesManager.shared
     @StateObject private var visitedRegionManager = VisitedRegionManager.shared
     @StateObject private var reverseGeocoder = ReverseGeocoder.shared
     @StateObject private var gridHashManager = GridHashManager.shared
+    @StateObject private var notificationManager = AchievementNotificationManager.shared
     @State private var position = MapCameraPosition.automatic
     @State private var showingSettings = false
     @State private var showingAccount = false
+    @State private var showingAchievements = false
     @State private var hasInitialized = false
     @State private var currentZoomLevel: String = "1:200m"
     
@@ -31,18 +33,33 @@ struct ContentView: View {
             FogOfWarMapView(
                 locationManager: locationManager,
                 exploredCirclesManager: exploredCirclesManager,
-                visitedRegionManager: visitedRegionManager,
                 position: $position,
                 currentZoomLevel: $currentZoomLevel
             )
             .ignoresSafeArea(.all)
             
-            // Top Navigation
+                            // Top Navigation
             VStack {
                 HStack {
                     // Sol - Hesap Butonu
                     Button(action: { showingAccount = true }) {
                         Image(systemName: "person.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                            .background(
+                                Circle()
+                                    .fill(.ultraThinMaterial)
+                                    .frame(width: 44, height: 44)
+                            )
+                    }
+                    
+                    // Spacing between Account and Achievement
+                    Spacer()
+                        .frame(width: 16)
+                    
+                    // Achievement Butonu
+                    Button(action: { showingAchievements = true }) {
+                        Image(systemName: "trophy.fill")
                             .font(.title2)
                             .foregroundStyle(.white)
                             .background(
@@ -81,9 +98,34 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 
-                BottomControlPanel(locationManager: locationManager, reverseGeocoder: reverseGeocoder, gridHashManager: gridHashManager, position: $position, currentZoomLevel: $currentZoomLevel)
+                BottomControlPanel(
+                    locationManager: locationManager, 
+                    exploredCirclesManager: exploredCirclesManager,
+                    reverseGeocoder: reverseGeocoder, 
+                    gridHashManager: gridHashManager, 
+                    position: $position, 
+                    currentZoomLevel: $currentZoomLevel
+                )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 30)
+            }
+            
+            // Achievement Notification Overlay
+            if notificationManager.isShowingNotification,
+               let notification = notificationManager.currentNotification {
+                VStack {
+                    AchievementNotificationView(
+                        achievement: notification.achievement,
+                        progress: notification.progress,
+                        isVisible: $notificationManager.isShowingNotification
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.top, 60)
+                    
+                    Spacer()
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(1000)
             }
         }
         .preferredColorScheme(.dark)
@@ -93,33 +135,56 @@ struct ContentView: View {
         .sheet(isPresented: $showingAccount) {
             AccountView()
         }
+        .sheet(isPresented: $showingAchievements) {
+            AchievementView()
+        }
         .onAppear {
-            // Uygulama açıldığında konum güncellemelerini başlat
-            if locationManager.isFullyAuthorized {
-                locationManager.startLocationUpdates()
+            // Konum servislerini başlat
+            Task { @MainActor in
+                // Mevcut permission durumunu kontrol et
+                print("📍 Current permission state: \(locationManager.permissionState)")
+                
+                if locationManager.needsPermission {
+                    // İzin yoksa iste
+                    print("📍 Requesting location permission...")
+                    await locationManager.requestWhenInUsePermission()
+                    
+                    // Permission aldıktan sonra location updates otomatik başlayacak (didChangeAuthorization'da)
+                    print("📍 Permission request completed, updates will start automatically")
+                } else if locationManager.isFullyAuthorized || locationManager.permissionState == .whenInUseGranted {
+                    // İzin varsa ama location updates başlamamışsa başlat
+                    if locationManager.currentLocation == nil {
+                        print("📍 Permission exists but no location yet, starting updates...")
+                        locationManager.startLocationUpdates()
+                    } else {
+                        print("📍 Location already available: \(locationManager.currentLocation!.coordinate)")
+                    }
+                }
             }
             
-            // İlk kez açılışta migration yap
-            if !hasInitialized {
-                performMigrationIfNeeded()
-                hasInitialized = true
+            hasInitialized = true
+        }
+        .onChange(of: locationManager.significantLocationChange) { _, newLocation in
+            if let location = newLocation {
+                // 1. ExploredCirclesManager - Fog of War için
+                exploredCirclesManager.addLocation(location)
+                
+                // 2. VisitedRegionManager - Database ve achievement için
+                visitedRegionManager.processNewLocation(location)
+                
+                // 3. ReverseGeocoder - Ana sayfa konum bilgisi için
+                reverseGeocoder.geocodeLocation(location)
+                
+                print("🎯 Processing location: \(location.coordinate) - All systems active")
             }
         }
         .onChange(of: locationManager.currentLocation) { _, newLocation in
             if let location = newLocation {
-                exploredCirclesManager.addLocation(location)
-                visitedRegionManager.processNewLocation(location)
-                reverseGeocoder.geocodeLocation(location)
+                // İlk konum geldiğinde log'la - harita kendi center'layacak
+                if !hasInitialized {
+                    print("📍 First location update received: \(location.coordinate)")
+                }
             }
-        }
-    }
-    
-    // MARK: - Migration
-    private func performMigrationIfNeeded() {
-        // Eğer VisitedRegionManager boşsa ve ExploredCircles varsa migration yap
-        if visitedRegionManager.visitedRegions.isEmpty && !exploredCirclesManager.exploredCircles.isEmpty {
-            print("🔄 Starting migration from ExploredCircles to VisitedRegions...")
-            visitedRegionManager.migrateFromExploredCircles(exploredCirclesManager.exploredCircles)
         }
     }
 }
@@ -175,69 +240,86 @@ struct LocationStatusIndicator: View {
 
 struct BottomControlPanel: View {
     @ObservedObject var locationManager: LocationManager
+    @ObservedObject var exploredCirclesManager: ExploredCirclesManager
     @ObservedObject var reverseGeocoder: ReverseGeocoder
     @ObservedObject var gridHashManager: GridHashManager
     @Binding var position: MapCameraPosition
     @Binding var currentZoomLevel: String
-    // explorationPercentage artık gridHashManager'dan gelecek
+    
+    // Settings entegrasyonu
+    private let settings = AppSettings.shared
     
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
     }
     
+    private func formatArea(_ area: Double) -> String {
+        if area > 1_000_000 {
+            return String(format: "%.1f km²", area / 1_000_000)
+        } else {
+            return String(format: "%.0f m²", area)
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
-            // İstatistik Kartı
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Keşfedilen Alan")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(gridHashManager.formattedPercentage)
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white)
-                        
-                        Text("%")
-                            .font(.title3)
+            // İstatistik Kartı - enableExplorationStats ayarına göre göster
+            if settings.enableExplorationStats {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Keşfedilen Alan")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
+                        
+                        HStack(alignment: .firstTextBaseline, spacing: 2) {
+                            Text(gridHashManager.formattedPercentage)
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .onAppear {
+                                    print("🎯 BottomControlPanel: Percentage on appear: \(gridHashManager.formattedPercentage)%")
+                                }
+                                .onChange(of: gridHashManager.formattedPercentage) { _, newValue in
+                                    print("🎯 BottomControlPanel: Percentage updated to: \(newValue)%")
+                                }
+                            
+                            Text("%")
+                                .font(.title3)
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    // Dünya ikonu
-                    Image(systemName: "globe")
-                        .font(.title)
-                        .foregroundStyle(.blue)
                     
-                    // Konum durumu
-                    if let location = locationManager.currentLocation {
-                        Text("GPS: ±\(Int(location.horizontalAccuracy))m")
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        // Dünya ikonu
+                        Image(systemName: "globe")
+                            .font(.title)
+                            .foregroundStyle(.blue)
+                        
+                        // Bölge sayısı
+                        Text("\(exploredCirclesManager.exploredCircles.count) bölge")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                 }
+                .padding(20)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.blue.opacity(0.3), .clear],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1
+                                )
+                        )
+                )
             }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [.blue.opacity(0.3), .clear],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    )
-            )
             
             // Aksiyon Butonları
             HStack(spacing: 12) {

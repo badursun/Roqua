@@ -1,6 +1,7 @@
 import Foundation
 import CoreLocation
 import SwiftUI
+import Combine
 
 // MARK: - Location Permission States
 enum LocationPermissionState {
@@ -16,137 +17,95 @@ enum LocationPermissionState {
 // MARK: - Location Manager
 @MainActor
 class LocationManager: NSObject, ObservableObject {
-    @Published var permissionState: LocationPermissionState = .notRequested
+    static let shared = LocationManager()
+    
     @Published var currentLocation: CLLocation?
-    @Published var isLocationServicesEnabled = false
-    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var significantLocationChange: CLLocation?
+    @Published var permissionState: LocationPermissionState = .notRequested
+    @Published var isTracking: Bool = false
     
     private let locationManager = CLLocationManager()
-    private var permissionContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
+    private let eventBus = EventBus.shared
+    private let settings = AppSettings.shared
+    
+    private var lastProcessedLocation: CLLocation?
     
     override init() {
         super.init()
         setupLocationManager()
-        updatePermissionState()
-        
-        // Mevcut izinleri kontrol et ve gerekirse location updates'i başlat
-        checkExistingPermissions()
     }
     
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 10 // 10 metre hareket ettiğinde güncelle
+        locationManager.distanceFilter = 10.0 // 10m minimum hareket - daha hızlı UI güncellemesi
         
-        // Location services check'i delegate callback'inde yapılacak
         print("📍 Setting up location manager...")
     }
     
-    private func updatePermissionState() {
-        authorizationStatus = locationManager.authorizationStatus
-        print("📍 Current authorization status: \(authorizationStatus.rawValue)")
-        
-        switch authorizationStatus {
-        case .notDetermined:
-            permissionState = .notRequested
-        case .authorizedWhenInUse:
-            permissionState = .whenInUseGranted
-        case .authorizedAlways:
-            permissionState = .alwaysGranted
-        case .denied:
-            permissionState = .denied
-        case .restricted:
-            permissionState = .restricted
-        @unknown default:
-            permissionState = .unknown
-        }
-    }
-    
-    private func checkExistingPermissions() {
-        // Bu fonksiyon artık delegate callback'inde çağrılacak
-        print("📍 Will check permissions in delegate callback")
-    }
+
     
     // MARK: - Permission Request Methods
-    func requestWhenInUsePermission() async {
-        guard permissionState == .notRequested else { 
-            print("⚠️ Permission already requested or granted: \(permissionState)")
-            return 
-        }
+    @MainActor
+    func checkLocationPermission() {
+        print("📍 Checking location permission...")
         
-        guard isLocationServicesEnabled else {
-            print("❌ Location services disabled")
+        let status = locationManager.authorizationStatus
+        print("📍 Current authorization status: \(status.rawValue)")
+        
+        switch status {
+        case .notDetermined:
+            print("📍 Requesting location permission...")
+            locationManager.requestAlwaysAuthorization()
+            
+        case .denied, .restricted:
+            print("❌ Location permission denied or restricted")
             permissionState = .denied
-            return
-        }
-        
-        print("📍 Requesting when in use permission...")
-        permissionState = .requesting
-        
-        // iOS permission request - delegate callback bekle
-        let status = await withCheckedContinuation { continuation in
-            self.permissionContinuation = continuation
             
-            // Main thread'de permission request - iOS requirement
-            self.locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse:
+            print("⚠️ Only 'When In Use' permission granted, requesting 'Always'...")
+            locationManager.requestAlwaysAuthorization()
+            permissionState = .whenInUseGranted
+            
+        case .authorizedAlways:
+            print("✅ Always permission granted")
+            permissionState = .alwaysGranted
+            startLocationUpdates()
+            
+        @unknown default:
+            print("❓ Unknown authorization status")
+            permissionState = .denied
         }
-        
-        print("📍 Permission request completed with status: \(status.rawValue)")
     }
     
-    func requestAlwaysPermission() async {
-        // When in use permission kontrolü - ama recursive call yapma
-        if permissionState != .whenInUseGranted {
-            print("⚠️ When in use permission required first. Current state: \(permissionState)")
-            return
-        }
-        
-        print("📍 Requesting always permission...")
-        permissionState = .requesting
-        
-        // iOS permission request - delegate callback bekle
-        let status = await withCheckedContinuation { continuation in
-            self.permissionContinuation = continuation
-            
-            // Main thread'de permission request - iOS requirement
-            self.locationManager.requestAlwaysAuthorization()
-        }
-        
-        print("📍 Always permission request completed with status: \(status.rawValue)")
-    }
-    
+    @MainActor
     func startLocationUpdates() {
-        guard permissionState == .alwaysGranted || permissionState == .whenInUseGranted else {
-            print("❌ No location permission for updates")
-            return
-        }
-        
         print("✅ Starting location updates")
+        locationManager.startUpdatingLocation()
         
-        // Background location için gerekli ayarlar - startUpdatingLocation'dan önce
-        if permissionState == .alwaysGranted {
-            // Background modes kontrolü - Info.plist'te location background mode var mı?
-            if let backgroundModes = Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") as? [String],
-               backgroundModes.contains("location") {
-                locationManager.allowsBackgroundLocationUpdates = true
-                locationManager.pausesLocationUpdatesAutomatically = false
-                print("✅ Background location updates enabled")
-            } else {
-                print("⚠️ Background location mode not configured in Info.plist - continuing with foreground only")
-            }
+        // backgroundProcessing ayarına göre background mode'u ayarla
+        if settings.backgroundProcessing {
+            // Background updates için significant location changes de başlat
+            locationManager.startMonitoringSignificantLocationChanges()
+            print("🔄 Background processing enabled - monitoring significant location changes")
+        } else {
+            print("🚫 Background processing disabled - foreground only")
         }
         
-        locationManager.startUpdatingLocation()
+        isTracking = true
+        
+        // Event publish et
+        eventBus.publish(locationEvent: .locationTrackingStarted)
     }
     
     func stopLocationUpdates() {
         print("⏹️ Stopping location updates")
         locationManager.stopUpdatingLocation()
+        locationManager.stopMonitoringSignificantLocationChanges()
+        isTracking = false
         
-        // Background updates'i güvenli şekilde kapat
-        if permissionState == .alwaysGranted {
-            locationManager.allowsBackgroundLocationUpdates = false
-        }
+        // Publish location tracking stopped event
+        eventBus.publish(locationEvent: .locationTrackingStopped)
     }
     
     // MARK: - Helper Methods
@@ -171,6 +130,16 @@ class LocationManager: NSObject, ObservableObject {
             UIApplication.shared.open(settingsUrl)
         }
     }
+    
+    func requestWhenInUsePermission() async {
+        print("📍 Requesting when in use permission...")
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    func requestAlwaysPermission() async {
+        print("📍 Requesting always permission...")
+        locationManager.requestAlwaysAuthorization()
+    }
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -179,15 +148,56 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         
         Task { @MainActor in
+            // Her zaman currentLocation'ı güncelle (UI için) - hızlı güncelleme
             currentLocation = location
-            print("📍 New location: \(location.coordinate.latitude), \(location.coordinate.longitude), accuracy: ±\(location.horizontalAccuracy)m")
+            
+            // Konum değişikliği kontrolü - sadece significant changes için
+            let shouldProcess = shouldProcessLocation(location)
+            
+            if shouldProcess {
+                lastProcessedLocation = location
+                significantLocationChange = location
+                
+                // Publish significant location change event
+                eventBus.publish(locationEvent: .significantLocationChange(location))
+                
+                print("📍 Significant location: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)), ±\(Int(location.horizontalAccuracy))m")
+            }
         }
+    }
+    
+    private func shouldProcessLocation(_ location: CLLocation) -> Bool {
+        // backgroundProcessing ayarı kontrolü
+        if !settings.backgroundProcessing {
+            // Background processing kapalıysa, sadece foreground'da işle
+            let appState = UIApplication.shared.applicationState
+            if appState != .active {
+                print("🚫 Background processing disabled - skipping location processing")
+                return false
+            }
+        }
+        
+        // Accuracy kontrolü
+        guard location.horizontalAccuracy <= settings.accuracyThreshold && location.horizontalAccuracy > 0 else {
+            return false
+        }
+        
+        // Distance kontrolü
+        if let lastLocation = lastProcessedLocation {
+            let distance = location.distance(from: lastLocation)
+            return distance >= settings.locationTrackingDistance
+        }
+        
+        return true // İlk konum her zaman işlenir
     }
     
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("❌ Location error: \(error.localizedDescription)")
         
         Task { @MainActor in
+            // Publish location error event
+            eventBus.publish(locationEvent: .locationError(error))
+            
             // Location error handling
             if let clError = error as? CLError {
                 switch clError.code {
@@ -204,50 +214,30 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         }
     }
     
-    nonisolated func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        print("🔄 Authorization changed to: \(status.rawValue) (\(status.description))")
-        
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
-            // Location services durumunu güncelle
-            isLocationServicesEnabled = CLLocationManager.locationServicesEnabled()
-            print("📍 Location services enabled: \(isLocationServicesEnabled)")
+            let status = manager.authorizationStatus
+            print("🔄 Authorization changed to: \(status.rawValue) (\(status.description))")
             
-            authorizationStatus = status
-            
-            // Önceki state'i sakla
-            let previousState = permissionState
-            
-            // Yeni state'i güncelle
             switch status {
             case .notDetermined:
                 permissionState = .notRequested
+                
+            case .denied, .restricted:
+                permissionState = .denied
+                eventBus.publish(locationEvent: .permissionDenied)
+                
             case .authorizedWhenInUse:
                 permissionState = .whenInUseGranted
-                print("✅ When in use permission granted")
+                eventBus.publish(locationEvent: .permissionGranted(.whenInUse))
+                
             case .authorizedAlways:
                 permissionState = .alwaysGranted
-                print("✅ Always permission granted")
+                eventBus.publish(locationEvent: .permissionGranted(.always))
                 startLocationUpdates()
-            case .denied:
-                permissionState = .denied
-                print("❌ Permission denied")
-            case .restricted:
-                permissionState = .restricted
-                print("❌ Permission restricted")
+                
             @unknown default:
-                permissionState = .unknown
-                print("⚠️ Unknown permission state")
-            }
-            
-            // State değişimini log'la
-            if previousState != permissionState {
-                print("🔄 Permission state changed: \(previousState) → \(permissionState)")
-            }
-            
-            // Continuation'ı resolve et
-            if let continuation = permissionContinuation {
-                permissionContinuation = nil
-                continuation.resume(returning: status)
+                permissionState = .denied
             }
         }
     }

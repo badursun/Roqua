@@ -45,14 +45,14 @@ Uygulama:
 
 🌐 2. Harita Üzerine Karanlık Katman
 	•	Tüm dünya haritası ilk açıldığında karanlık görünür
-	•	Sadece gezilen yerlerde dairesel alanlar (örneğin 150m radius) açılır
+	•	Sadece gezilen yerlerde dairesel alanlar (örneğin 100m radius) açılır
 	•	Bu alanlar üst üste geldikçe birleşir, harita “aydınlanmış” gibi görünür
 
 🔆 3. Dairesel Açılma (Fog of War Tarzı)
 	•	Kullanıcı her yeni konuma girdiğinde o konum merkezli Polygon Circle oluşturulur (GeoJSON)
 	•	Daire büyüklüğü:
-	•	Yürüyorsa → 100–150m
-	•	Araçla ise → 300–500m (ileride hız tespit ile dinamik)
+	•	Yürüyorsa → 100m
+	•	Araçla ise → 200 (ileride hız tespit ile dinamik)
 	•	Bu daireler haritada mask layer olarak görünür
 
 📊 4. Keşif Yüzdesi ve İstatistikler

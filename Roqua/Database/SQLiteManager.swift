@@ -6,15 +6,13 @@ class SQLiteManager {
     private var db: OpaquePointer?
     private let dbQueue = DispatchQueue(label: "com.roqua.sqlite", qos: .utility)
     
-    private let dbPath: String = {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        let documentsDirectory = paths[0]
-        return (documentsDirectory as NSString).appendingPathComponent("Roqua.sqlite")
-    }()
+    private var dbPath: String {
+        let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+        return "\(documentsPath)/Roqua.sqlite"
+    }
     
     private init() {
-        openDatabase()
-        createTables()
+        setupDatabase()
     }
     
     deinit {
@@ -22,8 +20,15 @@ class SQLiteManager {
     }
     
     // MARK: - Database Connection
-    private func openDatabase() {
+    private func setupDatabase() {
         if sqlite3_open(dbPath, &db) == SQLITE_OK {
+            // WAL mode'u etkinleştir (performance için)
+            sqlite3_exec(db, "PRAGMA journal_mode = WAL", nil, nil, nil)
+            sqlite3_exec(db, "PRAGMA synchronous = NORMAL", nil, nil, nil)
+            sqlite3_exec(db, "PRAGMA cache_size = 10000", nil, nil, nil)
+            sqlite3_exec(db, "PRAGMA temp_store = MEMORY", nil, nil, nil)
+            
+            createTables()
             print("🗄️ SQLite database opened successfully at: \(dbPath)")
         } else {
             print("❌ Unable to open database: \(String(cString: sqlite3_errmsg(db)))")

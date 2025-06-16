@@ -1,6 +1,8 @@
 import Foundation
 import CoreLocation
+import SwiftUI
 
+@MainActor
 class VisitedRegionManager: ObservableObject {
     static let shared = VisitedRegionManager()
     
@@ -9,9 +11,19 @@ class VisitedRegionManager: ObservableObject {
     
     private let sqliteManager = SQLiteManager.shared
     private let settings = AppSettings.shared
+    private let eventBus = EventBus.shared
+    
+    // Track previous state for change detection
+    private var previousCities: Set<String> = []
+    private var previousDistricts: Set<String> = []
+    private var previousCountries: Set<String> = []
+    private var previousExplorationPercentage: Double = 0.0
+    
+    private var lastProcessTime: Date?
     
     private init() {
         loadVisitedRegions()
+        initializePreviousState()
         print("🎯 VisitedRegionManager initialized with \(visitedRegions.count) regions")
     }
     
@@ -20,67 +32,105 @@ class VisitedRegionManager: ObservableObject {
         isLoading = true
         
         DispatchQueue.global(qos: .background).async { [weak self] in
-            let regions = self?.sqliteManager.getAllVisitedRegions() ?? []
+            let allRegions = self?.sqliteManager.getAllVisitedRegions() ?? []
+            
+            // Memory'ye sınırlı sayıda region yükle
+            let memoryLimit = self?.settings.maxRegionsInMemory ?? 1000
+            let regionsToLoad = Array(allRegions.suffix(memoryLimit))
             
             // Mevcut region'ları GridHashManager'a yükle
-            for region in regions {
+            for region in regionsToLoad {
                 Task { @MainActor in
                     GridHashManager.shared.register(region: region)
                 }
             }
             
             DispatchQueue.main.async {
-                self?.visitedRegions = regions
+                self?.visitedRegions = regionsToLoad
                 self?.isLoading = false
                 let explorationPercent = GridHashManager.shared.getExplorationPercentage(decimals: 6)
-                print("🗄️ Loaded \(regions.count) visited regions from database")
+                print("🗄️ Loaded \(regionsToLoad.count) visited regions from database (total: \(allRegions.count))")
                 print("🌍 Current exploration: \(explorationPercent)%")
+                
+                if allRegions.count > memoryLimit {
+                    print("📊 Memory optimization: Showing \(regionsToLoad.count)/\(allRegions.count) regions (limit: \(memoryLimit))")
+                }
             }
         }
     }
     
     // MARK: - Smart Location Processing
     func processNewLocation(_ location: CLLocation) {
-        // Background thread'de işle
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            self?.processLocationInBackground(location)
-        }
-    }
-    
-    private func processLocationInBackground(_ location: CLLocation) {
-        let accuracy = location.horizontalAccuracy
-        
-        // Settings'den accuracy threshold al - main thread'de al
-        let accuracyThreshold = DispatchQueue.main.sync { settings.accuracyThreshold }
-        
-        guard accuracy <= accuracyThreshold && accuracy > 0 else {
-            print("🎯 Location rejected due to poor accuracy: \(accuracy)m (threshold: \(accuracyThreshold)m)")
+        // Timestamp kontrolü - çok sık işlem yapılmasını önle
+        let now = Date()
+        if let lastProcessTime = lastProcessTime, now.timeIntervalSince(lastProcessTime) < 5.0 {
+            // 5 saniyeden az süre geçmişse işleme
+            print("⏱️ Location processing throttled - last process: \(String(format: "%.1f", now.timeIntervalSince(lastProcessTime)))s ago")
             return
         }
         
-        // Yakındaki bölgeleri kontrol et
-        let nearbyRegions = findNearbyRegions(location: location)
+        print("🎯 Processing location: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) ±\(Int(location.horizontalAccuracy))m")
         
-        if let existingRegion = findClusterableRegion(location: location, nearbyRegions: nearbyRegions) {
-            // Mevcut bölgeyi genişlet
-            updateExistingRegion(existingRegion, with: location)
-        } else if shouldCreateNewRegion(location: location, nearbyRegions: nearbyRegions) {
+        // Background thread'de işle
+        Task.detached { [weak self] in
+            await self?.processLocationInBackground(location)
+        }
+    }
+    
+    private func processLocationInBackground(_ location: CLLocation) async {
+        let accuracy = location.horizontalAccuracy
+        
+        // Settings'den accuracy threshold al
+        let accuracyThreshold = await settings.accuracyThreshold
+        
+        guard accuracy <= accuracyThreshold && accuracy > 0 else {
+            // Sadece çok kötü accuracy'de log
+            if accuracy > accuracyThreshold * 2 {
+                print("❌ Location rejected - poor accuracy: \(Int(accuracy))m > \(Int(accuracyThreshold))m threshold")
+            }
+            return
+        }
+        
+        print("✅ Location accepted - accuracy: \(Int(accuracy))m ≤ \(Int(accuracyThreshold))m threshold")
+        
+        // Yakındaki bölgeleri kontrol et
+        let nearbyRegions = await findNearbyRegions(location: location)
+        print("🔍 Found \(nearbyRegions.count) nearby regions")
+        
+        if let existingRegion = await findClusterableRegion(location: location, nearbyRegions: nearbyRegions) {
+            // Mevcut bölgeyi güncelle - ama çok sık güncelleme yapma
+            if await shouldUpdateExistingRegion(existingRegion, with: location) {
+                print("🔄 Updating existing region (ID: \(existingRegion.id ?? -1))")
+                await updateExistingRegion(existingRegion, with: location)
+            } else {
+                print("⏭️ Skipping update - too recent (region ID: \(existingRegion.id ?? -1))")
+            }
+        } else if await shouldCreateNewRegion(location: location, nearbyRegions: nearbyRegions) {
             // Yeni bölge oluştur
-            createNewRegion(from: location)
+            print("✨ Creating new region")
+            await createNewRegion(from: location)
+        } else {
+            print("⏭️ Skipping - too close to existing regions")
         }
-        // Else: Çok yakın, hiçbir şey yapma
+        
+        // Process time'ı güncelle
+        await MainActor.run { [weak self] in
+            self?.lastProcessTime = Date()
+        }
     }
     
-    private func findNearbyRegions(location: CLLocation) -> [VisitedRegion] {
-        let clusteringRadius = DispatchQueue.main.sync { settings.clusteringRadius }
+    private func findNearbyRegions(location: CLLocation) async -> [VisitedRegion] {
+        let clusteringRadius = await settings.clusteringRadius
         let searchRadius = clusteringRadius * 2 // Biraz daha geniş arama
-        return visitedRegions.filter { region in
-            region.distance(to: location) <= searchRadius
+        return await MainActor.run {
+            visitedRegions.filter { region in
+                region.distance(to: location) <= searchRadius
+            }
         }
     }
     
-    private func findClusterableRegion(location: CLLocation, nearbyRegions: [VisitedRegion]) -> VisitedRegion? {
-        let clusteringRadius = DispatchQueue.main.sync { settings.clusteringRadius }
+    private func findClusterableRegion(location: CLLocation, nearbyRegions: [VisitedRegion]) async -> VisitedRegion? {
+        let clusteringRadius = await settings.clusteringRadius
         // En yakın bölgeyi bul ve clustering radius içinde mi kontrol et
         return nearbyRegions
             .filter { $0.distance(to: location) <= clusteringRadius }
@@ -89,8 +139,8 @@ class VisitedRegionManager: ObservableObject {
             }
     }
     
-    private func shouldCreateNewRegion(location: CLLocation, nearbyRegions: [VisitedRegion]) -> Bool {
-        let locationTrackingDistance = DispatchQueue.main.sync { settings.locationTrackingDistance }
+    private func shouldCreateNewRegion(location: CLLocation, nearbyRegions: [VisitedRegion]) async -> Bool {
+        let locationTrackingDistance = await settings.locationTrackingDistance
         // Settings'den minimum distance al (location tracking distance'ın yarısı)
         let minimumDistance = locationTrackingDistance / 2
         return nearbyRegions.allSatisfy { region in
@@ -98,72 +148,175 @@ class VisitedRegionManager: ObservableObject {
         }
     }
     
-    private func updateExistingRegion(_ region: VisitedRegion, with location: CLLocation) {
+    private func shouldUpdateExistingRegion(_ region: VisitedRegion, with location: CLLocation) async -> Bool {
+        // Son güncelleme zamanını kontrol et - çok sık güncelleme yapma
+        if let lastUpdate = region.timestampEnd {
+            let timeSinceLastUpdate = Date().timeIntervalSince(lastUpdate)
+            if timeSinceLastUpdate < 30.0 { // 30 saniye minimum
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func updateExistingRegion(_ region: VisitedRegion, with location: CLLocation) async {
         var updatedRegion = region
-        
-        // Visit count artır
         updatedRegion.visitCount += 1
         updatedRegion.timestampEnd = Date()
         
-        // Accuracy güncelle (daha iyi accuracy varsa)
-        if let currentAccuracy = updatedRegion.accuracy,
-           location.horizontalAccuracy < currentAccuracy {
-            updatedRegion.accuracy = location.horizontalAccuracy
-        } else if updatedRegion.accuracy == nil {
-            updatedRegion.accuracy = location.horizontalAccuracy
-        }
-        
-        // Gerekirse radius'u genişlet
-        let distance = region.distance(to: location)
-        if distance > Double(region.radius) {
-            updatedRegion.radius = max(region.radius, Int(distance) + 20) // 20m buffer
-        }
-        
         // Database'i güncelle
-        if sqliteManager.updateVisitedRegion(updatedRegion) {
-            // GridHashManager'ı güncelle (radius değişmişse yeni grid'ler eklenebilir)
-            Task { @MainActor in
-                GridHashManager.shared.register(region: updatedRegion)
+        if let regionId = region.id {
+            _ = sqliteManager.updateVisitedRegion(updatedRegion)
+        }
+        
+        // Memory'de güncelle
+        await MainActor.run { [weak self] in
+            guard let self = self else { return }
+            if let index = self.visitedRegions.firstIndex(where: { $0.id == region.id }) {
+                self.visitedRegions[index] = updatedRegion
             }
-            
-            DispatchQueue.main.async { [weak self] in
-                if let index = self?.visitedRegions.firstIndex(where: { $0.id == region.id }) {
-                    self?.visitedRegions[index] = updatedRegion
-                    print("🎯 Updated existing region: \(updatedRegion.locationDescription)")
-                }
-            }
+        }
+        
+        // Sadece önemli güncellemelerde log
+        if updatedRegion.visitCount % 5 == 0 { // Her 5 ziyarette bir log
+            print("🎯 Updated existing region: \(region.locationDescription) (visit #\(updatedRegion.visitCount))")
         }
     }
     
-    private func createNewRegion(from location: CLLocation) {
-        // Settings'den exploration radius al - main thread'de al
-        let explorationRadius = DispatchQueue.main.sync { settings.explorationRadius }
-        let radius = Int(explorationRadius)
+    private func createNewRegion(from location: CLLocation) async {
+        let radius = Int(await settings.explorationRadius) // PRD'ye göre 150m
         
         let newRegion = VisitedRegion(
+            id: nil,
             latitude: location.coordinate.latitude,
             longitude: location.coordinate.longitude,
-            radius: radius,
+            radius: radius, // Settings'den al
             timestampStart: Date(),
+            timestampEnd: nil,
+            visitCount: 1,
+            city: nil,
+            district: nil,
+            country: nil,
+            countryCode: nil,
+            geohash: nil,
             accuracy: location.horizontalAccuracy
         )
         
-        // Database'e ekle
-        if let insertedId = sqliteManager.insertVisitedRegion(newRegion) {
-            var regionWithId = newRegion
-            regionWithId.id = insertedId
+        print("💾 Saving new region to database...")
+        
+        // Database'e kaydet
+        if let regionId = sqliteManager.insertVisitedRegion(newRegion) {
+            var savedRegion = newRegion
+            savedRegion.id = regionId
             
-            // GridHashManager'a kayıt et
-            Task { @MainActor in
-                GridHashManager.shared.register(region: regionWithId)
+            print("✅ Region saved with ID: \(regionId)")
+            
+            // Memory'e ekle - maxRegionsInMemory limit kontrolü ile
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                self.visitedRegions.append(savedRegion)
+                
+                // Memory limit kontrolü - settings'den al
+                let memoryLimit = self.settings.maxRegionsInMemory
+                if self.visitedRegions.count > memoryLimit {
+                    // En eski region'ları çıkar, en yenileri tut
+                    self.visitedRegions = Array(self.visitedRegions.suffix(memoryLimit))
+                    print("📊 Memory limit reached - trimmed to \(memoryLimit) regions")
+                }
+                
+                print("📊 Total regions in memory: \(self.visitedRegions.count)/\(memoryLimit)")
+                
+                // Event publish et
+                self.eventBus.publish(achievementEvent: .newRegionDiscovered(savedRegion))
+                
+                // Exploration percentage'ı güncelle
+                self.updateExplorationPercentage()
             }
             
-            DispatchQueue.main.async { [weak self] in
-                self?.visitedRegions.append(regionWithId)
-                let explorationPercent = GridHashManager.shared.getExplorationPercentage(decimals: 6)
-                print("🎯 Created new region: \(regionWithId.centerCoordinate) with radius \(radius)m")
-                print("🌍 Exploration: \(explorationPercent)%")
-                print("📊 Total regions: \(self?.visitedRegions.count ?? 0)")
+            // Reverse geocoding başlat (background'da)
+            if await settings.autoEnrichNewRegions {
+                print("🌍 Starting reverse geocoding...")
+                await ReverseGeocoder.shared.enrichRegion(savedRegion) { [weak self] enrichedRegion in
+                    Task { @MainActor in
+                        await self?.handleEnrichedRegion(enrichedRegion, oldRegion: savedRegion)
+                    }
+                }
+            }
+            
+            print("🎯 New region created: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) (radius: \(radius)m)")
+        } else {
+            print("❌ Failed to save region to database")
+        }
+    }
+    
+    private func handleEnrichedRegion(_ enrichedRegion: VisitedRegion, oldRegion: VisitedRegion) async {
+        print("🌍 Reverse geocoding completed for region ID: \(enrichedRegion.id ?? -1)")
+        
+        // Database'i güncelle
+        if sqliteManager.updateVisitedRegion(enrichedRegion) {
+            print("💾 Region enrichment saved to database")
+            
+            // Memory'de güncelle
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                if let index = self.visitedRegions.firstIndex(where: { $0.id == enrichedRegion.id }) {
+                    self.visitedRegions[index] = enrichedRegion
+                }
+                
+                // Event publish et
+                self.eventBus.publish(achievementEvent: .regionEnriched(enrichedRegion, oldRegion: oldRegion))
+                
+                // Geographic discovery events
+                self.checkGeographicDiscoveries(enrichedRegion)
+            }
+            
+            print("🌍 Region enriched: \(enrichedRegion.locationDescription)")
+        } else {
+            print("❌ Failed to save enriched region to database")
+        }
+    }
+    
+    @MainActor
+    private func checkGeographicDiscoveries(_ region: VisitedRegion) {
+        var discoveries: [String] = []
+        
+        // City discovery
+        if let city = region.city, !previousCities.contains(city) {
+            previousCities.insert(city)
+            eventBus.publish(achievementEvent: .newCityDiscovered(city, region: region))
+            discoveries.append("city: \(city)")
+        }
+        
+        // District discovery
+        if let district = region.district, !previousDistricts.contains(district) {
+            previousDistricts.insert(district)
+            eventBus.publish(achievementEvent: .newDistrictDiscovered(district, region: region))
+            discoveries.append("district: \(district)")
+        }
+        
+        // Country discovery
+        if let country = region.country, !previousCountries.contains(country) {
+            previousCountries.insert(country)
+            eventBus.publish(achievementEvent: .newCountryDiscovered(country, region: region))
+            discoveries.append("country: \(country)")
+        }
+        
+        if !discoveries.isEmpty {
+            print("🎉 New geographic discoveries: \(discoveries.joined(separator: ", "))")
+        }
+    }
+    
+    @MainActor
+    private func updateExplorationPercentage() {
+        let newPercentage = GridHashManager.shared.getExplorationPercentageDouble()
+        if abs(newPercentage - previousExplorationPercentage) > 0.00001 { // Meaningful change
+            let oldPercentage = previousExplorationPercentage
+            previousExplorationPercentage = newPercentage
+            eventBus.publish(achievementEvent: .explorationPercentageChanged(newPercentage, previousPercentage: oldPercentage))
+            
+            // Sadece önemli değişikliklerde log
+            if abs(newPercentage - oldPercentage) > 0.001 {
+                print("📈 Exploration updated: \(String(format: "%.6f", oldPercentage))% → \(String(format: "%.6f", newPercentage))%")
             }
         }
     }
@@ -176,35 +329,22 @@ class VisitedRegionManager: ObservableObject {
     
     // MARK: - Migration Support
     /// ExploredCirclesManager'dan geçiş için
-    func migrateFromExploredCircles(_ coordinates: [CLLocationCoordinate2D]) {
-        print("🔄 Starting migration from ExploredCircles...")
+    func migrateFromExploredCircles(_ circles: [CLLocationCoordinate2D]) {
+        print("🔄 Starting migration from \(circles.count) explored circles...")
         
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            var migratedCount = 0
-            
-            for coordinate in coordinates {
-                let region = VisitedRegion(
-                    latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
-                    radius: 200,
-                    timestampStart: Date().addingTimeInterval(-Double.random(in: 0...86400)) // Random time in last day
-                )
+        Task.detached { [weak self] in
+            for (index, coordinate) in circles.enumerated() {
+                let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                await self?.processNewLocation(location)
                 
-                if let insertedId = self?.sqliteManager.insertVisitedRegion(region) {
-                    var regionWithId = region
-                    regionWithId.id = insertedId
-                    
-                    // GridHashManager'a kayıt et
-                    GridHashManager.shared.register(region: regionWithId)
-                    migratedCount += 1
+                // Throttle migration to avoid overwhelming the system
+                if index % 10 == 0 {
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
                 }
             }
             
-            DispatchQueue.main.async {
-                self?.loadVisitedRegions() // Reload from database
-                let explorationPercent = GridHashManager.shared.getExplorationPercentage(decimals: 6)
-                print("🔄 Migration completed: \(migratedCount)/\(coordinates.count) regions migrated")
-                print("🌍 Total exploration: \(explorationPercent)%")
+            await MainActor.run {
+                print("🎉 Migration completed!")
             }
         }
     }
@@ -280,5 +420,15 @@ class VisitedRegionManager: ObservableObject {
         print("   Exploration: \(explorationPercent)%")
         print("   Grid count: \(gridCount)")
         print("   Grid efficiency: \(String(format: "%.2f", Double(gridCount) / Double(visitedRegions.count))) grids/region")
+    }
+    
+    // MARK: - Event Helper Methods
+    
+    @MainActor
+    private func initializePreviousState() {
+        previousCities = Set(visitedRegions.compactMap { $0.city })
+        previousDistricts = Set(visitedRegions.compactMap { $0.district })
+        previousCountries = Set(visitedRegions.compactMap { $0.country })
+        previousExplorationPercentage = GridHashManager.shared.getExplorationPercentageDouble()
     }
 } 

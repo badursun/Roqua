@@ -11,9 +11,9 @@ class AppSettings: ObservableObject {
     @AppStorage("preserveZoomPan") var preserveZoomPan: Bool = true
     
     // MARK: - Exploration Settings
-    @AppStorage("explorationRadius") var explorationRadius: Double = 100.0 // meters - default 100m
+    @AppStorage("explorationRadius") var explorationRadius: Double = 100.0 // meters - PRD'ye göre 100m
     @AppStorage("accuracyThreshold") var accuracyThreshold: Double = 50.0 // meters - default 50m
-    @AppStorage("clusteringRadius") var clusteringRadius: Double = 50.0 // meters - default 50m
+    @AppStorage("clusteringRadius") var clusteringRadius: Double =  50.0 // meters - exploration radius'un yarısı
     
     // MARK: - Map Settings
     @AppStorage("mapType") var mapType: Int = 0 // 0: Standard, 1: Satellite, 2: Hybrid
@@ -32,6 +32,11 @@ class AppSettings: ObservableObject {
     // MARK: - Grid & Exploration Settings
     @AppStorage("percentageDecimals") var percentageDecimals: Int = 5 // 0.00001% precision (balanced)
     @AppStorage("enableExplorationStats") var enableExplorationStats: Bool = true
+    
+    // MARK: - Reverse Geocoding Settings
+    @AppStorage("enableReverseGeocoding") var enableReverseGeocoding: Bool = true
+    @AppStorage("autoEnrichNewRegions") var autoEnrichNewRegions: Bool = true
+    @AppStorage("batchEnrichOnStartup") var batchEnrichOnStartup: Bool = false
     
     // MARK: - Singleton
     static let shared = AppSettings()
@@ -91,9 +96,14 @@ class AppSettings: ObservableObject {
         enableGeocoding = true
         offlineMode = false
         maxRegionsInMemory = 1000
-                  backgroundProcessing = true
-          percentageDecimals = 5
-          enableExplorationStats = true
+        backgroundProcessing = true
+        percentageDecimals = 5
+        enableExplorationStats = true
+        
+        // Reverse Geocoding defaults
+        enableReverseGeocoding = true
+        autoEnrichNewRegions = true
+        batchEnrichOnStartup = false
     }
     
     func exportSettings() -> [String: Any] {
@@ -112,9 +122,11 @@ class AppSettings: ObservableObject {
             "offlineMode": offlineMode,
             "maxRegionsInMemory": maxRegionsInMemory,
             "backgroundProcessing": backgroundProcessing,
-
             "percentageDecimals": percentageDecimals,
-            "enableExplorationStats": enableExplorationStats
+            "enableExplorationStats": enableExplorationStats,
+            "enableReverseGeocoding": enableReverseGeocoding,
+            "autoEnrichNewRegions": autoEnrichNewRegions,
+            "batchEnrichOnStartup": batchEnrichOnStartup
         ]
     }
     
@@ -167,6 +179,18 @@ class AppSettings: ObservableObject {
         }
         if let value = dict["enableExplorationStats"] as? Bool {
             enableExplorationStats = value
+        }
+        
+        if let value = dict["enableReverseGeocoding"] as? Bool {
+            enableReverseGeocoding = value
+        }
+        
+        if let value = dict["autoEnrichNewRegions"] as? Bool {
+            autoEnrichNewRegions = value
+        }
+        
+        if let value = dict["batchEnrichOnStartup"] as? Bool {
+            batchEnrichOnStartup = value
         }
     }
 }

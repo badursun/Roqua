@@ -279,7 +279,54 @@ struct SettingsView: View {
                 
                 // MARK: - Privacy Section
                 Section {
-                    // Enable Geocoding
+                    // Enable Reverse Geocoding
+                    HStack {
+                        Image(systemName: "globe.americas.fill")
+                            .foregroundColor(.green)
+                        VStack(alignment: .leading) {
+                            Text("Reverse Geocoding")
+                                .font(.headline)
+                            Text("Bölgelere şehir/ülke bilgisi ekle")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.enableReverseGeocoding)
+                    }
+                    
+                    // Auto Enrich New Regions
+                    HStack {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .foregroundColor(.blue)
+                        VStack(alignment: .leading) {
+                            Text("Otomatik Zenginleştirme")
+                                .font(.headline)
+                            Text("Yeni bölgeleri otomatik zenginleştir")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.autoEnrichNewRegions)
+                            .disabled(!settings.enableReverseGeocoding)
+                    }
+                    
+                    // Batch Enrich on Startup
+                    HStack {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .foregroundColor(.orange)
+                        VStack(alignment: .leading) {
+                            Text("Başlangıçta Toplu İşlem")
+                                .font(.headline)
+                            Text("Uygulama açılışında eksik bölgeleri zenginleştir")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $settings.batchEnrichOnStartup)
+                            .disabled(!settings.enableReverseGeocoding)
+                    }
+                    
+                    // Enable Geocoding (eski)
                     HStack {
                         Image(systemName: "globe")
                             .foregroundColor(.green)
@@ -307,6 +354,26 @@ struct SettingsView: View {
                         }
                         Spacer()
                         Toggle("", isOn: $settings.offlineMode)
+                    }
+                    
+                    // Manual Batch Enrich Button
+                    if settings.enableReverseGeocoding {
+                        Button(action: {
+                            Task { @MainActor in
+                                ReverseGeocoder.shared.enrichUnenrichedRegions()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                    .foregroundColor(.white)
+                                Text("Eksik Bölgeleri Zenginleştir")
+                                    .foregroundColor(.white)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
                     }
                     
                 } header: {
@@ -415,16 +482,30 @@ struct SettingsView: View {
     }
     
     private func clearAllData() {
-        // VisitedRegionManager'dan tüm verileri sil
+        print("🗑️ Starting complete data clearing process...")
+        
+        // 1. VisitedRegionManager - SQLite veritabanı ve memory'deki region'ları temizle
         VisitedRegionManager.shared.clearAllData()
+        print("✅ VisitedRegionManager cleared")
         
-        // GridHashManager'dan tüm verileri sil
+        // 2. GridHashManager - Grid hash'leri ve UserDefaults'u temizle
         GridHashManager.shared.clearAll()
+        print("✅ GridHashManager cleared")
         
-        // ExploredCirclesManager instance-based olduğu için burada sıfırlamaya gerek yok
-        // Sadece VisitedRegionManager ve GridHashManager yeterli
+        // 3. ExploredCirclesManager - Fog of War koordinatlarını ve UserDefaults'u temizle
+        ExploredCirclesManager.shared.clearAllData()
+        print("✅ ExploredCirclesManager cleared")
         
-        print("🗑️ All exploration data cleared successfully")
+        // 4. Achievement Progress'i temizle (opsiyonel - başarımlar sıfırlanır)
+        AchievementManager.shared.resetAllProgress()
+        print("✅ Achievement progress reset")
+        
+        // 5. ReverseGeocoder cache'ini temizle
+        ReverseGeocoder.shared.clearCache()
+        print("✅ ReverseGeocoder cache cleared")
+        
+        print("🎉 All exploration data cleared successfully!")
+        print("📊 Next location update will start fresh exploration")
     }
 }
 
