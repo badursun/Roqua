@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var showingSettings = false
     @State private var showingAccount = false
     @State private var showingAchievements = false
+    @State private var navigationPath = NavigationPath()
     @State private var hasInitialized = false
     @State private var currentZoomLevel: String = "1:200m"
     
@@ -28,7 +29,8 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
+        NavigationStack(path: $navigationPath) {
+            ZStack {
             // Tam Ekran Harita
             FogOfWarMapView(
                 locationManager: locationManager,
@@ -43,30 +45,34 @@ struct ContentView: View {
                 HStack {
                     // Sol - Hesap Butonu
                     Button(action: { showingAccount = true }) {
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .background(
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                    .frame(width: 44, height: 44)
-                            )
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: "person.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                        }
                     }
                     
                     // Spacing between Account and Achievement
                     Spacer()
-                        .frame(width: 16)
+                        .frame(width:8)
                     
                     // Achievement Butonu
-                    Button(action: { showingAchievements = true }) {
-                        Image(systemName: "trophy.fill")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .background(
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                    .frame(width: 44, height: 44)
-                            )
+                    Button(action: { 
+                        navigationPath.append("achievements")
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: "trophy.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                        }
                     }
                     
                     Spacer()
@@ -78,14 +84,15 @@ struct ContentView: View {
                     
                     // Sağ - Menü Butonu
                     Button(action: { showingSettings = true }) {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .background(
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                    .frame(width: 44, height: 44)
-                            )
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: "line.3.horizontal")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -135,8 +142,13 @@ struct ContentView: View {
         .sheet(isPresented: $showingAccount) {
             AccountView()
         }
-        .sheet(isPresented: $showingAchievements) {
-            AchievementView()
+        .navigationDestination(for: String.self) { destination in
+            switch destination {
+            case "achievements":
+                AchievementPageView()
+            default:
+                EmptyView()
+            }
         }
         .onAppear {
             // Konum servislerini başlat
@@ -186,6 +198,7 @@ struct ContentView: View {
                 }
             }
         }
+        } // NavigationStack
     }
 }
 

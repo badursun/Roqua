@@ -43,6 +43,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+html, body {overscroll-behavior: none; -ms-scroll-chaining: none; scroll-behavior: smooth;}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -453,7 +454,7 @@ body {
 .achievement-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: #fff;
     border-radius: var(--radius);
     display: flex;
     align-items: center;
@@ -465,7 +466,7 @@ body {
 
 .achievement-actions {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     opacity: 0;
     transition: opacity 0.15s ease;
 }
@@ -475,10 +476,10 @@ body {
 }
 
 .action-btn {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -496,6 +497,11 @@ body {
 .delete-btn {
     background: linear-gradient(135deg, var(--danger-color), #DC2626);
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
 }
 
 .action-btn:hover {
@@ -523,6 +529,13 @@ body {
     width: 14px;
     height: 14px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' /%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.copy-btn::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z' /%3E%3C/svg%3E") center/contain no-repeat;
 }
 
 .achievement-title {
@@ -764,6 +777,52 @@ form {
     margin-right: 6px;
 }
 
+/* Form Validation Styles */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.field-error {
+    color: var(--danger-color);
+    font-size: 10px;
+    margin-top: 4px;
+    display: block;
+}
+
+.field-help {
+    color: var(--text-tertiary);
+    font-size: 10px;
+    margin-top: 2px;
+    display: block;
+}
+
+.parameter-help {
+    color: var(--text-muted);
+    font-size: 9px;
+    margin-top: 2px;
+    display: block;
+    font-style: italic;
+}
+
+/* Parameters Container */
+#parametersContainer {
+    background: rgba(168, 85, 247, 0.05);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin: 12px 0;
+}
+
+#parametersContainer h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -861,20 +920,181 @@ form {
     }
 }
 
-/* SF Symbols & Icon Mapping */
+/* SF Symbols & Icon Support */
+@font-face {
+    font-family: 'SF Symbols';
+    src: local('SF Pro Text'), local('-apple-system'), local('system-ui');
+    font-display: swap;
+}
+
 .sf-icon {
     display: inline-block;
     width: 1em;
     height: 1em;
     font-style: normal;
+    font-family: 'SF Symbols', -apple-system, BlinkMacSystemFont, 'Apple Color Emoji', system-ui;
+    line-height: 1;
+    text-align: center;
+    font-weight: 400;
+}
+
+/* Achievement Icon Container */
+.achievement-icon {
+    position: relative;
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: white;
+    background: #000;
+    flex-shrink: 0;
 }
 
 .achievement-icon .sf-icon {
     font-size: inherit;
 }
 
-/* Icon fallbacks for SF Symbols */
-/* Removed - using direct content instead */
+/* Icon Picker Grid */
+.icon-picker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: grid;
+    gap: 12px;
+    max-height: 280px;
+    min-width: 400px;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Icon picker smart positioning - prevent overflow */
+.icon-picker {
+    max-width: calc(100vw - 40px);
+}
+
+/* Modal form has limited space, so ensure icon picker fits */
+.modal-content .icon-picker {
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 320px;
+}
+
+/* Icon picker scrollbar styling */
+.icon-picker::-webkit-scrollbar {
+    width: 6px;
+}
+
+.icon-picker::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 3px;
+}
+
+.icon-picker::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.icon-picker::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+.icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: var(--bg-primary);
+    min-height: 60px;
+}
+
+.icon-option:hover {
+    border-color: var(--primary-color);
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.icon-option.selected {
+    border-color: var(--primary-color);
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.icon-option .sf-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.icon-option .icon-name {
+    font-size: 9px;
+    text-align: center;
+    color: var(--text-secondary);
+    line-height: 1.1;
+    max-width: 45px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Icon Categories */
+.icon-category {
+    margin-bottom: 12px;
+}
+
+.icon-category-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.icon-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 4px;
+}
+
+/* Icon Input Group */
+.icon-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    position: relative;
+}
+
+.icon-input-group input {
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.icon-input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+/* Icon picker positioned relative to input group */
+.icon-input-group .icon-picker {
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+}
 
 /* Animation */
 .fade-in {

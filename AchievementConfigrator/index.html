@@ -12,6 +12,7 @@
             <h1>🏆 Roqua Achievement Configurator</h1>
             <div class="header-actions">
                 <button id="import-btn" class="btn btn-secondary">📁 JSON İçe Aktar</button>
+                <button id="preview-btn" class="btn btn-secondary">👁️ JSON Önizle</button>
                 <button id="export-btn" class="btn btn-secondary">💾 JSON Dışa Aktar</button>
                 <button id="add-btn" class="btn btn-primary">+ Yeni Başarım</button>
             </div>
@@ -103,7 +104,9 @@
                     </div>
                     <div class="form-group">
                         <label for="achievement-category">Kategori *</label>
-                        <input type="text" id="achievement-category" required>
+                        <select id="achievement-category" required>
+                            <option value="">Kategori Seçin</option>
+                        </select>
                     </div>
                 </div>
 
@@ -131,7 +134,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="achievement-icon">İkon</label>
-                        <input type="text" id="achievement-icon" placeholder="figure.walk">
+                        <div class="icon-input-group">
+                            <input type="text" id="achievement-icon" placeholder="figure.walk">
+                            <button type="button" id="icon-picker-btn" class="btn btn-secondary">İkon Seç</button>
+                            <div id="icon-picker-modal" class="icon-picker" style="display: none;"></div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="achievement-target">Hedef *</label>
@@ -167,9 +174,15 @@
                     </div>
                 </div>
 
+                <!-- Parameters Container - Dynamically populated -->
+                <div id="parametersContainer" style="display: none;">
+                    <div id="parametersFields"></div>
+                </div>
+
                 <div class="form-group">
-                    <label for="achievement-params">Parametreler (JSON)</label>
-                    <textarea id="achievement-params" placeholder='{"cityName": "İstanbul"}'></textarea>
+                    <label for="achievement-params">Parametreler (JSON) - İsteğe Bağlı</label>
+                    <textarea id="achievement-params" placeholder='{"cityName": "İstanbul"}' rows="3"></textarea>
+                    <small class="field-help">Calculator tipine özel parametreler veya manuel JSON girişi</small>
                 </div>
 
                 <div class="form-group">
@@ -201,9 +214,28 @@
         </div>
     </div>
 
+    <!-- JSON Preview Modal -->
+    <div id="json-preview-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
+            <div class="modal-header">
+                <h2>JSON Veri Önizleme</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="height: 60vh; overflow-y: auto;">
+                <pre id="json-preview-content" style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word;"></pre>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="close-preview">Kapat</button>
+                <button type="button" class="btn btn-primary" id="copy-json">JSON Kopyala</button>
+                <button type="button" class="btn btn-success" id="download-from-preview">İndir</button>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="file-input" accept=".json" style="display: none;">
 
     <script src="achievement-manager.js"></script>
+    <script src="achievement-form-controller.js"></script>
     <script src="app.js"></script>
 </body>
 </html> 

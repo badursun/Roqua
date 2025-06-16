@@ -20,10 +20,10 @@ class AchievementManager {
     /**
      * Initialize the manager with sample data
      */
-    init() {
+    async init() {
         // Load sample data if no data exists
         if (this.achievements.length === 0) {
-            this.loadSampleData();
+            await this.loadSampleData();
         }
         this.applyFilters();
         this.updateStats();
@@ -32,125 +32,57 @@ class AchievementManager {
     }
 
     /**
-     * Load sample achievement data
+     * Load sample achievement data from JSON file
      */
-    loadSampleData() {
-        this.achievements = [
-            {
-                id: "first_steps",
-                category: "firstSteps",
-                type: "milestone",
-                title: "İlk Adımlar",
-                description: "İlk 10 bölgeyi keşfet",
-                iconName: "🚶",
-                target: 10,
-                isHidden: false,
-                rarity: "common",
-                calculator: "milestone",
-                params: null
-            },
-            {
-                id: "istanbul_master",
-                category: "cityMaster",
-                type: "geographic",
-                title: "İstanbul Ustası",
-                description: "İstanbul'da 50+ bölge keşfet",
-                iconName: "🏢",
-                target: 50,
-                isHidden: false,
-                rarity: "rare",
-                calculator: "city",
-                params: {
-                    cityName: "İstanbul"
-                }
-            },
-            {
-                id: "district_explorer_25",
-                category: "districtExplorer",
-                type: "geographic",
-                title: "İlçe Uzmanı",
-                description: "25+ farklı ilçe keşfet",
-                iconName: "🗺️",
-                target: 25,
-                isHidden: false,
-                rarity: "rare",
-                calculator: "district",
-                params: null
-            },
-            {
-                id: "country_collector_5",
-                category: "countryCollector",
-                type: "geographic",
-                title: "Dünya Gezgini",
-                description: "5+ ülke ziyaret et",
-                iconName: "🌍",
-                target: 5,
-                isHidden: false,
-                rarity: "epic",
-                calculator: "country",
-                params: null
-            },
-            {
-                id: "area_explorer_1km",
-                category: "areaExplorer",
-                type: "exploration",
-                title: "Alan Kaşifi",
-                description: "1 km² alan keşfet",
-                iconName: "📐",
-                target: 1000000,
-                isHidden: false,
-                rarity: "common",
-                calculator: "area",
-                params: {
-                    unit: "square_meters"
-                }
-            },
-            {
-                id: "daily_explorer_7",
-                category: "dailyExplorer",
-                type: "temporal",
-                title: "Günlük Kaşif",
-                description: "7 gün üst üste keşif yap",
-                iconName: "📅",
-                target: 7,
-                isHidden: false,
-                rarity: "rare",
-                calculator: "daily_streak",
-                params: {
-                    type: "consecutive_days"
-                }
-            },
-            {
-                id: "weekend_warrior",
-                category: "weekendWarrior",
-                type: "temporal",
-                title: "Hafta Sonu Savaşçısı",
-                description: "4 hafta sonu üst üste keşif yap",
-                iconName: "☀️",
-                target: 4,
-                isHidden: false,
-                rarity: "rare",
-                calculator: "weekend_streak",
-                params: {
-                    type: "consecutive_weekends"
-                }
-            },
-            {
-                id: "percentage_001",
-                category: "percentageMilestone",
-                type: "exploration",
-                title: "Dünya'nın Binde Biri",
-                description: "Dünya'nın %0.001'ini keşfet",
-                iconName: "💯",
-                target: 1,
-                isHidden: false,
-                rarity: "epic",
-                calculator: "percentage",
-                params: {
-                    multiplier: 1000
-                }
+    async loadSampleData() {
+        try {
+            const response = await fetch('sample-achievements.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        ];
+            const data = await response.json();
+            
+            // Use the importFromJSON method to load the data
+            const achievements = data.achievements || [];
+            this.achievements = achievements;
+            
+            console.log(`✅ ${achievements.length} sample achievement yüklendi`);
+            return;
+        } catch (error) {
+            console.warn('⚠️ Sample achievements yüklenemedi, fallback data kullanılıyor:', error.message);
+            
+            // Fallback to minimal hardcoded data
+            this.achievements = [
+                {
+                    id: "first_steps",
+                    category: "firstSteps",
+                    type: "milestone",
+                    title: "İlk Adımlar",
+                    description: "İlk 10 bölgeyi keşfet",
+                    icon: "figure.walk",
+                    target: 10,
+                    isHidden: false,
+                    rarity: "common",
+                    calculator: "milestone",
+                    params: null
+                },
+                {
+                    id: "istanbul_master",
+                    category: "cityMaster",
+                    type: "geographic",
+                    title: "İstanbul Ustası",
+                    description: "İstanbul'da 50+ bölge keşfet",
+                    icon: "building.2.fill",
+                    target: 50,
+                    isHidden: false,
+                    rarity: "rare",
+                    calculator: "city",
+                    params: {
+                        cityName: "İstanbul"
+                    }
+                }
+            ];
+        }
     }
 
     /**
@@ -447,36 +379,167 @@ class AchievementManager {
     }
 
     /**
-     * Get icon display with fallback
+     * Get icon display with SF Symbols support and Unicode fallbacks
      */
     getIconDisplay(iconName) {
-        const iconMap = {
+        if (!iconName) return '<span class="sf-icon">🏆</span>';
+        
+        // SF Symbols to Unicode mapping for web compatibility
+        const sfSymbolsToUnicode = {
+            // Hareket & Aktivite
             'figure.walk': '🚶',
+            'figure.run': '🏃',
+            'figure.hiking': '🥾',
+            'figure.cycling': '🚴',
+            'bicycle': '🚲',
+            'car.fill': '🚗',
+            'bus.fill': '🚌',
+            'tram.fill': '🚊',
+            'train.side.front.car': '🚂',
+            'airplane': '✈️',
+            'airplane.departure': '✈️',
+            'airplane.arrival': '🛬',
+            'ferry.fill': '⛴️',
+            'sailboat.fill': '⛵',
+            
+            // Lokasyon & Yerler
+            'location.fill': '📍',
+            'mappin': '📌',
+            'mappin.and.ellipse': '📍',
+            'mappin.circle.fill': '📍',
+            'pin.fill': '📌',
+            'signpost.left.fill': '🪧',
+            'signpost.right.fill': '🪧',
+            
+            // Yapılar & Binalar
+            'house.fill': '🏠',
+            'building.fill': '🏢',
             'building.2.fill': '🏢',
             'building.columns.fill': '🏛️',
+            'house.and.flag.fill': '🏛️',
+            'hospital.fill': '🏥',
+            'cross.case.fill': '🏥',
+            'graduationcap.fill': '🎓',
+            'book.closed.fill': '📚',
+            'storefront.fill': '🏪',
+            'cart.fill': '🛒',
+            'fuelpump.fill': '⛽',
+            'fork.knife': '🍽️',
+            'cup.and.saucer.fill': '☕',
+            
+            // Harita & Coğrafya
             'map.fill': '🗺️',
             'map.circle.fill': '🗺️',
+            'globe': '🌍',
             'globe.europe.africa.fill': '🌍',
             'globe.americas.fill': '🌎',
             'globe.central.south.asia.fill': '🌏',
-            'square.grid.3x3.fill': '📐',
-            'square.grid.4x3.fill': '📏',
-            'percent': '💯',
-            'calendar.badge.checkmark': '📅',
+            'compass.drawing': '🧭',
+            'location.north.fill': '🧭',
+            'scope': '🔍',
+            
+            // Doğa & Çevre
+            'mountain.2.fill': '⛰️',
+            'tree.fill': '🌳',
+            'leaf.fill': '🍃',
+            'snowflake': '❄️',
             'sun.max.fill': '☀️',
+            'moon.fill': '🌙',
+            'star.fill': '⭐',
+            'cloud.fill': '☁️',
+            'drop.fill': '💧',
+            'flame.fill': '🔥',
+            
+            // Zaman & Takvim
+            'clock.fill': '🕐',
+            'timer': '⏲️',
+            'stopwatch.fill': '⏱️',
+            'calendar': '📅',
+            'calendar.badge.checkmark': '📅',
+            'hourglass': '⏳',
+            'alarm.fill': '⏰',
+            
+            // Keşif & Macera
             'binoculars.fill': '🔭',
             'backpack.fill': '🎒',
-            'airplane.departure': '✈️'
+            'camera.fill': '📷',
+            'photo.fill': '🖼️',
+            'eye.fill': '👁️',
+            'magnifyingglass': '🔍',
+            'flashlight.on.fill': '🔦',
+            'tent.fill': '⛺',
+            
+            // Ödüller & Başarımlar
+            'trophy.fill': '🏆',
+            'medal.fill': '🏅',
+            'rosette': '🏵️',
+            'crown.fill': '👑',
+            'gem.fill': '💎',
+            'sparkles': '✨',
+            'target': '🎯',
+            'flag.fill': '🚩',
+            'flag.checkered': '🏁',
+            'checkmark.seal.fill': '✅',
+            
+            // Sayılar & İstatistik
+            'chart.bar.fill': '📊',
+            'chart.pie.fill': '📈',
+            'chart.line.uptrend.xyaxis': '📈',
+            'percent': '%',
+            'number': '#',
+            'plus.circle.fill': '➕',
+            'minus.circle.fill': '➖',
+            'multiply.circle.fill': '✖️',
+            'speedometer': '⚡',
+            
+            // Grid & Alan
+            'square.grid.3x3.fill': '⊞',
+            'square.grid.4x3.fill': '⊟',
+            'grid': '▦',
+            'rectangle.grid.1x2.fill': '▬',
+            'rectangle.grid.2x2.fill': '▦',
+            'square.fill': '⬛',
+            'circle.fill': '⚫',
+            'triangle.fill': '🔺',
+            
+            // Sosyal & İnsan
+            'person.fill': '👤',
+            'person.2.fill': '👥',
+            'person.3.fill': '👨‍👩‍👧',
+            'heart.fill': '❤️',
+            'hand.thumbsup.fill': '👍',
+            'hands.clap.fill': '👏',
+            'face.smiling.fill': '😊',
+            
+            // Teknoloji & Araçlar
+            'iphone': '📱',
+            'laptopcomputer': '💻',
+            'wifi': '📶',
+            'antenna.radiowaves.left.and.right': '📡',
+            'qrcode': '▦',
+            'link': '🔗'
         };
         
-        return iconMap[iconName] || iconName || '🏆';
+        // Check if it's a SF Symbol (contains dots) or regular emoji
+        if (iconName.includes('.')) {
+            const unicodeIcon = sfSymbolsToUnicode[iconName];
+            if (unicodeIcon) {
+                return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">${unicodeIcon}</span>`;
+            } else {
+                // Fallback for unknown SF Symbols
+                return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">⚪</span>`;
+            }
+        }
+        
+        // Regular emoji or text
+        return `<span class="sf-icon">${iconName}</span>`;
     }
 
     /**
      * Render single achievement card
      */
     renderAchievementCard(achievement) {
-        const iconDisplay = this.getIconDisplay(achievement.iconName);
+        const iconDisplay = this.getIconDisplay(achievement.icon);
         const hiddenClass = achievement.isHidden ? ' hidden' : '';
         const hiddenIcon = achievement.isHidden ? '<span title="Gizli Başarım" style="color: var(--accent-color); font-size: 10px;">✨</span>' : '';
         
@@ -492,6 +555,7 @@ class AchievementManager {
                             </div>
                         </div>
                         <div class="achievement-actions">
+                            <button class="action-btn copy-btn" onclick="app.copyAchievement('${achievement.id}')" title="Kopyala"></button>
                             <button class="action-btn edit-btn" onclick="app.editAchievement('${achievement.id}')" title="Düzenle"></button>
                             <button class="action-btn delete-btn" onclick="app.deleteAchievementConfirm('${achievement.id}')" title="Sil"></button>
                         </div>
@@ -526,6 +590,7 @@ class AchievementManager {
                         <div class="achievement-rarity rarity-${achievement.rarity}">${achievement.rarity.toUpperCase()}</div>
                         <div class="target-value">${achievement.target.toLocaleString('tr-TR')}</div>
                         <div class="achievement-actions">
+                            <button class="action-btn copy-btn" onclick="app.copyAchievement('${achievement.id}')" title="Kopyala"></button>
                             <button class="action-btn edit-btn" onclick="app.editAchievement('${achievement.id}')" title="Düzenle"></button>
                             <button class="action-btn delete-btn" onclick="app.deleteAchievementConfirm('${achievement.id}')" title="Sil"></button>
                         </div>
@@ -630,14 +695,36 @@ class AchievementManager {
     }
 
     /**
-     * Export achievements to JSON
+     * Export achievements to JSON with proper ordering
      */
     exportToJSON() {
         return {
             version: "1.0",
-            lastUpdated: new Date().toISOString(),
-            achievements: this.achievements
+            lastUpdated: new Date().toISOString().split('T')[0],
+            achievements: this.achievements.map(achievement => {
+                // Ensure proper ordering: category, type, target
+                return {
+                    id: achievement.id,
+                    title: achievement.title,
+                    description: achievement.description,
+                    icon: achievement.icon || achievement.iconName,
+                    rarity: achievement.rarity,
+                    isHidden: achievement.isHidden || false,
+                    category: achievement.category,
+                    type: achievement.type,
+                    target: achievement.target,
+                    calculator: achievement.calculator,
+                    parameters: achievement.parameters || {}
+                };
+            })
         };
+    }
+
+    /**
+     * Generate formatted JSON string for preview
+     */
+    generateFormattedJSON() {
+        return JSON.stringify(this.exportToJSON(), null, 2);
     }
 }
 

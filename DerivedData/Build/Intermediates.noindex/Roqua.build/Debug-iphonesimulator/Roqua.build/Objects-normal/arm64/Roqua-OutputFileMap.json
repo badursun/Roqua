@@ -15,6 +15,106 @@
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
   },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/AchievementCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/AreaCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AreaCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/CityCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CityCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/CountryCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/CountryCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/DailyStreakCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DailyStreakCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/DistrictCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/DistrictCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/MilestoneCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/MilestoneCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/PercentageCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/PercentageCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Calculators/WeekendStreakCalculator.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/WeekendStreakCalculator~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/ContentView.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Database/SQLiteManager.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/SQLiteManager.swiftconstvalues",
     "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/SQLiteManager.d",
@@ -24,6 +124,16 @@
     "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/SQLiteManager.o",
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/SQLiteManager.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/SQLiteManager~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Managers/AchievementManager.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementManager~partial.swiftmodule"
   },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Managers/ExploredCirclesManager.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ExploredCirclesManager.swiftconstvalues",
@@ -44,6 +154,16 @@
     "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/GridHashManager.o",
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/GridHashManager.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/GridHashManager~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Managers/LegacyAchievementBridge.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LegacyAchievementBridge~partial.swiftmodule"
   },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Managers/LocationManager.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/LocationManager.swiftconstvalues",
@@ -75,6 +195,16 @@
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/VisitedRegionManager.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/VisitedRegionManager~partial.swiftmodule"
   },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Models/AchievementDefinition.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementDefinition~partial.swiftmodule"
+  },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Models/AppSettings.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AppSettings.swiftconstvalues",
     "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AppSettings.d",
@@ -84,6 +214,16 @@
     "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AppSettings.o",
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AppSettings.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AppSettings~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Models/Events.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/Events~partial.swiftmodule"
   },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Models/VisitedRegion.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/VisitedRegion.swiftconstvalues",
@@ -105,15 +245,25 @@
     "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/RoquaApp.swiftdeps",
     "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/RoquaApp~partial.swiftmodule"
   },
-  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/ContentView.swift" : {
-    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.swiftconstvalues",
-    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.d",
-    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.dia",
-    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.o",
-    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.bc",
-    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.o",
-    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView.swiftdeps",
-    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/AchievementPageView.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementPageView~partial.swiftmodule"
+  },
+  "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/Components/AchievementNotificationView.swift" : {
+    "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.swiftconstvalues",
+    "dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.d",
+    "diagnostics" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.dia",
+    "index-unit-output-path" : "/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.o",
+    "llvm-bc" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.bc",
+    "object" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.o",
+    "swift-dependencies" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView.swiftdeps",
+    "swiftmodule" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/AchievementNotificationView~partial.swiftmodule"
   },
   "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/MapView/FogOfWarMapView.swift" : {
     "const-values" : "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/DerivedData/Build/Intermediates.noindex/Roqua.build/Debug-iphonesimulator/Roqua.build/Objects-normal/arm64/FogOfWarMapView.swiftconstvalues",

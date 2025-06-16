@@ -225,6 +225,20 @@
         "params": {
           "type": "consecutive_weekends"
         }
+      },
+      {
+        "id": "explorer_10000",
+        "category": "explorer",
+        "type": "milestone",
+        "title": "Büyük Kaşif Kolomb",
+        "description": "10000 bölge keşfet ve Kolomb ünvanını al",
+        "iconName": "binoculars.fill",
+        "target": 10000,
+        "isHidden": true,
+        "rarity": "common",
+        "calculator": "milestone",
+        "params": null
       }
     ]
   } 
+  

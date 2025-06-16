@@ -151,58 +151,142 @@ class AchievementFormController {
     }
 
     /**
-     * Setup SF Symbols for iOS
+     * Setup SF Symbols for iOS - Comprehensive List for Achievements
      */
     setupSFSymbols() {
         this.sfSymbols = [
-            // Navigation & Movement
+            // Hareket & Aktivite
             { symbol: 'figure.walk', emoji: '🚶', category: 'Hareket', name: 'Yürüyüş' },
             { symbol: 'figure.run', emoji: '🏃', category: 'Hareket', name: 'Koşu' },
+            { symbol: 'figure.hiking', emoji: '🥾', category: 'Hareket', name: 'Yürüyüş' },
+            { symbol: 'figure.cycling', emoji: '🚴', category: 'Hareket', name: 'Bisiklet' },
             { symbol: 'bicycle', emoji: '🚲', category: 'Hareket', name: 'Bisiklet' },
             { symbol: 'car.fill', emoji: '🚗', category: 'Hareket', name: 'Araba' },
-            { symbol: 'airplane.departure', emoji: '✈️', category: 'Hareket', name: 'Uçak' },
+            { symbol: 'bus.fill', emoji: '🚌', category: 'Hareket', name: 'Otobüs' },
+            { symbol: 'tram.fill', emoji: '🚊', category: 'Hareket', name: 'Tramvay' },
+            { symbol: 'train.side.front.car', emoji: '🚂', category: 'Hareket', name: 'Tren' },
+            { symbol: 'airplane', emoji: '✈️', category: 'Hareket', name: 'Uçak' },
+            { symbol: 'airplane.departure', emoji: '✈️', category: 'Hareket', name: 'Kalkış' },
+            { symbol: 'airplane.arrival', emoji: '🛬', category: 'Hareket', name: 'İniş' },
+            { symbol: 'ferry.fill', emoji: '⛴️', category: 'Hareket', name: 'Feribot' },
+            { symbol: 'sailboat.fill', emoji: '⛵', category: 'Hareket', name: 'Yelkenli' },
             
-            // Buildings & Places
-            { symbol: 'building.2.fill', emoji: '🏢', category: 'Yapılar', name: 'Ofis Binası' },
-            { symbol: 'building.columns.fill', emoji: '🏛️', category: 'Yapılar', name: 'Müze' },
+            // Lokasyon & Yerler  
+            { symbol: 'location.fill', emoji: '📍', category: 'Lokasyon', name: 'Konum' },
+            { symbol: 'mappin', emoji: '📌', category: 'Lokasyon', name: 'İğne' },
+            { symbol: 'mappin.and.ellipse', emoji: '📍', category: 'Lokasyon', name: 'Konum Daire' },
+            { symbol: 'mappin.circle.fill', emoji: '📍', category: 'Lokasyon', name: 'Konum Daire' },
+            { symbol: 'pin.fill', emoji: '📌', category: 'Lokasyon', name: 'Pin' },
+            { symbol: 'signpost.left.fill', emoji: '🪧', category: 'Lokasyon', name: 'Tabela Sol' },
+            { symbol: 'signpost.right.fill', emoji: '🪧', category: 'Lokasyon', name: 'Tabela Sağ' },
+            
+            // Yapılar & Binalar
             { symbol: 'house.fill', emoji: '🏠', category: 'Yapılar', name: 'Ev' },
-            { symbol: 'location.fill', emoji: '📍', category: 'Yapılar', name: 'Konum' },
-            { symbol: 'mappin.and.ellipse', emoji: '📍', category: 'Yapılar', name: 'Harita Pini' },
+            { symbol: 'building.fill', emoji: '🏢', category: 'Yapılar', name: 'Bina' },
+            { symbol: 'building.2.fill', emoji: '🏢', category: 'Yapılar', name: 'İkiz Bina' },
+            { symbol: 'building.columns.fill', emoji: '🏛️', category: 'Yapılar', name: 'Köşk/Müze' },
+            { symbol: 'house.and.flag.fill', emoji: '🏛️', category: 'Yapılar', name: 'Resmi Bina' },
+            { symbol: 'hospital.fill', emoji: '🏥', category: 'Yapılar', name: 'Hastane' },
+            { symbol: 'cross.case.fill', emoji: '🏥', category: 'Yapılar', name: 'Tıp Merkezi' },
+            { symbol: 'graduationcap.fill', emoji: '🎓', category: 'Yapılar', name: 'Üniversite' },
+            { symbol: 'book.closed.fill', emoji: '📚', category: 'Yapılar', name: 'Kütüphane' },
+            { symbol: 'storefront.fill', emoji: '🏪', category: 'Yapılar', name: 'Mağaza' },
+            { symbol: 'cart.fill', emoji: '🛒', category: 'Yapılar', name: 'Market' },
+            { symbol: 'fuelpump.fill', emoji: '⛽', category: 'Yapılar', name: 'Benzin İstasyonu' },
+            { symbol: 'fork.knife', emoji: '🍽️', category: 'Yapılar', name: 'Restoran' },
+            { symbol: 'cup.and.saucer.fill', emoji: '☕', category: 'Yapılar', name: 'Kafe' },
             
-            // Maps & Geography
+            // Harita & Coğrafya
             { symbol: 'map.fill', emoji: '🗺️', category: 'Harita', name: 'Harita' },
             { symbol: 'map.circle.fill', emoji: '🗺️', category: 'Harita', name: 'Harita Daire' },
-            { symbol: 'globe.europe.africa.fill', emoji: '🌍', category: 'Harita', name: 'Dünya (Avrupa)' },
-            { symbol: 'globe.americas.fill', emoji: '🌎', category: 'Harita', name: 'Dünya (Amerika)' },
-            { symbol: 'globe.central.south.asia.fill', emoji: '🌏', category: 'Harita', name: 'Dünya (Asya)' },
+            { symbol: 'globe', emoji: '🌍', category: 'Harita', name: 'Dünya' },
+            { symbol: 'globe.europe.africa.fill', emoji: '🌍', category: 'Harita', name: 'Avrupa/Afrika' },
+            { symbol: 'globe.americas.fill', emoji: '🌎', category: 'Harita', name: 'Amerika' },
+            { symbol: 'globe.central.south.asia.fill', emoji: '🌏', category: 'Harita', name: 'Asya' },
+            { symbol: 'compass.drawing', emoji: '🧭', category: 'Harita', name: 'Pusula' },
+            { symbol: 'location.north.fill', emoji: '🧭', category: 'Harita', name: 'Kuzey' },
+            { symbol: 'scope', emoji: '🔍', category: 'Harita', name: 'Büyüteç' },
             
-            // Measurement & Analytics
-            { symbol: 'square.grid.3x3.fill', emoji: '📐', category: 'Ölçüm', name: '3x3 Grid' },
-            { symbol: 'square.grid.4x3.fill', emoji: '📏', category: 'Ölçüm', name: '4x3 Grid' },
-            { symbol: 'percent', emoji: '💯', category: 'Ölçüm', name: 'Yüzde' },
-            { symbol: 'chart.bar.fill', emoji: '📊', category: 'Ölçüm', name: 'Grafik' },
-            { symbol: 'speedometer', emoji: '⏱️', category: 'Ölçüm', name: 'Hızölçer' },
+            // Doğa & Çevre
+            { symbol: 'mountain.2.fill', emoji: '⛰️', category: 'Doğa', name: 'Dağlar' },
+            { symbol: 'tree.fill', emoji: '🌳', category: 'Doğa', name: 'Ağaç' },
+            { symbol: 'leaf.fill', emoji: '🍃', category: 'Doğa', name: 'Yaprak' },
+            { symbol: 'snowflake', emoji: '❄️', category: 'Doğa', name: 'Kar Tanesi' },
+            { symbol: 'sun.max.fill', emoji: '☀️', category: 'Doğa', name: 'Güneş' },
+            { symbol: 'moon.fill', emoji: '🌙', category: 'Doğa', name: 'Ay' },
+            { symbol: 'star.fill', emoji: '⭐', category: 'Doğa', name: 'Yıldız' },
+            { symbol: 'cloud.fill', emoji: '☁️', category: 'Doğa', name: 'Bulut' },
+            { symbol: 'drop.fill', emoji: '💧', category: 'Doğa', name: 'Damla' },
+            { symbol: 'flame.fill', emoji: '🔥', category: 'Doğa', name: 'Ateş' },
             
-            // Time & Calendar
-            { symbol: 'calendar.badge.checkmark', emoji: '📅', category: 'Zaman', name: 'Takvim' },
+            // Zaman & Takvim
             { symbol: 'clock.fill', emoji: '🕐', category: 'Zaman', name: 'Saat' },
-            { symbol: 'timer', emoji: '⏲️', category: 'Zaman', name: 'Zamanlayıcı' },
-            { symbol: 'sun.max.fill', emoji: '☀️', category: 'Zaman', name: 'Gündüz' },
-            { symbol: 'moon.fill', emoji: '🌙', category: 'Zaman', name: 'Gece' },
+            { symbol: 'timer', emoji: '⏲️', category: 'Zaman', name: 'Kronometrek' },
+            { symbol: 'stopwatch.fill', emoji: '⏱️', category: 'Zaman', name: 'Kronometre' },
+            { symbol: 'calendar', emoji: '📅', category: 'Zaman', name: 'Takvim' },
+            { symbol: 'calendar.badge.checkmark', emoji: '📅', category: 'Zaman', name: 'Takvim Tik' },
+            { symbol: 'hourglass', emoji: '⏳', category: 'Zaman', name: 'Kum Saati' },
+            { symbol: 'alarm.fill', emoji: '⏰', category: 'Zaman', name: 'Alarm' },
             
-            // Exploration & Adventure
+            // Keşif & Macera
             { symbol: 'binoculars.fill', emoji: '🔭', category: 'Keşif', name: 'Dürbün' },
             { symbol: 'backpack.fill', emoji: '🎒', category: 'Keşif', name: 'Sırt Çantası' },
             { symbol: 'camera.fill', emoji: '📷', category: 'Keşif', name: 'Kamera' },
-            { symbol: 'compass.drawing', emoji: '🧭', category: 'Keşif', name: 'Pusula' },
-            { symbol: 'mountain.2.fill', emoji: '⛰️', category: 'Keşif', name: 'Dağ' },
+            { symbol: 'photo.fill', emoji: '🖼️', category: 'Keşif', name: 'Fotoğraf' },
+            { symbol: 'eye.fill', emoji: '👁️', category: 'Keşif', name: 'Göz' },
+            { symbol: 'magnifyingglass', emoji: '🔍', category: 'Keşif', name: 'Arama' },
+            { symbol: 'flashlight.on.fill', emoji: '🔦', category: 'Keşif', name: 'El Feneri' },
+            { symbol: 'tent.fill', emoji: '⛺', category: 'Keşif', name: 'Çadır' },
             
-            // Achievement & Rewards
+            // Ödüller & Başarımlar
             { symbol: 'trophy.fill', emoji: '🏆', category: 'Ödül', name: 'Kupa' },
             { symbol: 'medal.fill', emoji: '🏅', category: 'Ödül', name: 'Madalya' },
-            { symbol: 'star.fill', emoji: '⭐', category: 'Ödül', name: 'Yıldız' },
+            { symbol: 'rosette', emoji: '🏵️', category: 'Ödül', name: 'Rozet' },
             { symbol: 'crown.fill', emoji: '👑', category: 'Ödül', name: 'Taç' },
-            { symbol: 'target', emoji: '🎯', category: 'Ödül', name: 'Hedef' }
+            { symbol: 'gem.fill', emoji: '💎', category: 'Ödül', name: 'Elmas' },
+            { symbol: 'sparkles', emoji: '✨', category: 'Ödül', name: 'Parıltı' },
+            { symbol: 'target', emoji: '🎯', category: 'Ödül', name: 'Hedef' },
+            { symbol: 'flag.fill', emoji: '🚩', category: 'Ödül', name: 'Bayrak' },
+            { symbol: 'flag.checkered', emoji: '🏁', category: 'Ödül', name: 'Finiş' },
+            { symbol: 'checkmark.seal.fill', emoji: '✅', category: 'Ödül', name: 'Onay Mührü' },
+            
+            // Sayılar & İstatistik
+            { symbol: 'chart.bar.fill', emoji: '📊', category: 'İstatistik', name: 'Bar Grafik' },
+            { symbol: 'chart.pie.fill', emoji: '📈', category: 'İstatistik', name: 'Pasta Grafik' },
+            { symbol: 'chart.line.uptrend.xyaxis', emoji: '📈', category: 'İstatistik', name: 'Yükseliş' },
+            { symbol: 'percent', emoji: '%', category: 'İstatistik', name: 'Yüzde' },
+            { symbol: 'number', emoji: '#', category: 'İstatistik', name: 'Sayı' },
+            { symbol: 'plus.circle.fill', emoji: '➕', category: 'İstatistik', name: 'Artı' },
+            { symbol: 'minus.circle.fill', emoji: '➖', category: 'İstatistik', name: 'Eksi' },
+            { symbol: 'multiply.circle.fill', emoji: '✖️', category: 'İstatistik', name: 'Çarpı' },
+            { symbol: 'speedometer', emoji: '⚡', category: 'İstatistik', name: 'Hız' },
+            
+            // Grid & Alan
+            { symbol: 'square.grid.3x3.fill', emoji: '⊞', category: 'Grid', name: '3x3 Grid' },
+            { symbol: 'square.grid.4x3.fill', emoji: '⊟', category: 'Grid', name: '4x3 Grid' },
+            { symbol: 'grid', emoji: '▦', category: 'Grid', name: 'Grid' },
+            { symbol: 'rectangle.grid.1x2.fill', emoji: '▬', category: 'Grid', name: '1x2 Grid' },
+            { symbol: 'rectangle.grid.2x2.fill', emoji: '▦', category: 'Grid', name: '2x2 Grid' },
+            { symbol: 'square.fill', emoji: '⬛', category: 'Grid', name: 'Kare' },
+            { symbol: 'circle.fill', emoji: '⚫', category: 'Grid', name: 'Daire' },
+            { symbol: 'triangle.fill', emoji: '🔺', category: 'Grid', name: 'Üçgen' },
+            
+            // Sosyal & İnsan
+            { symbol: 'person.fill', emoji: '👤', category: 'Sosyal', name: 'Kişi' },
+            { symbol: 'person.2.fill', emoji: '👥', category: 'Sosyal', name: 'İki Kişi' },
+            { symbol: 'person.3.fill', emoji: '👨‍👩‍👧', category: 'Sosyal', name: 'Grup' },
+            { symbol: 'heart.fill', emoji: '❤️', category: 'Sosyal', name: 'Kalp' },
+            { symbol: 'hand.thumbsup.fill', emoji: '👍', category: 'Sosyal', name: 'Beğeni' },
+            { symbol: 'hands.clap.fill', emoji: '👏', category: 'Sosyal', name: 'Alkış' },
+            { symbol: 'face.smiling.fill', emoji: '😊', category: 'Sosyal', name: 'Gülümseme' },
+            
+            // Teknoloji & Araçlar
+            { symbol: 'iphone', emoji: '📱', category: 'Teknoloji', name: 'Telefon' },
+            { symbol: 'laptopcomputer', emoji: '💻', category: 'Teknoloji', name: 'Laptop' },
+            { symbol: 'wifi', emoji: '📶', category: 'Teknoloji', name: 'WiFi' },
+            { symbol: 'antenna.radiowaves.left.and.right', emoji: '📡', category: 'Teknoloji', name: 'Sinyal' },
+            { symbol: 'qrcode', emoji: '▦', category: 'Teknoloji', name: 'QR Kod' },
+            { symbol: 'link', emoji: '🔗', category: 'Teknoloji', name: 'Bağlantı' }
         ];
     }
 
@@ -212,22 +296,47 @@ class AchievementFormController {
     bindFormEvents() {
         // ID field auto-sanitization
         document.addEventListener('input', (e) => {
-            if (e.target.id === 'achievementId') {
+            if (e.target.id === 'achievement-id') {
                 this.sanitizeId(e.target);
             }
         });
 
         // Calculator type change
         document.addEventListener('change', (e) => {
-            if (e.target.id === 'achievementCalculator') {
+            if (e.target.id === 'achievement-calculator') {
                 this.onCalculatorTypeChange(e.target.value);
             }
         });
 
         // Real-time validation
         document.addEventListener('blur', (e) => {
-            if (e.target.form && e.target.form.id === 'achievementForm') {
+            if (e.target.form && e.target.form.id === 'achievement-form') {
                 this.validateField(e.target);
+            }
+        });
+
+        // Icon picker button
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'icon-picker-btn') {
+                this.toggleIconPicker();
+            }
+            
+            // Icon selection
+            if (e.target.closest('.icon-option')) {
+                const iconOption = e.target.closest('.icon-option');
+                const iconSymbol = iconOption.dataset.symbol;
+                this.selectIcon(iconSymbol);
+            }
+        });
+
+        // Close icon picker when clicking outside
+        document.addEventListener('click', (e) => {
+            const iconPicker = document.getElementById('icon-picker-modal');
+            const iconBtn = document.getElementById('icon-picker-btn');
+            
+            if (iconPicker && iconPicker.style.display !== 'none' && 
+                !iconPicker.contains(e.target) && e.target !== iconBtn) {
+                this.hideIconPicker();
             }
         });
     }
@@ -241,7 +350,7 @@ class AchievementFormController {
         // Convert to lowercase
         value = value.toLowerCase();
         
-        // Replace spaces and special chars with underscore
+        // Allow letters, numbers and underscore, replace other chars with underscore
         value = value.replace(/[^a-z0-9_]/g, '_');
         
         // Remove multiple underscores
@@ -263,8 +372,7 @@ class AchievementFormController {
      * Check if ID already exists
      */
     checkIdDuplicate(id) {
-        const errorElement = document.getElementById('idError');
-        const input = document.getElementById('achievementId');
+        const input = document.getElementById('achievement-id');
         
         if (!id) {
             this.showFieldError(input, 'ID gereklidir');
@@ -292,7 +400,7 @@ class AchievementFormController {
      */
     onCalculatorTypeChange(calculatorType) {
         const parametersContainer = document.getElementById('parametersContainer');
-        const targetField = document.getElementById('achievementTarget');
+        const targetField = document.getElementById('achievement-target');
         
         const calculator = this.calculatorTypes.find(c => c.id === calculatorType);
         
@@ -372,75 +480,9 @@ class AchievementFormController {
     }
 
     /**
-     * Populate form with existing data (for edit mode)
-     */
-    populateForm(achievement) {
-        this.currentMode = 'edit';
-        this.currentAchievementId = achievement.id;
-        
-        // Basic fields
-        document.getElementById('achievementId').value = achievement.id;
-        document.getElementById('achievementTitle').value = achievement.title;
-        document.getElementById('achievementDescription').value = achievement.description;
-        document.getElementById('achievementCategory').value = achievement.category;
-        document.getElementById('achievementRarity').value = achievement.rarity;
-        document.getElementById('achievementCalculator').value = achievement.calculator;
-        document.getElementById('achievementTarget').value = achievement.target;
-        document.getElementById('achievementIcon').value = achievement.iconName;
-        document.getElementById('achievementHidden').checked = achievement.isHidden || false;
-        
-        // Trigger calculator change to show parameters
-        this.onCalculatorTypeChange(achievement.calculator);
-        
-        // Populate parameters if they exist
-        if (achievement.parameters) {
-            setTimeout(() => {
-                this.populateParameters(achievement.parameters);
-            }, 100);
-        }
-    }
-
-    /**
-     * Populate parameters fields
-     */
-    populateParameters(parameters) {
-        for (const [key, value] of Object.entries(parameters)) {
-            const field = document.getElementById(`param_${key}`);
-            if (field) {
-                if (Array.isArray(value)) {
-                    field.value = JSON.stringify(value, null, 2);
-                } else {
-                    field.value = value;
-                }
-            }
-        }
-    }
-
-    /**
-     * Clear form for add mode
-     */
-    clearForm() {
-        this.currentMode = 'add';
-        this.currentAchievementId = null;
-        
-        document.getElementById('achievementForm').reset();
-        document.getElementById('parametersContainer').style.display = 'none';
-        
-        // Clear all error states
-        const errorElements = document.querySelectorAll('.field-error, .error-message');
-        errorElements.forEach(el => el.remove());
-        
-        const inputs = document.querySelectorAll('#achievementForm input, #achievementForm select, #achievementForm textarea');
-        inputs.forEach(input => {
-            input.classList.remove('error');
-        });
-    }
-
-    /**
      * Validate entire form
      */
     validateForm() {
-        const form = document.getElementById('achievementForm');
         let isValid = true;
         
         // Clear previous errors
@@ -448,14 +490,14 @@ class AchievementFormController {
         
         // Validate required fields
         const requiredFields = [
-            { id: 'achievementId', name: 'ID' },
-            { id: 'achievementTitle', name: 'Başlık' },
-            { id: 'achievementDescription', name: 'Açıklama' },
-            { id: 'achievementCategory', name: 'Kategori' },
-            { id: 'achievementRarity', name: 'Nadirlik' },
-            { id: 'achievementCalculator', name: 'Hesaplayıcı' },
-            { id: 'achievementTarget', name: 'Hedef' },
-            { id: 'achievementIcon', name: 'İkon' }
+            { id: 'achievement-id', name: 'ID' },
+            { id: 'achievement-title', name: 'Başlık' },
+            { id: 'achievement-description', name: 'Açıklama' },
+            { id: 'achievement-category', name: 'Kategori' },
+            { id: 'achievement-rarity', name: 'Nadirlik' },
+            { id: 'achievement-calculator', name: 'Hesaplayıcı' },
+            { id: 'achievement-target', name: 'Hedef' },
+            { id: 'achievement-icon', name: 'İkon' }
         ];
         
         for (const field of requiredFields) {
@@ -467,25 +509,37 @@ class AchievementFormController {
         }
         
         // Validate ID
-        const idField = document.getElementById('achievementId');
+        const idField = document.getElementById('achievement-id');
         if (idField.value && !this.checkIdDuplicate(idField.value)) {
             isValid = false;
         }
         
         // Validate target (must be positive number)
-        const targetField = document.getElementById('achievementTarget');
+        const targetField = document.getElementById('achievement-target');
         if (targetField.value && (isNaN(targetField.value) || parseFloat(targetField.value) <= 0)) {
             this.showFieldError(targetField, 'Hedef pozitif bir sayı olmalıdır');
             isValid = false;
         }
         
         // Validate parameters
-        const calculatorType = document.getElementById('achievementCalculator').value;
+        const calculatorType = document.getElementById('achievement-calculator').value;
         const calculator = this.calculatorTypes.find(c => c.id === calculatorType);
         
         if (calculator && calculator.hasParameters) {
             const parametersValid = this.validateParameters(calculator);
             if (!parametersValid) {
+                isValid = false;
+            }
+        }
+        
+        // Validate manual JSON parameters
+        const manualParams = document.getElementById('achievement-params');
+        if (manualParams && manualParams.value.trim()) {
+            try {
+                JSON.parse(manualParams.value.trim());
+                this.clearFieldError(manualParams);
+            } catch (e) {
+                this.showFieldError(manualParams, 'Geçerli JSON formatında olmalıdır');
                 isValid = false;
             }
         }
@@ -553,21 +607,36 @@ class AchievementFormController {
      */
     getFormData() {
         const formData = {
-            id: document.getElementById('achievementId').value.trim(),
-            title: document.getElementById('achievementTitle').value.trim(),
-            description: document.getElementById('achievementDescription').value.trim(),
-            category: document.getElementById('achievementCategory').value,
-            rarity: document.getElementById('achievementRarity').value,
-            calculator: document.getElementById('achievementCalculator').value,
-            target: parseFloat(document.getElementById('achievementTarget').value),
-            iconName: document.getElementById('achievementIcon').value,
-            isHidden: document.getElementById('achievementHidden').checked
+            id: document.getElementById('achievement-id').value.trim(),
+            title: document.getElementById('achievement-title').value.trim(),
+            description: document.getElementById('achievement-description').value.trim(),
+            category: document.getElementById('achievement-category').value,
+            rarity: document.getElementById('achievement-rarity').value,
+            calculator: document.getElementById('achievement-calculator').value,
+            target: parseFloat(document.getElementById('achievement-target').value),
+            icon: document.getElementById('achievement-icon').value,
+            isHidden: document.getElementById('achievement-hidden').checked
         };
         
         // Add parameters if they exist
         const calculator = this.calculatorTypes.find(c => c.id === formData.calculator);
         if (calculator && calculator.hasParameters) {
             formData.parameters = this.getParametersData(calculator);
+        }
+        
+        // Also check for manual JSON parameters
+        const manualParams = document.getElementById('achievement-params');
+        if (manualParams && manualParams.value.trim()) {
+            try {
+                const manualParamsData = JSON.parse(manualParams.value.trim());
+                // Merge with existing parameters or use as fallback
+                formData.parameters = formData.parameters ? 
+                    { ...formData.parameters, ...manualParamsData } : 
+                    manualParamsData;
+            } catch (e) {
+                // Invalid JSON, but don't fail - validation should catch this
+                console.warn('Invalid JSON in manual parameters field');
+            }
         }
         
         return formData;
@@ -621,13 +690,24 @@ class AchievementFormController {
         
         // Field-specific validation
         switch (field.id) {
-            case 'achievementId':
+            case 'achievement-id':
                 return this.checkIdDuplicate(field.value);
                 
-            case 'achievementTarget':
+            case 'achievement-target':
                 if (field.value && (isNaN(field.value) || parseFloat(field.value) <= 0)) {
                     this.showFieldError(field, 'Pozitif bir sayı olmalıdır');
                     return false;
+                }
+                break;
+                
+            case 'achievement-params':
+                if (field.value.trim()) {
+                    try {
+                        JSON.parse(field.value.trim());
+                    } catch (e) {
+                        this.showFieldError(field, 'Geçerli JSON formatında olmalıdır');
+                        return false;
+                    }
                 }
                 break;
         }
@@ -669,17 +749,233 @@ class AchievementFormController {
         const errorElements = document.querySelectorAll('.field-error, .error-message');
         errorElements.forEach(el => el.remove());
         
-        const inputs = document.querySelectorAll('#achievementForm input, #achievementForm select, #achievementForm textarea');
+        const inputs = document.querySelectorAll('#achievement-form input, #achievement-form select, #achievement-form textarea');
         inputs.forEach(input => {
             input.classList.remove('error');
         });
     }
 
     /**
+     * Clear form for add mode
+     */
+    clearForm() {
+        this.currentMode = 'add';
+        this.currentAchievementId = null;
+        
+        document.getElementById('achievement-form').reset();
+        const parametersContainer = document.getElementById('parametersContainer');
+        if (parametersContainer) parametersContainer.style.display = 'none';
+        
+        // Clear manual JSON parameters
+        const manualParams = document.getElementById('achievement-params');
+        if (manualParams) manualParams.value = '';
+        
+        this.clearAllErrors();
+    }
+
+    /**
+     * Copy achievement data for creating variations
+     */
+    copyForNewAchievement(achievement) {
+        this.currentMode = 'copy';
+        this.currentAchievementId = null;
+        
+        // Generate new ID based on original
+        const baseId = achievement.id;
+        let newId = `${baseId}_copy`;
+        let counter = 1;
+        
+        // Find unique ID
+        while (this.achievementManager.getAchievement(newId)) {
+            newId = `${baseId}_copy_${counter}`;
+            counter++;
+        }
+        
+        // Populate form with copied data but new ID
+        document.getElementById('achievement-id').value = newId;
+        document.getElementById('achievement-title').value = `${achievement.title} (Kopya)`;
+        document.getElementById('achievement-description').value = achievement.description;
+        document.getElementById('achievement-category').value = achievement.category;
+        document.getElementById('achievement-rarity').value = achievement.rarity;
+        document.getElementById('achievement-calculator').value = achievement.calculator;
+        document.getElementById('achievement-target').value = achievement.target;
+        document.getElementById('achievement-icon').value = achievement.icon || achievement.iconName;
+        document.getElementById('achievement-hidden').checked = achievement.isHidden || false;
+        
+        // Trigger calculator change to show parameters
+        this.onCalculatorTypeChange(achievement.calculator);
+        
+        // Populate parameters if they exist
+        if (achievement.parameters) {
+            setTimeout(() => {
+                this.populateParameters(achievement.parameters);
+                // Also populate manual JSON field
+                const manualParams = document.getElementById('achievement-params');
+                if (manualParams) {
+                    manualParams.value = JSON.stringify(achievement.parameters, null, 2);
+                }
+            }, 100);
+        }
+        
+        // Clear any existing errors
+        this.clearAllErrors();
+        
+        // Focus on title field for quick editing
+        setTimeout(() => {
+            document.getElementById('achievement-title').focus();
+            document.getElementById('achievement-title').select();
+        }, 150);
+    }
+
+    /**
+     * Populate form with existing data (for edit mode)
+     */
+    populateForm(achievement) {
+        this.currentMode = 'edit';
+        this.currentAchievementId = achievement.id;
+        
+        // Basic fields
+        document.getElementById('achievement-id').value = achievement.id;
+        document.getElementById('achievement-title').value = achievement.title;
+        document.getElementById('achievement-description').value = achievement.description;
+        document.getElementById('achievement-category').value = achievement.category;
+        document.getElementById('achievement-rarity').value = achievement.rarity;
+        document.getElementById('achievement-calculator').value = achievement.calculator;
+        document.getElementById('achievement-target').value = achievement.target;
+        document.getElementById('achievement-icon').value = achievement.icon || achievement.iconName;
+        document.getElementById('achievement-hidden').checked = achievement.isHidden || false;
+        
+        // Trigger calculator change to show parameters
+        this.onCalculatorTypeChange(achievement.calculator);
+        
+        // Populate parameters if they exist
+        if (achievement.parameters) {
+            setTimeout(() => {
+                this.populateParameters(achievement.parameters);
+                // Also populate manual JSON field as backup
+                const manualParams = document.getElementById('achievement-params');
+                if (manualParams) {
+                    manualParams.value = JSON.stringify(achievement.parameters, null, 2);
+                }
+            }, 100);
+        }
+    }
+
+    /**
+     * Populate parameters fields
+     */
+    populateParameters(parameters) {
+        for (const [key, value] of Object.entries(parameters)) {
+            const field = document.getElementById(`param_${key}`);
+            if (field) {
+                if (Array.isArray(value)) {
+                    field.value = JSON.stringify(value, null, 2);
+                } else {
+                    field.value = value;
+                }
+            }
+        }
+    }
+
+    /**
+     * Initialize form UI components
+     */
+    initializeFormUI() {
+        this.renderCategoryOptions();
+        this.renderCalculatorOptions();
+        this.renderIconPicker();
+    }
+
+    /**
+     * Render icon picker modal
+     */
+    renderIconPicker() {
+        const iconPicker = document.getElementById('icon-picker-modal');
+        if (!iconPicker) return;
+
+        // Group SF Symbols by category
+        const categorizedIcons = this.sfSymbols.reduce((acc, symbol) => {
+            if (!acc[symbol.category]) {
+                acc[symbol.category] = [];
+            }
+            acc[symbol.category].push(symbol);
+            return acc;
+        }, {});
+
+        let html = '';
+        for (const [category, icons] of Object.entries(categorizedIcons)) {
+            html += `
+                <div class="icon-category">
+                    <div class="icon-category-title">${category}</div>
+                    <div class="icon-category-grid">
+                        ${icons.map(icon => `
+                            <div class="icon-option" data-symbol="${icon.symbol}" title="${icon.name}">
+                                <span class="sf-icon">${icon.emoji}</span>
+                                <span class="icon-name">${icon.symbol.split('.')[0]}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        iconPicker.innerHTML = html;
+    }
+
+    /**
+     * Toggle icon picker visibility
+     */
+    toggleIconPicker() {
+        const iconPicker = document.getElementById('icon-picker-modal');
+        if (iconPicker.style.display === 'none' || !iconPicker.style.display) {
+            this.showIconPicker();
+        } else {
+            this.hideIconPicker();
+        }
+    }
+
+    /**
+     * Show icon picker
+     */
+    showIconPicker() {
+        const iconPicker = document.getElementById('icon-picker-modal');
+        iconPicker.style.display = 'block';
+        
+        // Highlight currently selected icon
+        const currentIcon = document.getElementById('achievement-icon').value;
+        const iconOptions = iconPicker.querySelectorAll('.icon-option');
+        iconOptions.forEach(option => {
+            option.classList.toggle('selected', option.dataset.symbol === currentIcon);
+        });
+    }
+
+    /**
+     * Hide icon picker
+     */
+    hideIconPicker() {
+        const iconPicker = document.getElementById('icon-picker-modal');
+        iconPicker.style.display = 'none';
+    }
+
+    /**
+     * Select an icon
+     */
+    selectIcon(iconSymbol) {
+        const iconInput = document.getElementById('achievement-icon');
+        iconInput.value = iconSymbol;
+        
+        // Update icon display in input (could add preview here)
+        this.hideIconPicker();
+        
+        // Trigger validation
+        this.validateField(iconInput);
+    }
+
+    /**
      * Render category options
      */
     renderCategoryOptions() {
-        const select = document.getElementById('achievementCategory');
+        const select = document.getElementById('achievement-category');
         if (!select) return;
         
         select.innerHTML = '<option value="">Kategori Seçin</option>';
@@ -697,7 +993,7 @@ class AchievementFormController {
      * Render calculator type options
      */
     renderCalculatorOptions() {
-        const select = document.getElementById('achievementCalculator');
+        const select = document.getElementById('achievement-calculator');
         if (!select) return;
         
         select.innerHTML = '<option value="">Hesaplayıcı Seçin</option>';
@@ -709,118 +1005,6 @@ class AchievementFormController {
             option.title = calculator.description;
             select.appendChild(option);
         });
-    }
-
-    /**
-     * Render icon options with search and categories
-     */
-    renderIconSelector() {
-        const container = document.getElementById('iconSelectorContainer');
-        if (!container) return;
-        
-        const categories = [...new Set(this.sfSymbols.map(icon => icon.category))];
-        
-        let html = `
-            <div class="icon-selector">
-                <div class="icon-search">
-                    <input type="text" id="iconSearch" placeholder="İkon ara...">
-                </div>
-                <div class="icon-categories">
-                    <button type="button" class="icon-category-btn active" data-category="all">Tümü</button>
-                    ${categories.map(cat => 
-                        `<button type="button" class="icon-category-btn" data-category="${cat}">${cat}</button>`
-                    ).join('')}
-                </div>
-                <div class="icon-grid" id="iconGrid">
-                    ${this.renderIconGrid()}
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML = html;
-        
-        // Bind icon selector events
-        this.bindIconSelectorEvents();
-    }
-
-    /**
-     * Render icon grid
-     */
-    renderIconGrid(filter = '') {
-        let icons = this.sfSymbols;
-        
-        if (filter && filter !== 'all') {
-            icons = icons.filter(icon => 
-                icon.category === filter || 
-                icon.name.toLowerCase().includes(filter.toLowerCase()) ||
-                icon.symbol.toLowerCase().includes(filter.toLowerCase())
-            );
-        }
-        
-        return icons.map(icon => `
-            <div class="icon-option" data-symbol="${icon.symbol}" title="${icon.name}">
-                <span class="icon-emoji">${icon.emoji}</span>
-                <span class="icon-name">${icon.name}</span>
-            </div>
-        `).join('');
-    }
-
-    /**
-     * Bind icon selector events
-     */
-    bindIconSelectorEvents() {
-        // Icon search
-        const searchInput = document.getElementById('iconSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const iconGrid = document.getElementById('iconGrid');
-                iconGrid.innerHTML = this.renderIconGrid(e.target.value);
-            });
-        }
-        
-        // Category filter
-        const categoryBtns = document.querySelectorAll('.icon-category-btn');
-        categoryBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                categoryBtns.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                const category = e.target.dataset.category;
-                const iconGrid = document.getElementById('iconGrid');
-                iconGrid.innerHTML = this.renderIconGrid(category === 'all' ? '' : category);
-            });
-        });
-        
-        // Icon selection
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.icon-option')) {
-                const iconOption = e.target.closest('.icon-option');
-                const symbol = iconOption.dataset.symbol;
-                
-                // Update hidden input
-                document.getElementById('achievementIcon').value = symbol;
-                
-                // Update visual feedback
-                document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
-                iconOption.classList.add('selected');
-                
-                // Update preview if exists
-                const preview = document.getElementById('iconPreview');
-                if (preview) {
-                    const iconData = this.sfSymbols.find(icon => icon.symbol === symbol);
-                    preview.innerHTML = `${iconData.emoji} ${iconData.name}`;
-                }
-            }
-        });
-    }
-
-    /**
-     * Initialize form UI components
-     */
-    initializeFormUI() {
-        this.renderCategoryOptions();
-        this.renderCalculatorOptions();
-        this.renderIconSelector();
     }
 }
 

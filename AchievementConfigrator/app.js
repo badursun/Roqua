@@ -6,6 +6,7 @@
 class App {
     constructor() {
         this.manager = new AchievementManager();
+        this.formController = null;
         this.deleteId = null;
         this.initializeEventListeners();
     }
@@ -16,6 +17,7 @@ class App {
     initializeEventListeners() {
         // Header actions
         document.getElementById('import-btn').addEventListener('click', () => this.importJSON());
+        document.getElementById('preview-btn').addEventListener('click', () => this.showJSONPreview());
         document.getElementById('export-btn').addEventListener('click', () => this.exportJSON());
         document.getElementById('add-btn').addEventListener('click', () => this.showAddModal());
 
@@ -88,6 +90,7 @@ class App {
         // Achievement modal
         const achievementModal = document.getElementById('achievement-modal');
         const deleteModal = document.getElementById('delete-modal');
+        const jsonPreviewModal = document.getElementById('json-preview-modal');
 
         // Close modal buttons
         document.querySelectorAll('.modal-close').forEach(btn => {
@@ -95,7 +98,7 @@ class App {
         });
 
         // Click outside modal to close
-        [achievementModal, deleteModal].forEach(modal => {
+        [achievementModal, deleteModal, jsonPreviewModal].forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     this.closeAllModals();
@@ -123,13 +126,26 @@ class App {
                 this.confirmDelete();
             }
         });
+
+        // JSON Preview modal buttons
+        document.getElementById('close-preview').addEventListener('click', () => {
+            this.closeAllModals();
+        });
+        document.getElementById('copy-json').addEventListener('click', () => {
+            this.copyJSONToClipboard();
+        });
+        document.getElementById('download-from-preview').addEventListener('click', () => {
+            this.downloadJSONFromPreview();
+        });
     }
 
     /**
      * Initialize the application
      */
-    init() {
-        this.manager.init();
+    async init() {
+        await this.manager.init();
+        this.formController = new AchievementFormController(this.manager);
+        this.formController.initializeFormUI();
         this.showWelcomeMessage();
     }
 
@@ -147,7 +163,7 @@ class App {
     showAddModal() {
         this.manager.editingId = null;
         document.getElementById('modal-title').textContent = 'Yeni Başarım';
-        this.clearForm();
+        this.formController.clearForm();
         this.showModal('achievement-modal');
     }
 
@@ -163,8 +179,27 @@ class App {
 
         this.manager.editingId = id;
         document.getElementById('modal-title').textContent = 'Başarımı Düzenle';
-        this.populateForm(achievement);
+        this.formController.populateForm(achievement);
         this.showModal('achievement-modal');
+    }
+
+    /**
+     * Copy achievement for creating variations
+     */
+    copyAchievement(id) {
+        const achievement = this.manager.getAchievement(id);
+        if (!achievement) {
+            this.showError('Başarım bulunamadı');
+            return;
+        }
+
+        this.manager.editingId = null;
+        document.getElementById('modal-title').textContent = 'Başarım Kopyala';
+        this.formController.copyForNewAchievement(achievement);
+        this.showModal('achievement-modal');
+        
+        // Show helpful toast
+        this.showSuccess(`${achievement.title} başarımı kopyalandı. ID ve başlığı düzenleyerek kaydedin.`);
     }
 
     /**
@@ -194,7 +229,12 @@ class App {
      */
     saveAchievement() {
         try {
-            const achievement = this.getFormData();
+            if (!this.formController.validateForm()) {
+                this.showError('Lütfen form hatalarını düzeltin');
+                return;
+            }
+
+            const achievement = this.formController.getFormData();
             
             if (this.manager.editingId) {
                 this.manager.updateAchievement(this.manager.editingId, achievement);
@@ -346,6 +386,57 @@ class App {
     }
 
     /**
+     * Show JSON preview modal
+     */
+    showJSONPreview() {
+        try {
+            const jsonData = this.manager.generateFormattedJSON();
+            document.getElementById('json-preview-content').textContent = jsonData;
+            this.showModal('json-preview-modal');
+        } catch (error) {
+            this.showError(`JSON preview hatası: ${error.message}`);
+        }
+    }
+
+    /**
+     * Copy JSON to clipboard from preview
+     */
+    async copyJSONToClipboard() {
+        try {
+            const jsonContent = document.getElementById('json-preview-content').textContent;
+            await navigator.clipboard.writeText(jsonContent);
+            this.showSuccess('JSON panoya kopyalandı');
+        } catch (error) {
+            this.showError('Panoya kopyalama başarısız');
+        }
+    }
+
+    /**
+     * Download JSON file from preview
+     */
+    downloadJSONFromPreview() {
+        try {
+            const jsonContent = document.getElementById('json-preview-content').textContent;
+            const blob = new Blob([jsonContent], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `roqua-achievements-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            this.showSuccess('JSON dosyası indirildi');
+        } catch (error) {
+            this.showError(`İndirme hatası: ${error.message}`);
+        }
+    }
+
+    /**
      * Show success message
      */
     showSuccess(message) {
@@ -430,11 +521,7 @@ class App {
 }
 
 // Initialize app when DOM is loaded
-let app;
-document.addEventListener('DOMContentLoaded', () => {
-    app = new App();
-    app.init();
-});
-
-// Expose app globally for inline event handlers
-window.app = app; 
+document.addEventListener('DOMContentLoaded', async () => {
+    window.app = new App();
+    await window.app.init();
+}); 

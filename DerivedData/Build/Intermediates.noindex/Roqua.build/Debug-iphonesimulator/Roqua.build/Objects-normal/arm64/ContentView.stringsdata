@@ -1,29 +1,61 @@
 {
-  "source": "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Views/ContentView.swift",
+  "source": "/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/ContentView.swift",
   "tables": {
     "Localizable": [
       {
         "comment": "",
-        "key": "Keşfedilen",
+        "key": "Keşfedilen Alan",
         "location": {
-          "startingColumn": 26,
-          "startingLine": 24
+          "startingColumn": 30,
+          "startingLine": 283
         }
       },
       {
         "comment": "",
-        "key": "GPS: ±%lldm",
+        "key": "%",
         "location": {
           "startingColumn": 34,
-          "startingLine": 95
+          "startingLine": 299
         }
       },
       {
         "comment": "",
-        "key": "Zoom: %@",
+        "key": "%lld bölge",
         "location": {
           "startingColumn": 30,
-          "startingLine": 101
+          "startingLine": 314
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konumum",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 357
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konum Kapalı",
+        "location": {
+          "startingColumn": 69,
+          "startingLine": 357
+        }
+      },
+      {
+        "comment": "",
+        "key": "İstatistikler",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 383
+        }
+      },
+      {
+        "comment": "",
+        "key": "±%lldm",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 429
         }
       },
       {
@@ -31,23 +63,23 @@
         "key": "Hesap",
         "location": {
           "startingColumn": 30,
-          "startingLine": 174
+          "startingLine": 473
         }
       },
       {
         "comment": "",
-        "key": "Hesap",
+        "key": "Gizli Kaşif",
         "location": {
-          "startingColumn": 22,
-          "startingLine": 163
+          "startingColumn": 26,
+          "startingLine": 460
         }
       },
       {
         "comment": "",
-        "key": "Bu özellik yakında gelecek!",
+        "key": "Kimlik gerekmez. Sadece keşfet.",
         "location": {
-          "startingColumn": 22,
-          "startingLine": 167
+          "startingColumn": 26,
+          "startingLine": 464
         }
       },
       {
@@ -55,7 +87,7 @@
         "key": "Kapat",
         "location": {
           "startingColumn": 28,
-          "startingLine": 178
+          "startingLine": 477
         }
       }
     ]

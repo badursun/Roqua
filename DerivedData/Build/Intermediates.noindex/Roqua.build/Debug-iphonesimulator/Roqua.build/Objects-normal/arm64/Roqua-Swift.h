@@ -317,7 +317,7 @@ SWIFT_CLASS("_TtC5Roqua15FogOfWarOverlay")
 SWIFT_CLASS("_TtC5Roqua16FogOfWarRenderer")
 @interface FogOfWarRenderer : MKOverlayRenderer
 - (void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef _Nonnull)context;
-- (nonnull instancetype)initWithOverlay:(id <MKOverlay> _Nonnull)overlay SWIFT_UNAVAILABLE;
+- (nonnull instancetype)initWithOverlay:(id <MKOverlay> _Nonnull)overlay OBJC_DESIGNATED_INITIALIZER;
 @end
 
 SWIFT_CLASS("_TtC5Roqua15LocationManager")
@@ -330,7 +330,7 @@ SWIFT_CLASS("_TtC5Roqua15LocationManager")
 @interface LocationManager (SWIFT_EXTENSION(Roqua)) <CLLocationManagerDelegate>
 - (void)locationManager:(CLLocationManager * _Nonnull)manager didUpdateLocations:(NSArray<CLLocation *> * _Nonnull)locations;
 - (void)locationManager:(CLLocationManager * _Nonnull)manager didFailWithError:(NSError * _Nonnull)error;
-- (void)locationManager:(CLLocationManager * _Nonnull)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status;
+- (void)locationManagerDidChangeAuthorization:(CLLocationManager * _Nonnull)manager;
 @end
 
 #endif
