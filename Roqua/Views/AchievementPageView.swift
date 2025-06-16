@@ -553,15 +553,12 @@ struct AchievementContentView: View {
                         )
                     }
                     
-                    // Hidden Achievements (if any unlocked)
-                    if !unlockedHiddenAchievements.isEmpty {
-                        HiddenAchievementsSection(
-                            achievements: unlockedHiddenAchievements,
-                            onAchievementTap: { achievement in
-                                selectedAchievement = achievement
-                            }
-                        )
-                    }
+                    // Hidden Achievements Section
+                    HiddenAchievementsSection(
+                        onAchievementTap: { achievement in
+                            selectedAchievement = achievement
+                        }
+                    )
                 }
                 .padding(.horizontal)
             }
@@ -591,33 +588,66 @@ struct AchievementContentView: View {
         return Dictionary(grouping: regularAchievements) { $0.category }
     }
     
-    // Enhanced sorting: Category alphabetically, then by target value
+    // Dynamic sorting: Category by logical order based on actual data
     private var sortedCategories: [AchievementCategory] {
-        return Array(groupedAchievements.keys).sorted { category1, category2 in
-            category1.rawValue < category2.rawValue
+        // Get all unique categories from achievements
+        let availableCategories = Array(groupedAchievements.keys)
+        
+        // Define preferred order for categories that exist
+        let categoryOrder: [AchievementCategory] = [
+            .firstSteps,        // İlk Adımlar
+            .explorer,          // Kaşif
+            .adventurer,        // Maceracı
+            .worldTraveler,     // Dünya Gezgini
+            .cityMaster,        // Şehir Ustası
+            .districtExplorer,  // İlçe Kaşifi
+            .countryCollector,  // Ülke Koleksiyoneri
+            .areaExplorer,      // Alan Kaşifi
+            .percentageMilestone, // Yüzde Milestone
+            .dailyExplorer,     // Günlük Kaşif
+            .weekendWarrior,    // Hafta Sonu Savaşçısı
+        ]
+        
+        // Sort available categories by preferred order, unknowns go to end
+        return availableCategories.sorted { category1, category2 in
+            let index1 = categoryOrder.firstIndex(of: category1) ?? Int.max
+            let index2 = categoryOrder.firstIndex(of: category2) ?? Int.max
+            
+            if index1 == Int.max && index2 == Int.max {
+                // Both unknown, sort alphabetically
+                return category1.rawValue < category2.rawValue
+            }
+            
+            return index1 < index2
         }
     }
     
     private func sortedAchievements(for category: AchievementCategory) -> [Achievement] {
         let categoryAchievements = groupedAchievements[category] ?? []
         return categoryAchievements.sorted { achievement1, achievement2 in
-            let progress1 = achievementManager.getProgress(for: achievement1.id)
-            let progress2 = achievementManager.getProgress(for: achievement2.id)
-            
-            // Sort by target progress (ascending), then by unlock status
-            if progress1?.targetProgress != progress2?.targetProgress {
-                return (progress1?.targetProgress ?? 0) < (progress2?.targetProgress ?? 0)
+            // Primary: Sort by target (ascending - kolay → zor)
+            if achievement1.target != achievement2.target {
+                return achievement1.target < achievement2.target
             }
             
-            // If same target, unlocked ones first
-            let unlocked1 = progress1?.isUnlocked ?? false
-            let unlocked2 = progress2?.isUnlocked ?? false
-            if unlocked1 != unlocked2 {
-                return unlocked1 && !unlocked2
+            // Secondary: Sort by rarity (ascending - kolay → zor)
+            let rarity1Value = rarityValue(achievement1.rarity)
+            let rarity2Value = rarityValue(achievement2.rarity)
+            if rarity1Value != rarity2Value {
+                return rarity1Value < rarity2Value
             }
             
-            // Then by title
+            // Tertiary: Sort by title alphabetically
             return achievement1.title < achievement2.title
+        }
+    }
+    
+    private func rarityValue(_ rarity: Achievement.AchievementRarity) -> Int {
+        switch rarity {
+        case .common: return 1     // En kolay
+        case .rare: return 2       // Orta
+        case .epic: return 3       // Zor  
+        case .legendary: return 4  // En zor
         }
     }
     
@@ -706,26 +736,23 @@ struct AllAchievementsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                // Regular Achievements by Category
-                ForEach(Array(groupedAchievements.keys).sorted { $0.rawValue < $1.rawValue }, id: \.self) { category in
-                    CategoryListSection(
-                        category: category,
-                        achievements: groupedAchievements[category] ?? [],
-                        onAchievementTap: { achievement in
-                            selectedAchievement = achievement
-                        }
-                    )
+                            // Regular Achievements by Category
+            ForEach(sortedCategories, id: \.self) { category in
+                CategoryListSection(
+                    category: category,
+                    achievements: sortedAchievements(for: category),
+                    onAchievementTap: { achievement in
+                        selectedAchievement = achievement
+                    }
+                )
+            }
+            
+            // Hidden Achievements Section
+            HiddenAchievementsSection(
+                onAchievementTap: { achievement in
+                    selectedAchievement = achievement
                 }
-                
-                // Hidden Achievements (if any unlocked)
-                if !unlockedHiddenAchievements.isEmpty {
-                    HiddenAchievementsSection(
-                        achievements: unlockedHiddenAchievements,
-                        onAchievementTap: { achievement in
-                            selectedAchievement = achievement
-                        }
-                    )
-                }
+            )
             }
             .padding(.horizontal)
         }
@@ -740,6 +767,69 @@ struct AllAchievementsView: View {
     private var groupedAchievements: [AchievementCategory: [Achievement]] {
         let regularAchievements = achievementManager.achievements.filter { !$0.isHidden }
         return Dictionary(grouping: regularAchievements) { $0.category }
+    }
+    
+    // Dynamic sorting: Category by logical order based on actual data
+    private var sortedCategories: [AchievementCategory] {
+        // Get all unique categories from achievements
+        let availableCategories = Array(groupedAchievements.keys)
+        
+        // Define preferred order for categories that exist
+        let categoryOrder: [AchievementCategory] = [
+            .firstSteps,        // İlk Adımlar
+            .explorer,          // Kaşif
+            .adventurer,        // Maceracı
+            .worldTraveler,     // Dünya Gezgini
+            .cityMaster,        // Şehir Ustası
+            .districtExplorer,  // İlçe Kaşifi
+            .countryCollector,  // Ülke Koleksiyoneri
+            .areaExplorer,      // Alan Kaşifi
+            .percentageMilestone, // Yüzde Milestone
+            .dailyExplorer,     // Günlük Kaşif
+            .weekendWarrior,    // Hafta Sonu Savaşçısı
+        ]
+        
+        // Sort available categories by preferred order, unknowns go to end
+        return availableCategories.sorted { category1, category2 in
+            let index1 = categoryOrder.firstIndex(of: category1) ?? Int.max
+            let index2 = categoryOrder.firstIndex(of: category2) ?? Int.max
+            
+            if index1 == Int.max && index2 == Int.max {
+                // Both unknown, sort alphabetically
+                return category1.rawValue < category2.rawValue
+            }
+            
+            return index1 < index2
+        }
+    }
+    
+    private func sortedAchievements(for category: AchievementCategory) -> [Achievement] {
+        let categoryAchievements = groupedAchievements[category] ?? []
+        return categoryAchievements.sorted { achievement1, achievement2 in
+            // Primary: Sort by target (ascending - kolay → zor)
+            if achievement1.target != achievement2.target {
+                return achievement1.target < achievement2.target
+            }
+            
+            // Secondary: Sort by rarity (ascending - kolay → zor)
+            let rarity1Value = rarityValue(achievement1.rarity)
+            let rarity2Value = rarityValue(achievement2.rarity)
+            if rarity1Value != rarity2Value {
+                return rarity1Value < rarity2Value
+            }
+            
+            // Tertiary: Sort by title alphabetically
+            return achievement1.title < achievement2.title
+        }
+    }
+    
+    private func rarityValue(_ rarity: Achievement.AchievementRarity) -> Int {
+        switch rarity {
+        case .common: return 1     // En kolay
+        case .rare: return 2       // Orta
+        case .epic: return 3       // Zor  
+        case .legendary: return 4  // En zor
+        }
     }
     
     private var unlockedHiddenAchievements: [Achievement] {
@@ -800,10 +890,7 @@ struct AchievementMedalCard: View {
                     )
                 
                 // Achievement Icon
-                Image(systemName: achievement.iconName)
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                AchievementIconView.medium(achievement)
             }
             .shadow(color: enhancedMedalShadowColor, radius: 8, x: 0, y: 4)
             
@@ -938,21 +1025,34 @@ struct CategoryListSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Clean Category Header - No Badge
-            HStack(alignment: .center, spacing: 8) {
-                Text(titleForCategory(category))
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+            // Enhanced Category Header with Badges and Rating
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .center, spacing: 12) {
+                    // Category Title
+                    Text(titleForCategory(category))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                    
+                    // Completion Badge
+                    CompletionBadge(
+                        completionRatio: achievementManager.completionRatio(for: category),
+                        isFullyMastered: achievementManager.isFullyMastered(category: category)
+                    )
+                    
+                    Spacer()
+                    
+                    // Difficulty Rating
+                    DifficultyRating(difficulty: achievementManager.difficultyRating(for: category))
+                }
                 
-                Text("(\(unlockedCount)/\(achievements.count))")
-                    .font(.title3)
-                    .fontWeight(.medium)
-                    .foregroundColor(.white.opacity(0.8))
-                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
-                
-                Spacer()
+                // Category Progress Bar
+                CategoryProgressBar(
+                    completionRatio: achievementManager.completionRatio(for: category),
+                    completedCount: unlockedCount,
+                    totalCount: achievements.count
+                )
             }
             .padding(.horizontal, 4)
             
@@ -976,16 +1076,29 @@ struct CategoryListSection: View {
     
     private var sortedAchievements: [Achievement] {
         achievements.sorted { achievement1, achievement2 in
-            // First sort by unlocked status (unlocked first)
-            let isUnlocked1 = achievementManager.getProgress(for: achievement1.id)?.isUnlocked ?? false
-            let isUnlocked2 = achievementManager.getProgress(for: achievement2.id)?.isUnlocked ?? false
-            
-            if isUnlocked1 != isUnlocked2 {
-                return isUnlocked1
+            // Primary: Sort by target (ascending - kolay → zor)
+            if achievement1.target != achievement2.target {
+                return achievement1.target < achievement2.target
             }
             
-            // Then sort by target (easier first)
-            return achievement1.target < achievement2.target
+            // Secondary: Sort by rarity (ascending - kolay → zor)
+            let rarity1Value = rarityValue(achievement1.rarity)
+            let rarity2Value = rarityValue(achievement2.rarity)
+            if rarity1Value != rarity2Value {
+                return rarity1Value < rarity2Value
+            }
+            
+            // Tertiary: Sort by title alphabetically
+            return achievement1.title < achievement2.title
+        }
+    }
+    
+    private func rarityValue(_ rarity: Achievement.AchievementRarity) -> Int {
+        switch rarity {
+        case .common: return 1     // En kolay
+        case .rare: return 2       // Orta
+        case .epic: return 3       // Zor  
+        case .legendary: return 4  // En zor
         }
     }
     
@@ -1005,11 +1118,11 @@ struct CategoryListSection: View {
         case .districtExplorer: return "İlçe Kaşifi"
         case .countryCollector: return "Ülke Koleksiyoneri"
         case .areaExplorer: return "Alan Kaşifi"
-        case .distanceWalker: return "Mesafe Yürüyüşçüsü"
-        case .gridMaster: return "Grid Ustası"
-        case .percentageMilestone: return "Yüzde Milestone"
+        case .percentageMilestone: return "Yüzde Dönüm Noktaları"
         case .dailyExplorer: return "Günlük Kaşif"
         case .weekendWarrior: return "Hafta Sonu Savaşçısı"
+        case .distanceWalker: return "Mesafe Yürüyüşçüsü"
+        case .gridMaster: return "Grid Ustası"
         case .monthlyChallenger: return "Aylık Meydan Okuyucu"
         }
     }
@@ -1024,11 +1137,11 @@ struct CategoryListSection: View {
         case .districtExplorer: return "map.circle"
         case .countryCollector: return "globe.europe.africa"
         case .areaExplorer: return "square.grid.3x3"
-        case .distanceWalker: return "figure.walk.diamond"
-        case .gridMaster: return "grid"
         case .percentageMilestone: return "percent"
         case .dailyExplorer: return "calendar"
         case .weekendWarrior: return "sun.max"
+        case .distanceWalker: return "figure.walk.diamond"
+        case .gridMaster: return "grid"
         case .monthlyChallenger: return "calendar.badge.clock"
         }
     }
@@ -1085,11 +1198,8 @@ struct UniformAchievementCard: View {
                     )
                 
                 // Achievement Icon
-                Image(systemName: achievement.iconName)
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(.white)
+                AchievementIconView.medium(achievement)
                     .opacity(isUnlocked ? 1.0 : 0.8)
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
             }
             .shadow(color: enhancedMedalShadowColor, radius: 8, x: 0, y: 4)
             
@@ -1221,71 +1331,17 @@ struct UniformAchievementCard: View {
     }
 }
 
-// MARK: - Hidden Achievements Section
-struct HiddenAchievementsSection: View {
-    let achievements: [Achievement]
-    let onAchievementTap: (Achievement) -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Section Header
-            HStack {
-                Image(systemName: "eye.slash")
-                    .font(.title3)
-                    .foregroundColor(.purple)
-                
-                Text("Gizli Ödüller")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                Text("\(achievements.count)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-            }
-            
-            // Hidden Achievements
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 12),
-                GridItem(.flexible(), spacing: 12)
-            ], spacing: 12) {
-                ForEach(achievements) { achievement in
-                    UniformAchievementCard(
-                        achievement: achievement,
-                        progress: AchievementManager.shared.getProgress(for: achievement.id)
-                    )
-                    .onTapGesture {
-                        onAchievementTap(achievement)
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(
-            LinearGradient(
-                colors: [Color.purple.opacity(0.1), Color.clear],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.purple.opacity(0.3), lineWidth: 1)
-        )
-        .cornerRadius(12)
-    }
-}
+
 
 // MARK: - Achievement Detail Sheet
 struct AchievementDetailSheet: View {
     let achievement: Achievement
     let progress: AchievementProgress?
     @Environment(\.dismiss) private var dismiss
+    
+    private var isMystery: Bool {
+        achievement.id.hasPrefix("mystery_")
+    }
     
     var body: some View {
         NavigationView {
@@ -1330,11 +1386,25 @@ struct AchievementDetailSheet: View {
                                 )
                             
                             // Achievement Icon
-                            Image(systemName: achievement.iconName)
-                                .font(.system(size: 40))
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                                .shadow(radius: 4)
+                            if isMystery {
+                                ZStack {
+                                    AchievementIconView.large(achievement)
+                                    
+                                    // Sparkle effect for mystery
+                                    ForEach(0..<4, id: \.self) { i in
+                                        Image(systemName: "sparkle")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.white.opacity(0.9))
+                                            .offset(
+                                                x: [20, -20, 0, 15][i],
+                                                y: [-20, 20, -25, 18][i]
+                                            )
+                                            .opacity(0.8)
+                                    }
+                                }
+                            } else {
+                                AchievementIconView.large(achievement)
+                            }
                         }
                         .shadow(color: medalShadowColor, radius: 12, x: 0, y: 6)
                         
@@ -1358,12 +1428,59 @@ struct AchievementDetailSheet: View {
                         
                         Text(achievement.description)
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(isMystery ? .purple : .secondary)
                             .multilineTextAlignment(.center)
+                            .italic(isMystery)
                     }
                     
                     // Progress Section
-                    if let progress = progress {
+                    if isMystery {
+                        // Mystery Achievement Info
+                        VStack(spacing: 16) {
+                            Divider()
+                            
+                            VStack(spacing: 12) {
+                                HStack {
+                                    Image(systemName: "lock.fill")
+                                        .foregroundColor(.purple)
+                                    Text("Gizli Ödül")
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.purple)
+                                }
+                                .font(.headline)
+                                
+                                VStack(spacing: 8) {
+                                    Text("Bu özel ödülü açmak için:")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
+                                            Image(systemName: "checkmark.circle")
+                                                .foregroundColor(.green)
+                                            Text("Keşfetmeye devam edin")
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        HStack {
+                                            Image(systemName: "checkmark.circle")
+                                                .foregroundColor(.green)
+                                            Text("Farklı bölgeleri ziyaret edin")
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        HStack {
+                                            Image(systemName: "checkmark.circle")
+                                                .foregroundColor(.green)
+                                            Text("Sabırlı olun ve maceraya devam edin")
+                                                .font(.subheadline)
+                                        }
+                                    }
+                                    .padding(.top, 4)
+                                }
+                            }
+                        }
+                    } else if let progress = progress {
                         VStack(spacing: 16) {
                             Divider()
                             
@@ -1430,6 +1547,10 @@ struct AchievementDetailSheet: View {
     }
     
     private var medalColors: [Color] {
+        if isMystery {
+            return [Color.purple, Color.indigo] // Mystery colors
+        }
+        
         switch achievement.rarity {
         case .common:
             return [Color(red: 0.8, green: 0.8, blue: 0.85), Color(red: 0.6, green: 0.6, blue: 0.65)] // Silver
@@ -1443,6 +1564,10 @@ struct AchievementDetailSheet: View {
     }
     
     private var outerRingColors: [Color] {
+        if isMystery {
+            return [Color.purple.opacity(0.8), Color.indigo.opacity(0.8)] // Mystery ring
+        }
+        
         switch achievement.rarity {
         case .common:
             return [Color(red: 0.9, green: 0.9, blue: 0.95), Color(red: 0.7, green: 0.7, blue: 0.75)] // Silver ring
@@ -1456,6 +1581,10 @@ struct AchievementDetailSheet: View {
     }
     
     private var medalShadowColor: Color {
+        if isMystery {
+            return Color.purple.opacity(0.5) // Mystery shadow
+        }
+        
         switch achievement.rarity {
         case .common: return Color(red: 0.8, green: 0.8, blue: 0.85).opacity(0.4) // Silver shadow
         case .rare: return Color(red: 1.0, green: 0.85, blue: 0.3).opacity(0.4) // Gold shadow
@@ -1488,6 +1617,260 @@ struct AchievementDetailSheet: View {
         formatter.timeStyle = .short
         formatter.locale = Locale(identifier: "tr_TR")
         return formatter.string(from: date)
+    }
+}
+
+// MARK: - Hidden Achievements Section
+struct HiddenAchievementsSection: View {
+    @StateObject private var achievementManager = AchievementManager.shared
+    let onAchievementTap: (Achievement) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Section Header
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "lock.fill")
+                        .font(.title3)
+                        .foregroundColor(.purple)
+                    
+                    Text("Özel Ödüller")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    // Hidden count badge
+                    Text("\(unlockedHiddenCount)/\(totalHiddenCount)")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.purple.opacity(0.2))
+                        .foregroundColor(.purple)
+                        .cornerRadius(12)
+                }
+                
+                Text("Gizli ödülleri açmak için keşfetmeye devam edin")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Hidden Achievements Grid
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 8),
+                GridItem(.flexible(), spacing: 8)
+            ], spacing: 12) {
+                // Unlocked Hidden Achievements
+                ForEach(unlockedHiddenAchievements) { achievement in
+                    HiddenAchievementCard(
+                        achievement: achievement,
+                        progress: achievementManager.getProgress(for: achievement.id),
+                        isUnlocked: true
+                    )
+                    .onTapGesture {
+                        onAchievementTap(achievement)
+                    }
+                }
+                
+                // Locked Hidden Achievement Placeholders
+                ForEach(0..<lockedHiddenCount, id: \.self) { index in
+                    HiddenAchievementCard(
+                        achievement: nil,
+                        progress: nil,
+                        isUnlocked: false
+                    )
+                    .onTapGesture {
+                        // Create a mystery achievement to show mystery message
+                        let mysteryAchievement = createMysteryAchievement(for: index)
+                        onAchievementTap(mysteryAchievement)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.regularMaterial)
+                .shadow(color: .purple.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
+    }
+    
+    private var hiddenAchievements: [Achievement] {
+        achievementManager.achievements.filter { $0.isHidden }
+    }
+    
+    private var unlockedHiddenAchievements: [Achievement] {
+        hiddenAchievements.filter { achievement in
+            achievementManager.getProgress(for: achievement.id)?.isUnlocked == true
+        }
+    }
+    
+    private var totalHiddenCount: Int {
+        hiddenAchievements.count
+    }
+    
+    private var unlockedHiddenCount: Int {
+        unlockedHiddenAchievements.count
+    }
+    
+    private var lockedHiddenCount: Int {
+        max(0, totalHiddenCount - unlockedHiddenCount)
+    }
+    
+    private func createMysteryAchievement(for index: Int) -> Achievement {
+        let mysteryTexts = [
+            "Bu gizemli ödülü açmak için keşfetmeye devam edin...",
+            "Saklı hazineler sizi bekliyor. İlerleyişinizi sürdürün!",
+            "Bu özel başarı henüz gizli. Daha fazla macera yaşayın!",
+            "Bilinmeyen bir ödül... Keşiflere devam ederek açabilirsiniz.",
+            "Gizli ödül: Sadece en kararlı kâşifler açabilir!"
+        ]
+        
+        return Achievement(
+            id: "mystery_\(index)",
+            category: .firstSteps,
+            type: .milestone,
+            title: "Gizli Ödül",
+            description: mysteryTexts[index % mysteryTexts.count],
+            iconName: "questionmark.diamond.fill",
+            imageName: nil,
+            target: 0,
+            isHidden: true,
+            rarity: .legendary
+        )
+    }
+}
+
+// MARK: - Hidden Achievement Card
+struct HiddenAchievementCard: View {
+    let achievement: Achievement?
+    let progress: AchievementProgress?
+    let isUnlocked: Bool
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Icon Section
+            ZStack {
+                // Background Circle
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: isUnlocked ? unlockedColors : lockedColors,
+                            center: .topLeading,
+                            startRadius: 10,
+                            endRadius: 40
+                        )
+                    )
+                    .frame(width: 80, height: 80)
+                
+                if isUnlocked, let achievement = achievement {
+                    // Unlocked Achievement Icon
+                    AchievementIconView(achievement: achievement, size: 32, weight: .medium)
+                } else {
+                    // Locked Mystery Icon
+                    ZStack {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 28))
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .shadow(radius: 2)
+                        
+                        // Sparkle Effect
+                        ForEach(0..<3, id: \.self) { i in
+                            Image(systemName: "sparkle")
+                                .font(.system(size: 8))
+                                .foregroundColor(.white.opacity(0.8))
+                                .offset(
+                                    x: [15, -15, 0][i],
+                                    y: [-15, 15, -20][i]
+                                )
+                                .opacity(0.7)
+                        }
+                    }
+                }
+            }
+            .shadow(color: isUnlocked ? .purple.opacity(0.3) : .gray.opacity(0.2), radius: 8, x: 0, y: 4)
+            
+            // Text Section
+            VStack(spacing: 4) {
+                if isUnlocked, let achievement = achievement {
+                    // Unlocked Achievement Info
+                    Text(achievement.title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(rarityText(achievement.rarity))
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(colorForRarity(achievement.rarity).opacity(0.2))
+                        .foregroundColor(colorForRarity(achievement.rarity))
+                        .cornerRadius(8)
+                } else {
+                    // Locked Mystery Text
+                    Text("Gizli Ödül")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                    
+                    Text("Keşfet")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(.gray)
+                        .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isUnlocked ? .clear : Color.gray.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            isUnlocked ? 
+                                LinearGradient(colors: [.purple.opacity(0.3), .blue.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                LinearGradient(colors: [.gray.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                            lineWidth: 1
+                        )
+                )
+        )
+    }
+    
+    private var unlockedColors: [Color] {
+        [Color.purple, Color.blue]
+    }
+    
+    private var lockedColors: [Color] {
+        [Color.gray.opacity(0.6), Color.gray.opacity(0.8)]
+    }
+    
+    private func colorForRarity(_ rarity: Achievement.AchievementRarity) -> Color {
+        switch rarity {
+        case .common: return Color(red: 0.8, green: 0.8, blue: 0.85) // Silver
+        case .rare: return Color(red: 1.0, green: 0.85, blue: 0.3) // Gold
+        case .epic: return Color(red: 0.8, green: 0.4, blue: 1.0) // Purple
+        case .legendary: return Color(red: 1.0, green: 0.6, blue: 0.2) // Orange
+        }
+    }
+    
+    private func rarityText(_ rarity: Achievement.AchievementRarity) -> String {
+        switch rarity {
+        case .common: return "Yaygın"
+        case .rare: return "Nadir"
+        case .epic: return "Epik"
+        case .legendary: return "Efsanevi"
+        }
     }
 }
 

@@ -139,14 +139,36 @@
 - [x] Create EnhancedStatCard component with premium design
 - [x] Add visual highlighting for active streaks
 
-### **Phase 4: Category Enhancement** ⏳ 
-- [x] Enhanced category sorting (alphabetical + target-based)
+### **Phase 4: Category Enhancement** ✅ COMPLETED
+- [x] Enhanced category sorting (logical progression + target/rarity based)
 - [x] Footer filter system implementation  
 - [x] Full page scroll with unified content view
-- [ ] Add progress bars to category headers
-- [ ] Implement completion badges
-- [ ] Design difficulty rating system
-- [ ] Calculate estimated completion times
+- [x] Add progress bars to category headers
+- [x] Implement completion badges
+- [x] Design difficulty rating system
+- [x] Calculate estimated completion times
+- [x] Create CategoryProgressBar component with smooth animations
+- [x] Add CompletionBadge with green checkmark/gold crown variations
+- [x] Implement 5-star DifficultyRating system (uniform gold color)
+- [x] Removed EstimatedTimeDisplay (per user request)
+- [x] Fixed sorting logic: Category → Target (asc) → Rarity (asc) → Title (asc)
+- [x] Fixed dynamic category grouping (removed hardcoded categories, now JSON-based)
+- [x] Added missing percentageMilestone category support with "Yüzde Dönüm Noktaları" title
+- [x] **CRITICAL FIX**: Updated AchievementCategory enum rawValues to match JSON data exactly (camelCase)
+- [x] Fixed category grouping bug causing all achievements to appear under "İlk Adımlar"
+- [x] **JSON FIX**: Added missing multiplier parameters to percentageMilestone achievements
+- [x] Updated Achievement Hazırlama Tablosu documentation with mandatory parameter requirements
+- [x] **CITY CALCULATOR ENHANCEMENT**: Added multi-city support and localization-independent city matching
+- [x] Implemented Turkish character normalization and case-insensitive city comparison
+- [x] Added backward compatibility for single city parameters
+- [x] Added "Başkent Gezgini" achievement example with multi-city support
+- [x] **HIDDEN ACHIEVEMENTS FEATURE**: Implemented comprehensive mystery achievement system
+- [x] Created HiddenAchievementsSection with locked/unlocked states
+- [x] Added HiddenAchievementCard with sparkle effects and mystery icons
+- [x] Implemented mystery achievement placeholders with dynamic messages
+- [x] Enhanced AchievementDetailSheet with mystery-specific UI and instructions
+- [x] Added "Özel Ödüller" section showing locked achievements as teasers
+- [x] Implemented count badge (X/Y) to track hidden achievement progress
 
 ### **Phase 1: Achievement Unlock Animations** ⏳
 - [ ] Create confetti particle system
@@ -154,6 +176,15 @@
 - [ ] Implement haptic feedback
 - [ ] Add achievement unlock sounds
 - [ ] Test animation performance
+
+### **🖼️ Custom Image Support** ✅ COMPLETED
+- [x] Add `imageName` field to Achievement model
+- [x] Create AchievementIconView component with SF Symbol + Custom Image support
+- [x] Update all UI components to use new AchievementIconView
+- [x] Add backward compatibility for existing achievements
+- [x] Create comprehensive documentation with examples
+- [x] Add fallback mechanism for missing images
+- [x] Test responsive behavior across all achievement views
 
 ---
 

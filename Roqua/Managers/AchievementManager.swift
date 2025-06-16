@@ -12,20 +12,20 @@ enum AchievementType: String, CaseIterable, Codable {
 }
 
 enum AchievementCategory: String, CaseIterable, Codable {
-    case cityMaster = "city_master"
-    case districtExplorer = "district_explorer"
-    case countryCollector = "country_collector"
-    case areaExplorer = "area_explorer"
-    case distanceWalker = "distance_walker"
-    case gridMaster = "grid_master"
-    case percentageMilestone = "percentage_milestone"
-    case dailyExplorer = "daily_explorer"
-    case weekendWarrior = "weekend_warrior"
-    case monthlyChallenger = "monthly_challenger"
-    case firstSteps = "first_steps"
+    case cityMaster = "cityMaster"
+    case districtExplorer = "districtExplorer"
+    case countryCollector = "countryCollector"
+    case areaExplorer = "areaExplorer"
+    case distanceWalker = "distanceWalker"
+    case gridMaster = "gridMaster"
+    case percentageMilestone = "percentageMilestone"
+    case dailyExplorer = "dailyExplorer"
+    case weekendWarrior = "weekendWarrior"
+    case monthlyChallenger = "monthlyChallenger"
+    case firstSteps = "firstSteps"
     case explorer = "explorer"
     case adventurer = "adventurer"
-    case worldTraveler = "world_traveler"
+    case worldTraveler = "worldTraveler"
 }
 
 struct Achievement: Identifiable, Codable {
@@ -35,9 +35,19 @@ struct Achievement: Identifiable, Codable {
     let title: String
     let description: String
     let iconName: String
+    let imageName: String? // New: Custom image support
     let target: Int
     let isHidden: Bool // Gizli achievement'lar
     let rarity: AchievementRarity
+    
+    // Computed property to determine what to display
+    var displayIcon: String {
+        return imageName ?? iconName
+    }
+    
+    var isCustomImage: Bool {
+        return imageName != nil
+    }
     
     enum AchievementRarity: String, Codable {
         case common = "common"
@@ -141,6 +151,7 @@ class AchievementManager: ObservableObject {
             title: def.title,
             description: def.description,
             iconName: def.iconName,
+            imageName: def.imageName,
             target: def.target,
             isHidden: def.isHidden,
             rarity: Achievement.AchievementRarity(rawValue: def.rarity) ?? .common
@@ -683,6 +694,58 @@ class AchievementManager: ObservableObject {
             eventBus.publish(achievementEvent: .achievementUnlocked(achievement, progress: newProgress))
         }
     }
+}
+
+// MARK: - Category Enhancement Extension
+extension AchievementManager {
+    
+    // Calculate difficulty rating for a category (1-5 stars)
+    func difficultyRating(for category: AchievementCategory) -> Int {
+        let categoryAchievements = achievements.filter { $0.category == category }
+        guard !categoryAchievements.isEmpty else { return 1 }
+        
+        let rarityPoints = categoryAchievements.map { achievement in
+            switch achievement.rarity {
+            case .common: return 1
+            case .rare: return 3
+            case .epic: return 5
+            case .legendary: return 10
+            }
+        }
+        
+        let averageRarity = Double(rarityPoints.reduce(0, +)) / Double(rarityPoints.count)
+        
+        // Convert to 1-5 star system
+        switch averageRarity {
+        case 0..<2: return 1      // Very Easy (mostly common)
+        case 2..<4: return 2      // Easy (common + some rare)
+        case 4..<6: return 3      // Medium (mixed rarity)
+        case 6..<8: return 4      // Hard (mostly epic)
+        default: return 5         // Very Hard (legendary heavy)
+        }
+    }
     
 
+    
+    // Check if category is fully mastered (all achievements unlocked)
+    func isFullyMastered(category: AchievementCategory) -> Bool {
+        let categoryAchievements = achievements.filter { $0.category == category }
+        let unlockedCount = categoryAchievements.filter { achievement in
+            getProgress(for: achievement.id)?.isUnlocked ?? false
+        }.count
+        
+        return unlockedCount == categoryAchievements.count && !categoryAchievements.isEmpty
+    }
+    
+    // Get completion ratio for a category
+    func completionRatio(for category: AchievementCategory) -> Double {
+        let categoryAchievements = achievements.filter { $0.category == category }
+        guard !categoryAchievements.isEmpty else { return 0.0 }
+        
+        let unlockedCount = categoryAchievements.filter { achievement in
+            getProgress(for: achievement.id)?.isUnlocked ?? false
+        }.count
+        
+        return Double(unlockedCount) / Double(categoryAchievements.count)
+    }
 } 

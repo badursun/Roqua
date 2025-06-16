@@ -17,9 +17,7 @@ struct AchievementNotificationView: View {
                     .fill(colorForRarity(achievement.rarity))
                     .frame(width: 50, height: 50)
                 
-                Image(systemName: achievement.iconName)
-                    .font(.title2)
-                    .foregroundColor(.white)
+                AchievementIconView.small(achievement)
                 
                 // Sparkle effect
                 Image(systemName: "sparkles")
@@ -205,6 +203,7 @@ struct AchievementNotificationView_Previews: PreviewProvider {
                         title: "İlk Adımlar",
                         description: "İlk 10 bölgeyi keşfet",
                         iconName: "figure.walk",
+                        imageName: nil,
                         target: 10,
                         isHidden: false,
                         rarity: .common

@@ -15,6 +15,7 @@ struct AchievementDefinition: Codable, Identifiable {
     let title: String
     let description: String
     let iconName: String
+    let imageName: String?
     let target: Int
     let isHidden: Bool
     let rarity: String

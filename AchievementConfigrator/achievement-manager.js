@@ -99,13 +99,20 @@ class AchievementManager {
             throw new Error('Achievement ID already exists');
         }
 
-        // Parse params if string
+        // Handle params: empty string or empty object becomes null
         if (typeof achievement.params === 'string') {
             try {
-                achievement.params = achievement.params ? JSON.parse(achievement.params) : null;
+                if (!achievement.params.trim()) {
+                    achievement.params = null;
+                } else {
+                    const parsed = JSON.parse(achievement.params);
+                    achievement.params = (parsed && Object.keys(parsed).length > 0) ? parsed : null;
+                }
             } catch (e) {
                 throw new Error('Invalid JSON in params field');
             }
+        } else if (achievement.params && Object.keys(achievement.params).length === 0) {
+            achievement.params = null;
         }
 
         this.achievements.push(achievement);
@@ -126,22 +133,34 @@ class AchievementManager {
             throw new Error('Achievement not found');
         }
 
-        // If ID changed, check for duplicates
-        if (updatedAchievement.id !== id && this.achievements.find(a => a.id === updatedAchievement.id)) {
-            throw new Error('Achievement ID already exists');
+        // If ID changed, check for duplicates in OTHER achievements (excluding current one)
+        if (updatedAchievement.id !== id) {
+            const duplicateExists = this.achievements.some((a, i) => 
+                a.id === updatedAchievement.id && i !== index
+            );
+            if (duplicateExists) {
+                throw new Error('Achievement ID already exists');
+            }
         }
 
         if (!this.validateAchievement(updatedAchievement)) {
             throw new Error('Achievement validation failed');
         }
 
-        // Parse params if string
+        // Handle params: empty string or empty object becomes null
         if (typeof updatedAchievement.params === 'string') {
             try {
-                updatedAchievement.params = updatedAchievement.params ? JSON.parse(updatedAchievement.params) : null;
+                if (!updatedAchievement.params.trim()) {
+                    updatedAchievement.params = null;
+                } else {
+                    const parsed = JSON.parse(updatedAchievement.params);
+                    updatedAchievement.params = (parsed && Object.keys(parsed).length > 0) ? parsed : null;
+                }
             } catch (e) {
                 throw new Error('Invalid JSON in params field');
             }
+        } else if (updatedAchievement.params && Object.keys(updatedAchievement.params).length === 0) {
+            updatedAchievement.params = null;
         }
 
         this.achievements[index] = updatedAchievement;
@@ -388,6 +407,7 @@ class AchievementManager {
         const sfSymbolsToUnicode = {
             // Hareket & Aktivite
             'figure.walk': '🚶‍♂️',
+            'figure.walk.circle': '🚶‍♂️',
             'figure.run': '🏃‍♂️',
             'figure.hiking': '🥾',
             'figure.cycling': '🚴‍♂️',
@@ -415,6 +435,7 @@ class AchievementManager {
             'house.fill': '🏠',
             'building.fill': '🏢',
             'building.2.fill': '🏬',
+            'building.2.crop.circle': '🏬',
             'building.columns.fill': '🏛️',
             'house.and.flag.fill': '🏛️',
             'hospital.fill': '🏥',
@@ -429,11 +450,14 @@ class AchievementManager {
             
             // Harita & Coğrafya
             'map.fill': '🗺️',
+            'map': '🗺️',
             'map.circle.fill': '🌐',
+            'map.circle': '🌐',
             'globe': '🌍',
             'globe.europe.africa.fill': '🌍',
             'globe.americas.fill': '🌎',
             'globe.central.south.asia.fill': '🌏',
+            'globe.asia.australia.fill': '🌏',
             'compass.drawing': '🧭',
             'location.north.fill': '⬆️',
             'scope': '🔍',
@@ -444,6 +468,8 @@ class AchievementManager {
             'leaf.fill': '🍃',
             'snowflake': '❄️',
             'sun.max.fill': '☀️',
+            'sun.and.horizon.fill': '🌅',
+            'sun.haze.fill': '🌤️',
             'moon.fill': '🌙',
             'star.fill': '⭐',
             'cloud.fill': '☁️',
@@ -456,11 +482,13 @@ class AchievementManager {
             'stopwatch.fill': '⏱️',
             'calendar': '📅',
             'calendar.badge.checkmark': '✅',
+            'calendar.circle.fill': '📅',
             'hourglass': '⏳',
             'alarm.fill': '⏰',
             
             // Keşif & Macera
             'binoculars.fill': '🔭',
+            'binoculars': '🔭',
             'backpack.fill': '🎒',
             'camera.fill': '📷',
             'photo.fill': '🖼️',
@@ -499,6 +527,7 @@ class AchievementManager {
             'rectangle.grid.1x2.fill': '▬',
             'rectangle.grid.2x2.fill': '⚏',
             'square.fill': '⬛',
+            'square': '⬜',
             'circle.fill': '⚫',
             'triangle.fill': '🔺',
             
@@ -520,26 +549,25 @@ class AchievementManager {
             'link': '🔗'
         };
         
-        // Check if it's a SF Symbol (contains dots) or regular emoji
-        if (iconName.includes('.')) {
-            const unicodeIcon = sfSymbolsToUnicode[iconName];
-            if (unicodeIcon) {
-                return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">${unicodeIcon}</span>`;
-            } else {
-                // Fallback for unknown SF Symbols
-                return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">⚪</span>`;
+        // Check if it's a SF Symbol (exists in mapping) or regular emoji
+        const unicodeIcon = sfSymbolsToUnicode[iconName];
+        if (unicodeIcon) {
+            return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">${unicodeIcon}</span>`;
+        } else {
+            // Check if it's already an emoji (single Unicode character)
+            if (iconName.length <= 2) {
+                return `<span class="sf-icon">${iconName}</span>`;
             }
+            // Fallback for unknown SF Symbols
+            return `<span class="sf-icon" data-symbol="${iconName}" title="${iconName}">⚪</span>`;
         }
-        
-        // Regular emoji or text
-        return `<span class="sf-icon">${iconName}</span>`;
     }
 
     /**
      * Render single achievement card
      */
     renderAchievementCard(achievement) {
-        const iconDisplay = this.getIconDisplay(achievement.icon);
+        const iconDisplay = this.getIconDisplay(achievement.icon || achievement.iconName);
         const hiddenClass = achievement.isHidden ? ' hidden' : '';
         const hiddenIcon = achievement.isHidden ? '<span title="Gizli Başarım" style="color: var(--accent-color); font-size: 10px;">✨</span>' : '';
         
@@ -707,7 +735,7 @@ class AchievementManager {
                     id: achievement.id,
                     title: achievement.title,
                     description: achievement.description,
-                    icon: achievement.icon || achievement.iconName,
+                    iconName: achievement.icon || achievement.iconName,
                     rarity: achievement.rarity,
                     isHidden: achievement.isHidden || false,
                     category: achievement.category,
