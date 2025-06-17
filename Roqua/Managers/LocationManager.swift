@@ -175,10 +175,6 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         print("  - appState: \(UIApplication.shared.applicationState.rawValue)")
         print("  - accuracy: \(location.horizontalAccuracy)m vs threshold: \(settings.accuracyThreshold)m")
         
-        // DEBUG: Force allow for testing
-        print("  - FORCED: Returning true for debugging")
-        return true
-        
         // backgroundProcessing ayarı kontrolü
         if !settings.backgroundProcessing {
             // Background processing kapalıysa, sadece foreground'da işle

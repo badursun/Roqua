@@ -187,6 +187,9 @@ struct ContentView: View {
                 print("🔥 CONTENTVIEW: Significant location change detected!")
                 print("🔥 CONTENTVIEW: Location: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude))")
                 
+                // Data processing only - no map centering here
+                // Map centering is handled by real-time observer in FogOfWarMapView
+                
                 // 1. ExploredCirclesManager - Fog of War için
                 exploredCirclesManager.addLocation(location)
                 
@@ -197,7 +200,7 @@ struct ContentView: View {
                 // 3. ReverseGeocoder - Ana sayfa konum bilgisi için
                 reverseGeocoder.geocodeLocation(location)
                 
-                print("🎯 Processing location: \(location.coordinate) - All systems active")
+                print("🎯 Processing location: \(location.coordinate) - Data processing only (auto-centering handled by map observer)")
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .newPOIDiscovered)) { notification in
@@ -369,18 +372,9 @@ struct BottomControlPanel: View {
             HStack(spacing: 12) {
                 // Konumum Butonu
                 Button(action: {
-                    if isLocationTrackingActive, let currentLocation = locationManager.currentLocation {
-                        withAnimation(.easeInOut(duration: 1.0)) {
-                            position = .region(MKCoordinateRegion(
-                                center: currentLocation.coordinate,
-                                latitudinalMeters: 200,
-                                longitudinalMeters: 200
-                            ))
-                        }
-                    } else if !locationManager.isFullyAuthorized {
-                        // İzin yoksa ayarlara yönlendir
-                        locationManager.openSettings()
-                    }
+                    print("🎯 SIKIK BUTON BASILDI!")
+                    // SIKIK POSITION BINDING YERİNE DİREKT MAPVIEW'A SALLA
+                    FogOfWarMapView.centerToCurrentLocation(locationManager: locationManager)
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: isLocationTrackingActive ? "location.fill" : "location.slash.fill")
@@ -483,11 +477,17 @@ struct BottomControlPanel: View {
 // POI Detection Bar Component
 struct POIDetectionBar: View {
     let lastPOIDetection: (name: String, category: String)?
+    @StateObject private var settings = AppSettings.shared
     
     var body: some View {
         HStack(spacing: 12) {
-            // POI Icon
-            if let poiInfo = lastPOIDetection {
+            // Icon - Privacy mode veya POI durumuna göre
+            if settings.offlineMode {
+                Image(systemName: "airplane")
+                    .font(.title3)
+                    .foregroundStyle(.orange)
+                    .frame(width: 24, height: 24)
+            } else if let poiInfo = lastPOIDetection {
                 Image(systemName: poiCategoryIcon(poiInfo.category))
                     .font(.title3)
                     .foregroundStyle(poiCategoryColor(poiInfo.category))
@@ -499,9 +499,21 @@ struct POIDetectionBar: View {
                     .frame(width: 24, height: 24)
             }
             
-            // POI Information
+            // Information Content
             VStack(alignment: .leading, spacing: 2) {
-                if let poiInfo = lastPOIDetection {
+                if settings.offlineMode {
+                    // Çevrimdışı Mod Aktif Mesajı
+                    Text("Gizlilik Modu Aktif")
+                        .font(.callout)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.orange)
+                        .lineLimit(1)
+                    
+                    Text("Çevrimdışı Çalışıyor")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else if let poiInfo = lastPOIDetection {
                     Text(poiInfo.name.count > 25 ? String(poiInfo.name.prefix(25)) + "..." : poiInfo.name)
                         .font(.callout)
                         .fontWeight(.medium)
@@ -529,7 +541,11 @@ struct POIDetectionBar: View {
             Spacer()
             
             // Status Indicator
-            if lastPOIDetection != nil {
+            if settings.offlineMode {
+                Circle()
+                    .fill(.orange)
+                    .frame(width: 8, height: 8)
+            } else if lastPOIDetection != nil {
                 Circle()
                     .fill(.green)
                     .frame(width: 8, height: 8)
@@ -551,7 +567,7 @@ struct POIDetectionBar: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(lastPOIDetection != nil ? poiCategoryColor(lastPOIDetection!.category).opacity(0.3) : .gray.opacity(0.2), lineWidth: 1)
+                .stroke(settings.offlineMode ? .orange.opacity(0.3) : (lastPOIDetection != nil ? poiCategoryColor(lastPOIDetection!.category).opacity(0.3) : .gray.opacity(0.2)), lineWidth: 1)
         )
     }
     

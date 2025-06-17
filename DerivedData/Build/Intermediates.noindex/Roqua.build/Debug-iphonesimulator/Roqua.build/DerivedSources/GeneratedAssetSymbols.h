@@ -6,4 +6,7 @@
 #define AC_SWIFT_PRIVATE
 #endif
 
+/// The "istanbul_master" asset catalog image resource.
+static NSString * const ACImageNameIstanbulMaster AC_SWIFT_PRIVATE = @"istanbul_master";
+
 #undef AC_SWIFT_PRIVATE

@@ -5,7 +5,18 @@
 	<key>colors</key>
 	<array/>
 	<key>images</key>
-	<array/>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/Shared/DEPO/Dropbox/wwwroot/Roqua/Roqua/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameIstanbulMaster</string>
+			<key>relativePath</key>
+			<string>./istanbul_master.imageset</string>
+			<key>swiftSymbol</key>
+			<string>istanbulMaster</string>
+		</dict>
+	</array>
 	<key>symbols</key>
 	<array/>
 </dict>

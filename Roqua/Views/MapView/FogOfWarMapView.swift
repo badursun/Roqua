@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import Combine
 
 // MARK: - Fog of War Overlay
 class FogOfWarOverlay: NSObject, MKOverlay {
@@ -125,6 +126,19 @@ struct FogOfWarMapView: UIViewRepresentable {
         // Settings değişikliklerini uygula
         updateMapSettings(mapView: mapView)
         
+        // MapView reference'ı sakla - SIKIK BUTON İÇİN
+        context.coordinator.mapView = mapView
+        FogOfWarMapView.activeMapView = mapView
+        
+        // Position binding'i handle et (Konumum butonu için)
+        handlePositionBinding(mapView: mapView, context: context)
+        
+        // Real-time location observer setup (sadece bir kez)
+        if !context.coordinator.hasSetupLocationObserver {
+            setupLocationObserver(mapView: mapView, context: context)
+            context.coordinator.hasSetupLocationObserver = true
+        }
+        
         // İlk konum set'i - sadece bir kez yapılır
         if let currentLocation = locationManager.currentLocation, !context.coordinator.hasSetInitialRegion {
             let region = MKCoordinateRegion(
@@ -141,31 +155,8 @@ struct FogOfWarMapView: UIViewRepresentable {
             context.coordinator.addInitialOverlay(mapView: mapView)
         }
         
-        // Real-time location tracking - currentLocation değişikliklerini dinle
+        // Real-time location tracking artık observer ile yapılıyor
         if let currentLocation = locationManager.currentLocation {
-            // User location dot'unu güncelle
-            if settings.showUserLocation && settings.autoMapCentering {
-                // Sadece büyük mesafe değişikliklerinde center'la
-                if let lastLocation = context.coordinator.lastKnownLocation {
-                    let distance = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
-                        .distance(from: currentLocation)
-                    
-                    if distance > 100.0 { // 100m'den fazla hareket varsa center'la
-                        let currentRegion = mapView.region
-                        let newRegion = MKCoordinateRegion(
-                            center: currentLocation.coordinate,
-                            span: currentRegion.span
-                        )
-                        mapView.setRegion(newRegion, animated: true)
-                        context.coordinator.lastKnownLocation = currentLocation.coordinate
-                        print("🗺️ Map centered to current location")
-                    }
-                } else {
-                    // İlk konum set'i
-                    context.coordinator.lastKnownLocation = currentLocation.coordinate
-                }
-            }
-            
             // ExploredCirclesManager'a konum ekle (ContentView'da da ekleniyor ama burada da olsun)
             exploredCirclesManager.addLocation(currentLocation)
             
@@ -237,12 +228,108 @@ struct FogOfWarMapView: UIViewRepresentable {
         Coordinator(self)
     }
     
+    // SIKIK BUTON İÇİN - Static MapView Manager
+    static var activeMapView: MKMapView?
+    
+    // SIKIK BUTONUN DİREKT ÇAĞIRACAĞI FONKSİYON
+    static func centerToCurrentLocation(locationManager: LocationManager) {
+        guard let mapView = activeMapView,
+              let currentLocation = locationManager.currentLocation else {
+            print("❌ SIKIK BUTON: MapView ya da location yok")
+            return
+        }
+        
+        let region = MKCoordinateRegion(
+            center: currentLocation.coordinate,
+            latitudinalMeters: 200,
+            longitudinalMeters: 200
+        )
+        
+        DispatchQueue.main.async {
+            mapView.setRegion(region, animated: true)
+            print("🎯 SIKIK BUTON ÇALIŞTI: \(currentLocation.coordinate)")
+        }
+    }
+    
+    // Position binding handler (Konumum butonu için)
+    private func handlePositionBinding(mapView: MKMapView, context: Context) {
+        // Mirror reflection ile position'dan region extract et
+        let mirror = Mirror(reflecting: position)
+        for child in mirror.children {
+            if let region = child.value as? MKCoordinateRegion {
+                let currentCenter = mapView.region.center
+                let targetCenter = region.center
+                
+                // Anlamlı bir fark varsa haritayı güncelle
+                let latDiff = abs(currentCenter.latitude - targetCenter.latitude)
+                let lonDiff = abs(currentCenter.longitude - targetCenter.longitude)
+                
+                if latDiff > 0.0001 || lonDiff > 0.0001 {
+                    mapView.setRegion(region, animated: true)
+                    print("🎯 Map centered via position binding to: \(targetCenter)")
+                }
+                break
+            }
+        }
+    }
+    
+    // Real-time location observer setup
+    private func setupLocationObserver(mapView: MKMapView, context: Context) {
+                // LocationManager'dan gelen her location update'ini dinle
+        let coordinator = context.coordinator
+        coordinator.locationObserverCancellable = locationManager.$currentLocation
+            .compactMap { $0 } // nil locations'ları filtrele
+            .sink { newLocation in
+                // Main thread'de auto-centering yap
+                DispatchQueue.main.async {
+                    self.performRealTimeAutoCentering(
+                        mapView: mapView,
+                        newLocation: newLocation,
+                        context: coordinator
+                    )
+                }
+            }
+        
+        print("🎯 Real-time location observer setup completed")
+    }
+    
+    // Her location update'inde auto-centering
+    private func performRealTimeAutoCentering(mapView: MKMapView, newLocation: CLLocation, context: Coordinator) {
+        // Auto-centering aktif mi kontrol et
+        guard settings.showUserLocation && settings.autoMapCentering else { return }
+        
+        let currentMapCenter = mapView.region.center
+        let newLocationCoord = newLocation.coordinate
+        
+        // Pin'in ekran merkezi'nden uzaklığını hesapla
+        let distanceFromCenter = CLLocation(latitude: currentMapCenter.latitude, longitude: currentMapCenter.longitude)
+            .distance(from: newLocation)
+        
+        // Pin ekran merkezi'nden 10m uzaklaştıysa zorla center'la
+        if distanceFromCenter > 10.0 {
+            let currentRegion = mapView.region
+            let newRegion = MKCoordinateRegion(
+                center: newLocationCoord,
+                span: currentRegion.span
+            )
+            
+            mapView.setRegion(newRegion, animated: true)
+            context.lastKnownLocation = newLocationCoord
+            print("🎯 Real-time auto-centering: Pin moved \(Int(distanceFromCenter))m from center")
+        }
+    }
+    
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: FogOfWarMapView
         var fogOverlay: FogOfWarOverlay?
         var hasSetInitialRegion: Bool = false
         var lastKnownCircleCount: Int = 0
         var lastKnownLocation: CLLocationCoordinate2D?
+        var hasSetupLocationObserver: Bool = false
+        var locationObserverCancellable: AnyCancellable?
+        
+        // MKMapView reference - SIKIK BUTON İÇİN
+        weak var mapView: MKMapView?
         
         init(_ parent: FogOfWarMapView) {
             self.parent = parent

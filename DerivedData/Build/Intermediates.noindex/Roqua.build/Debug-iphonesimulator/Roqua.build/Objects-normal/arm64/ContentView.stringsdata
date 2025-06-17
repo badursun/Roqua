@@ -7,7 +7,7 @@
         "key": "Keşfedilen Alan",
         "location": {
           "startingColumn": 30,
-          "startingLine": 283
+          "startingLine": 319
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "%",
         "location": {
           "startingColumn": 34,
-          "startingLine": 299
+          "startingLine": 335
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "%lld bölge",
         "location": {
           "startingColumn": 30,
-          "startingLine": 314
+          "startingLine": 350
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Konumum",
         "location": {
           "startingColumn": 57,
-          "startingLine": 357
+          "startingLine": 402
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "Konum Kapalı",
         "location": {
           "startingColumn": 69,
-          "startingLine": 357
+          "startingLine": 402
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "İstatistikler",
         "location": {
           "startingColumn": 30,
-          "startingLine": 383
+          "startingLine": 428
         }
       },
       {
@@ -55,7 +55,39 @@
         "key": "±%lldm",
         "location": {
           "startingColumn": 30,
-          "startingLine": 429
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gizlilik Modu Aktif",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 526
+        }
+      },
+      {
+        "comment": "",
+        "key": "Çevrimdışı Çalışıyor",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 532
+        }
+      },
+      {
+        "comment": "",
+        "key": "Konum analiz ediliyor...",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 548
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yakındaki özel yerler aranıyor",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 554
         }
       },
       {
@@ -63,7 +95,7 @@
         "key": "Hesap",
         "location": {
           "startingColumn": 30,
-          "startingLine": 473
+          "startingLine": 908
         }
       },
       {
@@ -71,7 +103,7 @@
         "key": "Gizli Kaşif",
         "location": {
           "startingColumn": 26,
-          "startingLine": 460
+          "startingLine": 895
         }
       },
       {
@@ -79,7 +111,7 @@
         "key": "Kimlik gerekmez. Sadece keşfet.",
         "location": {
           "startingColumn": 26,
-          "startingLine": 464
+          "startingLine": 899
         }
       },
       {
@@ -87,7 +119,7 @@
         "key": "Kapat",
         "location": {
           "startingColumn": 28,
-          "startingLine": 477
+          "startingLine": 912
         }
       }
     ]
