@@ -36,7 +36,6 @@ struct OnboardingView: View {
                 )
             }
         }
-        .preferredColorScheme(.dark)
         .onAppear {
             checkExistingPermissionsAndSkip()
         }

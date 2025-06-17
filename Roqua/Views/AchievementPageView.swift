@@ -74,7 +74,6 @@ struct AchievementPageView: View {
         }
         .navigationTitle("Başarımlar")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
         .onAppear {
             achievementManager.refreshProgress()
         }

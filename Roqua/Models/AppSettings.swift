@@ -15,6 +15,9 @@ class AppSettings: ObservableObject {
     @AppStorage("accuracyThreshold") var accuracyThreshold: Double = 50.0 // meters - default 50m
     @AppStorage("clusteringRadius") var clusteringRadius: Double =  50.0 // meters - exploration radius'un yarısı
     
+    // MARK: - Appearance Settings  
+    @AppStorage("colorScheme") var colorScheme: Int = 0 // 0: System, 1: Light, 2: Dark
+    
     // MARK: - Map Settings
     @AppStorage("mapType") var mapType: Int = 0 // 0: Standard, 1: Satellite, 2: Hybrid
     @AppStorage("showUserLocation") var showUserLocation: Bool = true
@@ -28,15 +31,18 @@ class AppSettings: ObservableObject {
     // MARK: - Performance Settings
     @AppStorage("maxRegionsInMemory") var maxRegionsInMemory: Int = 1000
     @AppStorage("backgroundProcessing") var backgroundProcessing: Bool = true
+    @AppStorage("enableBackgroundProcessing") var enableBackgroundProcessing: Bool = true
     
     // MARK: - Grid & Exploration Settings
-    @AppStorage("percentageDecimals") var percentageDecimals: Int = 5 // 0.00001% precision (balanced)
+    @AppStorage("percentageDecimals") var percentageDecimals: Int = 9 // 0.000000001% precision (highest)
     @AppStorage("enableExplorationStats") var enableExplorationStats: Bool = true
     
     // MARK: - Reverse Geocoding Settings
     @AppStorage("enableReverseGeocoding") var enableReverseGeocoding: Bool = true
     @AppStorage("autoEnrichNewRegions") var autoEnrichNewRegions: Bool = true
     @AppStorage("batchEnrichOnStartup") var batchEnrichOnStartup: Bool = false
+    @AppStorage("enableAutoEnrichment") var enableAutoEnrichment: Bool = true
+    @AppStorage("enableBulkProcessOnLaunch") var enableBulkProcessOnLaunch: Bool = false
     
     // MARK: - Singleton
     static let shared = AppSettings()
@@ -89,6 +95,7 @@ class AppSettings: ObservableObject {
         explorationRadius = 100.0
         accuracyThreshold = 50.0
         clusteringRadius = 50.0
+        colorScheme = 0
         mapType = 0
         showUserLocation = true
         enablePitch = false
@@ -97,13 +104,16 @@ class AppSettings: ObservableObject {
         offlineMode = false
         maxRegionsInMemory = 1000
         backgroundProcessing = true
-        percentageDecimals = 5
+        percentageDecimals = 9
         enableExplorationStats = true
         
         // Reverse Geocoding defaults
         enableReverseGeocoding = true
         autoEnrichNewRegions = true
         batchEnrichOnStartup = false
+        enableAutoEnrichment = true
+        enableBulkProcessOnLaunch = false
+        enableBackgroundProcessing = true
     }
     
     func exportSettings() -> [String: Any] {

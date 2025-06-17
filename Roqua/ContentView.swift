@@ -16,8 +16,10 @@ struct ContentView: View {
     @StateObject private var reverseGeocoder = ReverseGeocoder.shared
     @StateObject private var gridHashManager = GridHashManager.shared
     @StateObject private var notificationManager = AchievementNotificationManager.shared
+    @StateObject private var settings = AppSettings.shared
+    @Environment(\.colorScheme) private var colorScheme
     @State private var position = MapCameraPosition.automatic
-    @State private var showingSettings = false
+    @State private var showingSideMenu = false
     @State private var showingAccount = false
     @State private var showingAchievements = false
     @State private var navigationPath = NavigationPath()
@@ -27,6 +29,19 @@ struct ContentView: View {
     
     private var isLocationTrackingActive: Bool {
         return locationManager.isFullyAuthorized && CLLocationManager.locationServicesEnabled()
+    }
+    
+    // Dynamic colors based on current color scheme (now managed globally)
+    private var buttonBackgroundMaterial: Material {
+        colorScheme == .dark ? .ultraThinMaterial : .thickMaterial
+    }
+    
+    private var buttonIconColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
+    private var overlayBackgroundColor: Color {
+        colorScheme == .dark ? Color.black.opacity(0.3) : Color.white.opacity(0.3)
     }
 
     var body: some View {
@@ -48,12 +63,12 @@ struct ContentView: View {
                     Button(action: { showingAccount = true }) {
                         ZStack {
                             Circle()
-                                .fill(.ultraThinMaterial)
+                                .fill(buttonBackgroundMaterial)
                                 .frame(width: 44, height: 44)
                             
                             Image(systemName: "person.circle.fill")
                                 .font(.title2)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(buttonIconColor)
                         }
                     }
                     
@@ -67,12 +82,12 @@ struct ContentView: View {
                     }) {
                         ZStack {
                             Circle()
-                                .fill(.ultraThinMaterial)
+                                .fill(buttonBackgroundMaterial)
                                 .frame(width: 44, height: 44)
                             
                             Image(systemName: "trophy.fill")
                                 .font(.title2)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(buttonIconColor)
                         }
                     }
                     
@@ -83,16 +98,39 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Sağ - Menü Butonu
-                    Button(action: { showingSettings = true }) {
+                    // Sağ - Settings Butonu
+                    Button(action: { 
+                        navigationPath.append("settings")
+                    }) {
                         ZStack {
                             Circle()
-                                .fill(.ultraThinMaterial)
+                                .fill(buttonBackgroundMaterial)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: "gearshape.fill")
+                                .font(.title2)
+                                .foregroundStyle(buttonIconColor)
+                        }
+                    }
+                    
+                    // Spacing between Settings and Menu
+                    Spacer()
+                        .frame(width: 8)
+                    
+                    // Hamburger Menu Butonu
+                    Button(action: { 
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showingSideMenu = true
+                        }
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(buttonBackgroundMaterial)
                                 .frame(width: 44, height: 44)
                             
                             Image(systemName: "line.3.horizontal")
                                 .font(.title2)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(buttonIconColor)
                         }
                     }
                 }
@@ -111,6 +149,28 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 
+                // Konumum Butonu - Bottom panel üstünde sağ tarafa
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        print("🎯 Konumum butonu tıklandı!")
+                        FogOfWarMapView.centerToCurrentLocation(locationManager: locationManager)
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(buttonBackgroundMaterial)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: isLocationTrackingActive ? "location.fill" : "location.slash.fill")
+                                .font(.title2)
+                                .foregroundStyle(isLocationTrackingActive ? buttonIconColor : .red)
+                        }
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 8)
+                }
+                
                 BottomControlPanel(
                     locationManager: locationManager, 
                     exploredCirclesManager: exploredCirclesManager,
@@ -121,6 +181,30 @@ struct ContentView: View {
                 )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 30)
+            }
+            
+            // Side Menu Overlay
+            if showingSideMenu {
+                overlayBackgroundColor
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showingSideMenu = false
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(999)
+                
+                HStack {
+                    SideMenuOverlay(
+                        isShowing: $showingSideMenu,
+                        navigationPath: $navigationPath
+                    )
+                    .transition(.move(edge: .leading))
+                    
+                    Spacer()
+                }
+                .zIndex(1000)
             }
             
             // Achievement Notification Overlay
@@ -138,12 +222,8 @@ struct ContentView: View {
                     Spacer()
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
-                .zIndex(1000)
+                .zIndex(1001)
             }
-        }
-        .preferredColorScheme(.dark)
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
         }
         .sheet(isPresented: $showingAccount) {
             AccountView()
@@ -152,6 +232,14 @@ struct ContentView: View {
             switch destination {
             case "achievements":
                 AchievementPageView()
+            case "settings":
+                SettingsPageView()
+            case "statistics":
+                StatisticsView()
+            case "about":
+                AboutView()
+            case "account":
+                AccountView()
             default:
                 EmptyView()
             }
@@ -226,6 +314,7 @@ struct ContentView: View {
 // MARK: - Location Status Indicator
 struct LocationStatusIndicator: View {
     @ObservedObject var locationManager: LocationManager
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         HStack(spacing: 6) {
@@ -235,11 +324,11 @@ struct LocationStatusIndicator: View {
             
             Text(statusText)
                 .font(.caption)
-                .foregroundStyle(.white)
+                .foregroundStyle(colorScheme == .dark ? .white : .black)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(.ultraThinMaterial)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .thickMaterial)
         .clipShape(Capsule())
     }
     
@@ -279,6 +368,7 @@ struct BottomControlPanel: View {
     @ObservedObject var gridHashManager: GridHashManager
     @Binding var position: MapCameraPosition
     @Binding var currentZoomLevel: String
+    @Environment(\.colorScheme) private var colorScheme
     
     // Settings entegrasyonu
     private let settings = AppSettings.shared
@@ -309,7 +399,7 @@ struct BottomControlPanel: View {
     }
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             // İstatistik Kartı - enableExplorationStats ayarına göre göster
             if settings.enableExplorationStats {
                 HStack {
@@ -322,7 +412,7 @@ struct BottomControlPanel: View {
                             Text(gridHashManager.formattedPercentage)
                                 .font(.title)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(colorScheme == .dark ? .white : .black)
                                 .onAppear {
                                     print("🎯 BottomControlPanel: Percentage on appear: \(gridHashManager.formattedPercentage)%")
                                 }
@@ -342,7 +432,7 @@ struct BottomControlPanel: View {
                         // Dünya ikonu
                         Image(systemName: "globe")
                             .font(.title)
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(colorScheme == .dark ? .white : .black)
                         
                         // Bölge sayısı
                         Text("\(exploredCirclesManager.exploredCircles.count) bölge")
@@ -353,7 +443,7 @@ struct BottomControlPanel: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(.ultraThinMaterial)
+                        .fill(colorScheme == .dark ? .ultraThinMaterial : .thickMaterial)
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(
@@ -368,56 +458,7 @@ struct BottomControlPanel: View {
                 )
             }
             
-            // Aksiyon Butonları
-            HStack(spacing: 12) {
-                // Konumum Butonu
-                Button(action: {
-                    print("🎯 SIKIK BUTON BASILDI!")
-                    // SIKIK POSITION BINDING YERİNE DİREKT MAPVIEW'A SALLA
-                    FogOfWarMapView.centerToCurrentLocation(locationManager: locationManager)
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: isLocationTrackingActive ? "location.fill" : "location.slash.fill")
-                            .font(.callout)
-                        Text(isLocationTrackingActive ? "Konumum" : "Konum Kapalı")
-                            .font(.callout)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: isLocationTrackingActive ? 
-                                        [.blue, .blue.opacity(0.8)] : 
-                                        [.red.opacity(0.8), .red.opacity(0.6)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                    )
-                }
-                
-                // İstatistikler Butonu
-                Button(action: {}) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chart.bar.fill")
-                            .font(.callout)
-                        Text("İstatistikler")
-                            .font(.callout)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundStyle(.primary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(.regularMaterial)
-                    )
-                }
-            }
+
             
             // Bilgi Çubuğu (Alt kısım) - POI göstergesi eklendi
             HStack(spacing: 16) {
@@ -465,7 +506,7 @@ struct BottomControlPanel: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(.ultraThinMaterial)
+                    .fill(colorScheme == .dark ? .ultraThinMaterial : .thickMaterial)
                     .opacity(0.8)
             )
         }
