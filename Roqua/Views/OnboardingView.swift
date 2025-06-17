@@ -101,7 +101,7 @@ struct WelcomeStep: View {
                 Text("Roqua")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                 
                 Text("Kendi dünyeni keşfet")
                     .font(.title2)
@@ -123,7 +123,7 @@ struct WelcomeStep: View {
                             .fontWeight(.medium)
                         Image(systemName: "arrow.right")
                     }
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(
@@ -153,7 +153,7 @@ struct FeaturesStep: View {
                 Text("Roqua Nasıl Çalışır?")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                     .multilineTextAlignment(.center)
                 
                 Text("Sade, güvenli ve tamamen senin")
@@ -190,7 +190,7 @@ struct FeaturesStep: View {
                         .fontWeight(.medium)
                     Image(systemName: "arrow.right")
                 }
-                .foregroundStyle(.white)
+                .foregroundColor(.adaptiveText)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(.regularMaterial)
@@ -221,7 +221,7 @@ struct FeatureCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                 
                 Text(description)
                     .font(.callout)
@@ -251,7 +251,7 @@ struct PrivacyStep: View {
                 Text("Gizliliğin Öncelik")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                     .multilineTextAlignment(.center)
             }
             .padding(.top, 50)
@@ -290,7 +290,7 @@ struct PrivacyStep: View {
                             .fontWeight(.medium)
                         Image(systemName: "checkmark.shield.fill")
                     }
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.green.opacity(0.8))
@@ -322,7 +322,7 @@ struct PrivacyCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                 
                 Text(description)
                     .font(.callout)
@@ -353,7 +353,7 @@ struct LocationPermissionStep: View {
                 Text("Konum İzni")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                 
                 Text("Gezdiğin yerleri takip edebilmek için konum izni gerekli")
                     .font(.callout)
@@ -400,7 +400,7 @@ struct LocationPermissionStep: View {
                             Text("İzin Verildi, Devam Et")
                                 .fontWeight(.medium)
                         }
-                        .foregroundStyle(.white)
+                        .foregroundColor(.adaptiveText)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.green.opacity(0.8))
@@ -413,7 +413,7 @@ struct LocationPermissionStep: View {
                             Text("Sürekli İzin Verildi, Devam Et")
                                 .fontWeight(.medium)
                         }
-                        .foregroundStyle(.white)
+                        .foregroundColor(.adaptiveText)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.green.opacity(0.8))
@@ -443,7 +443,7 @@ struct LocationPermissionStep: View {
                             Text("Konum İzni Ver")
                                 .fontWeight(.medium)
                         }
-                        .foregroundStyle(.white)
+                        .foregroundColor(.adaptiveText)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.blue.opacity(0.8))
@@ -474,7 +474,7 @@ struct AlwaysPermissionStep: View {
                 Text("Sürekli Takip")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundColor(.adaptiveText)
                 
                 Text("Uygulamayı kapatsan bile keşifler devam etsin")
                     .font(.callout)
@@ -521,7 +521,7 @@ struct AlwaysPermissionStep: View {
                             Text("Tamamlandı! Roqua'ya Başla")
                                 .fontWeight(.medium)
                         }
-                        .foregroundStyle(.white)
+                        .foregroundColor(.adaptiveText)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.green.opacity(0.8))
@@ -540,7 +540,7 @@ struct AlwaysPermissionStep: View {
                                 Text("Sürekli İzin Ver")
                                     .fontWeight(.medium)
                             }
-                            .foregroundStyle(.white)
+                            .foregroundColor(.adaptiveText)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(.purple.opacity(0.8))
@@ -559,7 +559,7 @@ struct AlwaysPermissionStep: View {
                     Button(action: onComplete) {
                         Text("Roqua'ya Başla")
                             .fontWeight(.medium)
-                            .foregroundStyle(.white)
+                            .foregroundColor(.adaptiveText)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(.regularMaterial)

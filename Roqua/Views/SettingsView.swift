@@ -365,9 +365,9 @@ struct SettingsView: View {
                         }) {
                             HStack {
                                 Image(systemName: "arrow.clockwise")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.adaptiveText)
                                 Text("Eksik Bölgeleri Zenginleştir")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.adaptiveText)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)

@@ -42,7 +42,7 @@ struct SettingsPageView: View {
         }
         .navigationTitle("Ayarlar")
         .navigationBarTitleDisplayMode(.inline)
-        .accentColor(.white)
+        .accentColor(.activeTab)
     }
 }
 

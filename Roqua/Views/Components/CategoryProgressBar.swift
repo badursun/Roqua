@@ -137,7 +137,7 @@ struct CompletionBadge: View {
                 // Badge Icon
                 Image(systemName: badgeIcon)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.adaptiveText)
                     .shadow(color: .black.opacity(0.3), radius: 1)
             }
             .scaleEffect(isAnimating ? 1.1 : 1.0)

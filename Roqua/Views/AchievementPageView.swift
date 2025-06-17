@@ -106,7 +106,7 @@ struct FilterButton: View {
                         .font(.caption)
                         .fontWeight(.medium)
                 }
-                .foregroundColor(isSelected ? .white : .white.opacity(0.7))
+                .foregroundColor(isSelected ? .adaptiveText : .adaptiveSecondaryText)
                 
                 Spacer()
             }
@@ -217,18 +217,25 @@ struct CompactAchievementSummary: View {
                         
                         Text("/")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(.adaptiveSecondaryText)
                         
                         Text("\(achievementManager.achievements.count)")
-                            .font(.system(size: 20, weight: .medium, design: .rounded))
-                            .foregroundColor(.white.opacity(0.8))
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.white, .yellow.opacity(0.9)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
                             .minimumScaleFactor(0.8)
                             .lineLimit(1)
                     }
                     
                     Text("Kazanılan Ödül")
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(.achievementSecondaryText)
                         .minimumScaleFactor(0.8)
                         .lineLimit(1)
                 }
@@ -389,7 +396,7 @@ struct SecondaryStatCard: View {
             // Title
             Text(title)
                 .font(.system(size: 9, weight: .medium))
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(.achievementSecondaryText)
                 .minimumScaleFactor(0.8)
                 .lineLimit(1)
         }
@@ -468,7 +475,7 @@ struct IndividualStatCard: View {
                 // Title with subtle styling
                 Text(title)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(.achievementSecondaryText)
             }
             
             Spacer()
@@ -900,7 +907,7 @@ struct AchievementMedalCard: View {
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
-                    .foregroundColor(.white)
+                    .foregroundColor(.achievementText)
                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                     .frame(height: 48) // Fixed height for 3 lines with larger font
                 
@@ -917,7 +924,7 @@ struct AchievementMedalCard: View {
                     Text(formatUnlockDate(unlockedAt))
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(.achievementSecondaryText)
                         .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                         .frame(height: 14)
                 } else {
@@ -933,8 +940,8 @@ struct AchievementMedalCard: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.3),
-                            Color.black.opacity(0.1)
+                            Color.achievementCardGradientTop,
+                            Color.achievementCardGradientBottom
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -1031,7 +1038,7 @@ struct CategoryListSection: View {
                     Text(titleForCategory(category))
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(.achievementText)
                         .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                     
                     // Completion Badge
@@ -1213,7 +1220,7 @@ struct UniformAchievementCard: View {
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
-                    .foregroundColor(.white)
+                    .foregroundColor(.achievementText)
                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                     .frame(height: 48) // Fixed height for 3 lines with larger font
                 
@@ -1237,7 +1244,7 @@ struct UniformAchievementCard: View {
                     Text("\(progress.currentProgress)/\(progress.targetProgress)")
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(.achievementSecondaryText)
                         .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                 }
                 .frame(height: 20)
@@ -1253,8 +1260,8 @@ struct UniformAchievementCard: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.3),
-                            Color.black.opacity(0.1)
+                            Color.achievementCardGradientTop,
+                            Color.achievementCardGradientBottom
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -1397,7 +1404,7 @@ struct AchievementDetailSheet: View {
                                     ForEach(0..<4, id: \.self) { i in
                                         Image(systemName: "sparkle")
                                             .font(.system(size: 12))
-                                            .foregroundColor(.white.opacity(0.9))
+                                            .foregroundColor(.adaptiveText.opacity(0.9))
                                             .offset(
                                                 x: [20, -20, 0, 15][i],
                                                 y: [-20, 20, -25, 18][i]
@@ -1777,14 +1784,14 @@ struct HiddenAchievementCard: View {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 28))
                             .fontWeight(.medium)
-                            .foregroundColor(.white)
+                            .foregroundColor(.achievementText)
                             .shadow(radius: 2)
                         
                         // Sparkle Effect
                         ForEach(0..<3, id: \.self) { i in
                             Image(systemName: "sparkle")
                                 .font(.system(size: 8))
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(.achievementSecondaryText)
                                 .offset(
                                     x: [15, -15, 0][i],
                                     y: [-15, 15, -20][i]

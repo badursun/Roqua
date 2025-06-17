@@ -19,7 +19,7 @@ struct AchievementIconView: View {
             // SF Symbol
             Image(systemName: achievement.displayIcon)
                 .font(.system(size: size, weight: weight))
-                .foregroundColor(.white)
+                .foregroundColor(.adaptiveText)
                 .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
         }
     }
