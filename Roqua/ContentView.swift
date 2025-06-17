@@ -231,7 +231,7 @@ struct ContentView: View {
         .navigationDestination(for: String.self) { destination in
             switch destination {
             case "achievements":
-                AchievementPageView()
+                ModernAchievementPageView()
             case "settings":
                 SettingsPageView()
             case "statistics":
