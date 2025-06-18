@@ -419,7 +419,7 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        Toggle("", isOn: $settings.backgroundProcessing)
+                        Toggle("", isOn: $settings.backgroundLocationEnabled)
                     }
                     
                 } header: {

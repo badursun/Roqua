@@ -49,19 +49,19 @@ struct SystemSettingsTab: View {
                         .foregroundColor(.secondary)
                 }
                 
-                // Background Processing
+                // Background Location
                 HStack {
-                    Image(systemName: "gearshape.2")
+                    Image(systemName: "location.fill")
                         .foregroundColor(.green)
                     VStack(alignment: .leading) {
-                        Text("Arka Plan İşleme")
+                        Text("Arka Plan Konum Takibi")
                             .font(.headline)
-                        Text("Background app refresh ile veri işleme")
+                        Text("Uygulama kapalıyken konum kaydı")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
-                    Toggle("", isOn: $settings.enableBackgroundProcessing)
+                    Toggle("", isOn: $settings.backgroundLocationEnabled)
                 }
                 
             } header: {

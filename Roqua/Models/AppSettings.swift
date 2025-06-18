@@ -30,8 +30,7 @@ class AppSettings: ObservableObject {
     
     // MARK: - Performance Settings
     @AppStorage("maxRegionsInMemory") var maxRegionsInMemory: Int = 1000
-    @AppStorage("backgroundProcessing") var backgroundProcessing: Bool = true
-    @AppStorage("enableBackgroundProcessing") var enableBackgroundProcessing: Bool = true
+    @AppStorage("backgroundLocationEnabled") var backgroundLocationEnabled: Bool = true
     
     // MARK: - Grid & Exploration Settings
     @AppStorage("percentageDecimals") var percentageDecimals: Int = 9 // 0.000000001% precision (highest)
@@ -103,7 +102,7 @@ class AppSettings: ObservableObject {
         enableGeocoding = true
         offlineMode = false
         maxRegionsInMemory = 1000
-        backgroundProcessing = true
+        backgroundLocationEnabled = true
         percentageDecimals = 9
         enableExplorationStats = true
         
@@ -113,7 +112,6 @@ class AppSettings: ObservableObject {
         batchEnrichOnStartup = false
         enableAutoEnrichment = true
         enableBulkProcessOnLaunch = false
-        enableBackgroundProcessing = true
     }
     
     func exportSettings() -> [String: Any] {
@@ -131,7 +129,7 @@ class AppSettings: ObservableObject {
             "enableGeocoding": enableGeocoding,
             "offlineMode": offlineMode,
             "maxRegionsInMemory": maxRegionsInMemory,
-            "backgroundProcessing": backgroundProcessing,
+            "backgroundLocationEnabled": backgroundLocationEnabled,
             "percentageDecimals": percentageDecimals,
             "enableExplorationStats": enableExplorationStats,
             "enableReverseGeocoding": enableReverseGeocoding,
@@ -180,8 +178,8 @@ class AppSettings: ObservableObject {
         if let value = dict["maxRegionsInMemory"] as? Int {
             maxRegionsInMemory = value
         }
-        if let value = dict["backgroundProcessing"] as? Bool {
-            backgroundProcessing = value
+        if let value = dict["backgroundLocationEnabled"] as? Bool {
+            backgroundLocationEnabled = value
         }
 
         if let value = dict["percentageDecimals"] as? Int {

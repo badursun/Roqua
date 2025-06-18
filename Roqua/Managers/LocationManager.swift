@@ -2,6 +2,7 @@ import Foundation
 import CoreLocation
 import SwiftUI
 import Combine
+import UIKit
 
 // MARK: - Location Permission States
 enum LocationPermissionState {
@@ -29,16 +30,102 @@ class LocationManager: NSObject, ObservableObject {
     private let settings = AppSettings.shared
     
     private var lastProcessedLocation: CLLocation?
+    private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     
     override init() {
         super.init()
         setupLocationManager()
+        setupAppStateNotifications()
+    }
+    
+    private func setupAppStateNotifications() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.handleAppStateChange(isActive: true)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.handleAppStateChange(isActive: false)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.handleMemoryWarning()
+            }
+        }
+    }
+    
+    private func handleAppStateChange(isActive: Bool) {
+        guard isTracking else { return }
+        
+        print("📱 App state changed: \(isActive ? "Active" : "Background")")
+        configureLocationAccuracy()
+        
+        if isActive {
+            endBackgroundTask()
+        } else {
+            startBackgroundTask()
+        }
+    }
+    
+    private func startBackgroundTask() {
+        guard backgroundTask == .invalid else { return }
+        
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "LocationProcessing") { [weak self] in
+            self?.endBackgroundTask()
+        }
+        
+        print("🔄 Background task started: \(backgroundTask.rawValue)")
+    }
+    
+    private func endBackgroundTask() {
+        guard backgroundTask != .invalid else { return }
+        
+        print("⏹️ Ending background task: \(backgroundTask.rawValue)")
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = .invalid
+    }
+    
+    private func handleMemoryWarning() {
+        print("⚠️ Memory warning received - reducing accuracy")
+        locationManager.desiredAccuracy = kCLLocationAccuracyReduced
+        locationManager.distanceFilter = 200.0
+    }
+    
+    deinit {
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10.0 // 10m minimum hareket - daha hızlı UI güncellemesi
+        
+        // Background location updates için gerekli
+        if Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") != nil {
+            locationManager.allowsBackgroundLocationUpdates = true
+            locationManager.pausesLocationUpdatesAutomatically = false
+            print("📍 Background location updates enabled")
+        }
         
         print("📍 Setting up location manager...")
     }
@@ -81,21 +168,36 @@ class LocationManager: NSObject, ObservableObject {
     @MainActor
     func startLocationUpdates() {
         print("✅ Starting location updates")
+        
+        // App state'e göre accuracy ayarla
+        configureLocationAccuracy()
+        
         locationManager.startUpdatingLocation()
         
-        // backgroundProcessing ayarına göre background mode'u ayarla
-        if settings.backgroundProcessing {
-            // Background updates için significant location changes de başlat
-            locationManager.startMonitoringSignificantLocationChanges()
-            print("🔄 Background processing enabled - monitoring significant location changes")
-        } else {
-            print("🚫 Background processing disabled - foreground only")
-        }
+        // Significant location changes her zaman başlat (background için kritik)
+        locationManager.startMonitoringSignificantLocationChanges()
+        print("🔄 Started both regular and significant location monitoring")
         
         isTracking = true
         
         // Event publish et
         eventBus.publish(locationEvent: .locationTrackingStarted)
+    }
+    
+    private func configureLocationAccuracy() {
+        let appState = UIApplication.shared.applicationState
+        
+        if appState == .active {
+            // Foreground: Yüksek doğruluk
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.distanceFilter = 10.0
+            print("📍 Foreground accuracy: Best (10m filter)")
+        } else {
+            // Background: Düşük doğruluk, pil tasarrufu
+            locationManager.desiredAccuracy = kCLLocationAccuracyReduced
+            locationManager.distanceFilter = 100.0
+            print("📍 Background accuracy: Reduced (100m filter)")
+        }
     }
     
     func stopLocationUpdates() {
@@ -170,35 +272,37 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
     }
     
     private func shouldProcessLocation(_ location: CLLocation) -> Bool {
+        let appState = UIApplication.shared.applicationState
         print("🔍 SHOULD PROCESS CHECK:")
-        print("  - backgroundProcessing: \(settings.backgroundProcessing)")
-        print("  - appState: \(UIApplication.shared.applicationState.rawValue)")
+        print("  - backgroundLocationEnabled: \(settings.backgroundLocationEnabled)")
+        print("  - appState: \(appState.rawValue)")
         print("  - accuracy: \(location.horizontalAccuracy)m vs threshold: \(settings.accuracyThreshold)m")
         
-        // backgroundProcessing ayarı kontrolü
-        if !settings.backgroundProcessing {
-            // Background processing kapalıysa, sadece foreground'da işle
-            let appState = UIApplication.shared.applicationState
-            if appState != .active {
-                print("🚫 Background processing disabled - skipping location processing")
-                return false
-            }
-        }
-        
-        // Accuracy kontrolü
+        // Accuracy kontrolü - her durumda geçerli olmalı
         guard location.horizontalAccuracy <= settings.accuracyThreshold && location.horizontalAccuracy > 0 else {
             print("🚫 Accuracy too low: \(location.horizontalAccuracy)m > \(settings.accuracyThreshold)m")
             return false
         }
         
         // Distance kontrolü
+        let shouldProcessByDistance: Bool
         if let lastLocation = lastProcessedLocation {
             let distance = location.distance(from: lastLocation)
-            print("  - distance from last: \(distance)m vs threshold: \(settings.locationTrackingDistance)m")
-            return distance >= settings.locationTrackingDistance
+            let threshold = appState == .active ? settings.locationTrackingDistance : 100.0 // Background'da daha büyük threshold
+            print("  - distance from last: \(distance)m vs threshold: \(threshold)m")
+            shouldProcessByDistance = distance >= threshold
+        } else {
+            shouldProcessByDistance = true // İlk konum her zaman işlenir
         }
         
-        return true // İlk konum her zaman işlenir
+        // Background'da heavy processing'i kısıtla, basic recording'i değil
+        if appState != .active && !settings.backgroundLocationEnabled {
+            print("🔄 Background mode: Basic recording only (heavy processing disabled)")
+            // Konum kaydını durdurma, sadece heavy processing'i (POI enrichment vs) durdur
+            // Basic location recording her zaman devam etmeli
+        }
+        
+        return shouldProcessByDistance
     }
     
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
