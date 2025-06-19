@@ -34,8 +34,8 @@ class FogOfWarRenderer: MKOverlayRenderer {
             print("🎨 Drawing fog overlay - circles: \(overlay.exploredCircles.count), zoom: \(String(format: "%.2f", zoomScale)), radius: \(Int(overlay.radius))m")
         }
         
-        // Fog layer (karanlık katman)
-        context.setFillColor(UIColor.black.withAlphaComponent(0.7).cgColor)
+        // Fog layer (karanlık katman) - daha koyu görünüm için alpha artırıldı
+        context.setFillColor(UIColor.black.withAlphaComponent(0.85).cgColor)
         context.fill(drawRect)
         
         // Keşfedilen alanları temizle (şeffaf yap)
@@ -139,21 +139,14 @@ struct FogOfWarMapView: UIViewRepresentable {
             context.coordinator.hasSetupLocationObserver = true
         }
         
-        // İlk konum set'i - sadece bir kez yapılır
-        if let currentLocation = locationManager.currentLocation, !context.coordinator.hasSetInitialRegion {
-            let region = MKCoordinateRegion(
-                center: currentLocation.coordinate,
-                latitudinalMeters: 200, // Çok daha yakın zoom seviyesi
-                longitudinalMeters: 200
-            )
-            mapView.setRegion(region, animated: false) // İlk set animasyonsuz
-            context.coordinator.hasSetInitialRegion = true
-            context.coordinator.lastKnownLocation = currentLocation.coordinate
-            print("🗺️ Initial map region set to user location")
-            
-            // İlk overlay'i ekle
+        // İlk overlay'i ekle (konum olmasaymış gibi)
+        if !context.coordinator.hasSetInitialOverlay {
             context.coordinator.addInitialOverlay(mapView: mapView)
+            context.coordinator.hasSetInitialOverlay = true
         }
+        
+        // İlk konum set'i - manual olarak tetiklenir
+        // Initial region setting artık location observer'da yapılacak
         
         // Real-time location tracking artık observer ile yapılıyor
         if let currentLocation = locationManager.currentLocation {
@@ -240,14 +233,14 @@ struct FogOfWarMapView: UIViewRepresentable {
         }
         
         let region = MKCoordinateRegion(
-            center: currentLocation.coordinate,
+            center: currentLocation.coordinate, // Gerçek konum kullan
             latitudinalMeters: 200,
             longitudinalMeters: 200
         )
         
         DispatchQueue.main.async {
             mapView.setRegion(region, animated: true)
-            print("🎯 SIKIK BUTON ÇALIŞTI: \(currentLocation.coordinate)")
+            print("🎯 SIKIK BUTON ÇALIŞTI: \(currentLocation.coordinate) (REAL LOCATION)")
         }
     }
     
@@ -275,13 +268,35 @@ struct FogOfWarMapView: UIViewRepresentable {
     
     // Real-time location observer setup
     private func setupLocationObserver(mapView: MKMapView, context: Context) {
-                // LocationManager'dan gelen her location update'ini dinle
         let coordinator = context.coordinator
+        
+        // ÖNEMLİ: Observer başlamadan önce fresh location iste
+        Task { @MainActor in
+            locationManager.requestFreshLocation()
+        }
+        
+        // LocationManager'dan gelen her location update'ini dinle
         coordinator.locationObserverCancellable = locationManager.$currentLocation
             .compactMap { $0 } // nil locations'ları filtrele
+            .filter { location in
+                // ÇÖZÜM: Sadece reasonable accuracy'li location'ları kabul et
+                let accuracyThreshold: Double = 100.0 // İlk açılış için relaxed threshold
+                let isAccurate = location.horizontalAccuracy > 0 && location.horizontalAccuracy <= accuracyThreshold
+                if !isAccurate {
+                    print("🚫 OBSERVER: Location filtered out - accuracy: \(location.horizontalAccuracy)m > \(accuracyThreshold)m")
+                }
+                return isAccurate
+            }
+            .removeDuplicates { old, new in
+                // Aynı koordinat tekrar gelirse ignore et (1m hassasiyet)
+                let distance = CLLocation(latitude: old.coordinate.latitude, longitude: old.coordinate.longitude)
+                    .distance(from: CLLocation(latitude: new.coordinate.latitude, longitude: new.coordinate.longitude))
+                return distance < 1.0
+            }
             .sink { newLocation in
                 // Main thread'de auto-centering yap
                 DispatchQueue.main.async {
+                    print("🔥 OBSERVER: New location received - \(newLocation.coordinate) (accuracy: \(newLocation.horizontalAccuracy)m)")
                     self.performRealTimeAutoCentering(
                         mapView: mapView,
                         newLocation: newLocation,
@@ -291,15 +306,33 @@ struct FogOfWarMapView: UIViewRepresentable {
             }
         
         print("🎯 Real-time location observer setup completed")
+        print("🔄 Fresh location requested - waiting for update...")
     }
     
     // Her location update'inde auto-centering
     private func performRealTimeAutoCentering(mapView: MKMapView, newLocation: CLLocation, context: Coordinator) {
-        // Auto-centering aktif mi kontrol et
-        guard settings.showUserLocation && settings.autoMapCentering else { return }
-        
         let currentMapCenter = mapView.region.center
         let newLocationCoord = newLocation.coordinate
+        
+        // ÖNEMLİ: İlk konum update'inde ZORLA center'la (setting'lerden bağımsız)
+        if !context.hasSetInitialRegion {
+            let initialRegion = MKCoordinateRegion(
+                center: newLocationCoord, // Gerçek konum kullan
+                latitudinalMeters: 200, // Yakın zoom seviyesi
+                longitudinalMeters: 200
+            )
+            mapView.setRegion(initialRegion, animated: false) // İlk set animasyonsuz
+            context.hasSetInitialRegion = true
+            context.lastKnownLocation = newLocationCoord
+            print("🗺️ INITIAL CENTERING: First location received - \(newLocationCoord) (REAL LOCATION)")
+            return
+        }
+        
+        // Sonraki auto-centering'ler için setting kontrolü
+        guard settings.showUserLocation && settings.autoMapCentering else { 
+            print("🚫 Auto-centering disabled in settings")
+            return 
+        }
         
         // Pin'in ekran merkezi'nden uzaklığını hesapla
         let distanceFromCenter = CLLocation(latitude: currentMapCenter.latitude, longitude: currentMapCenter.longitude)
@@ -323,6 +356,7 @@ struct FogOfWarMapView: UIViewRepresentable {
         var parent: FogOfWarMapView
         var fogOverlay: FogOfWarOverlay?
         var hasSetInitialRegion: Bool = false
+        var hasSetInitialOverlay: Bool = false
         var lastKnownCircleCount: Int = 0
         var lastKnownLocation: CLLocationCoordinate2D?
         var hasSetupLocationObserver: Bool = false

@@ -448,4 +448,12 @@ class POIEnrichmentManager {
         // For other categories, return the category name as type
         return category.rawValue.lowercased()
     }
+    
+    // MARK: - Cache Management
+    
+    func clearCache() {
+        print("🗑️ Clearing POI cache...")
+        poiCache.removeAll()
+        print("✅ POI cache cleared successfully")
+    }
 } 

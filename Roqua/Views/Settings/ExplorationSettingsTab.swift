@@ -7,30 +7,37 @@ struct ExplorationSettingsTab: View {
         Form {
             // MARK: - Exploration Section
             Section("Keşif Ayarları") {
-                // Exploration Radius
-                VStack(alignment: .leading, spacing: 8) {
+                // Exploration Radius - Slider
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: "circle.dashed")
                             .foregroundColor(.purple)
                         Text("Keşif Radius'u")
                             .font(.headline)
+                        Spacer()
+                        Text("\(Int(settings.explorationRadius))m")
+                            .font(.headline)
+                            .foregroundColor(.purple)
                     }
                     
-                    Picker("Exploration Radius", selection: $settings.explorationRadius) {
-                        ForEach(AppSettings.radiusOptions, id: \.value) { option in
-                            VStack(alignment: .leading) {
-                                Text(option.label)
-                                    .font(.body)
-                                Text(option.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .tag(option.value)
-                        }
+                    Slider(
+                        value: $settings.explorationRadius,
+                        in: AppSettings.minExplorationRadius...AppSettings.maxExplorationRadius,
+                        step: AppSettings.radiusStep
+                    ) {
+                        Text("Keşif Radius'u")
+                    } minimumValueLabel: {
+                        Text("\(Int(AppSettings.minExplorationRadius))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Text("\(Int(AppSettings.maxExplorationRadius))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .pickerStyle(.menu)
+                    .tint(.purple)
                     
-                    Text("Mevcut: \(settings.currentRadiusOption.description)")
+                    Text("Düşük değerler daha detaylı keşif sağlar, yüksek değerler pil ömrünü korur")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

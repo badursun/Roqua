@@ -3,6 +3,7 @@ import CoreLocation
 import SwiftUI
 import Combine
 import UIKit
+import BackgroundTasks
 
 // MARK: - Location Permission States
 enum LocationPermissionState {
@@ -36,6 +37,7 @@ class LocationManager: NSObject, ObservableObject {
         super.init()
         setupLocationManager()
         setupAppStateNotifications()
+        registerBackgroundTasks()
     }
     
     private func setupAppStateNotifications() {
@@ -102,11 +104,48 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     private func handleMemoryWarning() {
-        print("⚠️ Memory warning received - reducing accuracy")
+        print("⚠️ Memory warning received - reducing accuracy and increasing distance filter")
         locationManager.desiredAccuracy = kCLLocationAccuracyReduced
-        locationManager.distanceFilter = 200.0
+        locationManager.distanceFilter = 200.0  // Memory pressure durumunda fallback
+        print("📍 Memory warning fallback: Reduced accuracy (200m filter)")
     }
     
+    // MARK: - Background Task Registration
+    private func registerBackgroundTasks() {
+        // Info.plist'teki BGTaskSchedulerPermittedIdentifiers ile eşleşen identifier
+        let identifier = "com.adjans.roqua.background-location"
+        
+        let success = BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: identifier,
+            using: nil
+        ) { task in
+            self.handleBackgroundLocationTask(task: task as! BGProcessingTask)
+        }
+        
+        if success {
+            print("✅ BGTaskScheduler registered successfully for: \(identifier)")
+        } else {
+            print("❌ Failed to register BGTaskScheduler for: \(identifier)")
+        }
+    }
+    
+    private func handleBackgroundLocationTask(task: BGProcessingTask) {
+        print("🔄 Background location task started")
+        
+        // Task timeout handler
+        task.expirationHandler = {
+            print("⏰ Background task expiring")
+            task.setTaskCompleted(success: false)
+        }
+        
+        // Location işlemlerini burada yapabilirsin
+        // Örneğin: Lokasyon güncellemelerini işle, cache'i temizle vs.
+        
+        // Task başarıyla tamamlandı
+        task.setTaskCompleted(success: true)
+        print("✅ Background location task completed")
+    }
+
     deinit {
         if backgroundTask != .invalid {
             UIApplication.shared.endBackgroundTask(backgroundTask)
@@ -193,10 +232,10 @@ class LocationManager: NSObject, ObservableObject {
             locationManager.distanceFilter = 10.0
             print("📍 Foreground accuracy: Best (10m filter)")
         } else {
-            // Background: Düşük doğruluk, pil tasarrufu
+            // Background: Optimize edilmiş doğruluk, pil tasarrufu
             locationManager.desiredAccuracy = kCLLocationAccuracyReduced
-            locationManager.distanceFilter = 100.0
-            print("📍 Background accuracy: Reduced (100m filter)")
+            locationManager.distanceFilter = 20.0  // 100m'den 20m'ye optimize edildi
+            print("📍 Background accuracy: Reduced (20m filter) - Optimized for better tracking")
         }
     }
     
@@ -242,6 +281,20 @@ class LocationManager: NSObject, ObservableObject {
         print("📍 Requesting always permission...")
         locationManager.requestAlwaysAuthorization()
     }
+    
+    @MainActor
+    func requestImmediateLocation() {
+        print("🎯 Requesting immediate location for startup...")
+        locationManager.requestLocation()
+    }
+    
+    @MainActor
+    func requestFreshLocation() {
+        print("🔄 Requesting fresh location update...")
+        // Mevcut cache'i temizle ve fresh location iste
+        currentLocation = nil
+        locationManager.requestLocation()
+    }
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -252,8 +305,17 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         print("📱 RAW LOCATION UPDATE: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) - accuracy: \(Int(location.horizontalAccuracy))m")
         
         Task { @MainActor in
-            // Her zaman currentLocation'ı güncelle (UI için) - hızlı güncelleme
-            currentLocation = location
+            // 🔧 FIX: currentLocation'ı sadece reasonable accuracy'li location'larla güncelle
+            let accuracyThreshold: Double = 100.0 // UI için accuracy threshold
+            let isAccurate = location.horizontalAccuracy > 0 && location.horizontalAccuracy <= accuracyThreshold
+            
+            if isAccurate {
+                // Sadece doğru accuracy'li location'ları currentLocation'a set et
+                currentLocation = location
+                print("✅ CURRENT LOCATION UPDATED: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) (accuracy: \(Int(location.horizontalAccuracy))m)")
+            } else {
+                print("🚫 CURRENT LOCATION NOT UPDATED: accuracy \(Int(location.horizontalAccuracy))m > \(accuracyThreshold)m")
+            }
             
             // Konum değişikliği kontrolü - sadece significant changes için
             let shouldProcess = shouldProcessLocation(location)
@@ -278,9 +340,20 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
         print("  - appState: \(appState.rawValue)")
         print("  - accuracy: \(location.horizontalAccuracy)m vs threshold: \(settings.accuracyThreshold)m")
         
-        // Accuracy kontrolü - her durumda geçerli olmalı
-        guard location.horizontalAccuracy <= settings.accuracyThreshold && location.horizontalAccuracy > 0 else {
-            print("🚫 Accuracy too low: \(location.horizontalAccuracy)m > \(settings.accuracyThreshold)m")
+        // Accuracy kontrolü - background vs foreground farklı threshold
+        // İlk konum için (lastProcessedLocation == nil) daha relaxed threshold
+        let accuracyThreshold: Double
+        if appState == .active {
+            // Foreground: İlk konum için 5km (GPS startup için), sonraki konumlar için normal threshold
+            accuracyThreshold = lastProcessedLocation == nil ? 5000.0 : settings.accuracyThreshold
+        } else {
+            // Background: Her zaman 1km threshold
+            accuracyThreshold = 1000.0
+        }
+        
+        guard location.horizontalAccuracy <= accuracyThreshold && location.horizontalAccuracy > 0 else {
+            let thresholdType = appState == .active ? (lastProcessedLocation == nil ? "foreground-initial-5km" : "foreground") : "background"
+            print("🚫 Accuracy too low: \(location.horizontalAccuracy)m > \(accuracyThreshold)m (threshold for \(thresholdType))")
             return false
         }
         
@@ -318,9 +391,11 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
                 case .denied:
                     permissionState = .denied
                 case .locationUnknown:
-                    print("⚠️ Location temporarily unavailable")
+                    print("⚠️ Location temporarily unavailable - will retry with significant changes")
                 case .network:
-                    print("⚠️ Network error")
+                    print("⚠️ Network error - falling back to cached location if available")
+                case .locationUnknown:
+                    print("🎯 Immediate location request failed - continuing with regular updates")
                 default:
                     print("⚠️ Other location error: \(clError.localizedDescription)")
                 }
@@ -345,10 +420,11 @@ extension LocationManager: @preconcurrency CLLocationManagerDelegate {
                 permissionState = .whenInUseGranted
                 eventBus.publish(locationEvent: .permissionGranted(.whenInUse))
                 
-            case .authorizedAlways:
-                permissionState = .alwaysGranted
-                eventBus.publish(locationEvent: .permissionGranted(.always))
-                startLocationUpdates()
+                case .authorizedAlways:
+            permissionState = .alwaysGranted
+            eventBus.publish(locationEvent: .permissionGranted(.always))
+            // Always permission'da otomatik başlat
+            startLocationUpdates()
                 
             @unknown default:
                 permissionState = .denied

@@ -55,7 +55,13 @@ class AppSettings: ObservableObject {
         let description: String
     }
     
+    // Location Tracking Distance Slider: 10-200m (5m steps)
+    static let minTrackingDistance: Double = 10
+    static let maxTrackingDistance: Double = 200
+    static let trackingStep: Double = 5
+    
     static let trackingDistanceOptions: [TrackingDistanceOption] = [
+        TrackingDistanceOption(value: 10.0, label: "10m", description: "En hassas - çok detaylı"),
         TrackingDistanceOption(value: 25.0, label: "25m", description: "Çok hassas - daha fazla detay"),
         TrackingDistanceOption(value: 50.0, label: "50m", description: "Hassas - önerilen"),
         TrackingDistanceOption(value: 100.0, label: "100m", description: "Normal - batarya dostu"),
@@ -68,16 +74,28 @@ class AppSettings: ObservableObject {
         let description: String
     }
     
+    // Slider için range: 20-100m (5m steps)
+    static let minExplorationRadius: Double = 20
+    static let maxExplorationRadius: Double = 100
+    static let radiusStep: Double = 5
+    
     static let radiusOptions: [RadiusOption] = [
-        RadiusOption(value: 100.0, label: "100m", description: "Küçük - yürüyüş için ideal"),
-        RadiusOption(value: 200.0, label: "200m", description: "Orta - genel kullanım"),
-        RadiusOption(value: 500.0, label: "500m", description: "Büyük - araç kullanımı")
+        RadiusOption(value: 20.0, label: "20m", description: "Çok hassas - detaylı keşif"),
+        RadiusOption(value: 50.0, label: "50m", description: "Hassas - önerilen ayar"),
+        RadiusOption(value: 75.0, label: "75m", description: "Orta - genel kullanım"),
+        RadiusOption(value: 100.0, label: "100m", description: "Normal - batarya dostu")
     ]
     
+    // Accuracy Threshold Slider: 20-200m (10m steps)  
+    static let minAccuracyThreshold: Double = 20
+    static let maxAccuracyThreshold: Double = 200
+    static let accuracyStep: Double = 10
+    
     static let accuracyOptions: [RadiusOption] = [
-        RadiusOption(value: 50.0, label: "50m", description: "Yüksek doğruluk"),
-        RadiusOption(value: 100.0, label: "100m", description: "Normal doğruluk"),
-        RadiusOption(value: 200.0, label: "200m", description: "Düşük doğruluk - batarya dostu")
+        RadiusOption(value: 20.0, label: "20m", description: "En yüksek doğruluk - yavaş"),
+        RadiusOption(value: 50.0, label: "50m", description: "Yüksek doğruluk - önerilen"),
+        RadiusOption(value: 100.0, label: "100m", description: "Normal doğruluk - dengeli"),
+        RadiusOption(value: 200.0, label: "200m", description: "Düşük doğruluk - hızlı")
     ]
     
     static let clusteringOptions: [RadiusOption] = [
@@ -91,7 +109,7 @@ class AppSettings: ObservableObject {
         locationTrackingDistance = 50.0
         autoMapCentering = true
         preserveZoomPan = true
-        explorationRadius = 100.0
+        explorationRadius = 50.0
         accuracyThreshold = 50.0
         clusteringRadius = 50.0
         colorScheme = 0

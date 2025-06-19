@@ -134,24 +134,45 @@ struct SystemSettingsTab: View {
     
     // MARK: - Helper Methods
     private func getTotalRegionsCount() -> Int {
-        // Placeholder - implement in SQLiteManager if needed
-        return 0 // GridHashManager.shared.getAllRegions().count
+        return VisitedRegionManager.shared.visitedRegions.count
     }
     
     private func resetToDefaults() {
         // Reset settings to default values
         settings.resetToDefaults()
+        print("🔄 Settings reset to defaults")
     }
     
     private func clearAllData() {
-        Task {
-            do {
-                // Clear all exploration data
-                // GridHashManager.shared.clearCache()
-                print("All data cleared successfully (placeholder)")
-            } catch {
-                print("Clear data error: \(error)")
-            }
+        print("🗑️ Starting complete data clearing process...")
+        
+        Task { @MainActor in
+            // 1. VisitedRegionManager - SQLite veritabanı ve memory'deki region'ları temizle
+            VisitedRegionManager.shared.clearAllData()
+            print("✅ VisitedRegionManager cleared")
+            
+            // 2. ExploredCirclesManager - Fog of War koordinatlarını ve UserDefaults'u temizle
+            ExploredCirclesManager.shared.clearAllData()
+            print("✅ ExploredCirclesManager cleared")
+            
+            // 3. GridHashManager zaten ExploredCirclesManager içinde temizleniyor
+            print("✅ GridHashManager cleared via ExploredCirclesManager")
+            
+            // 4. Achievement Progress'i temizle (opsiyonel - başarımlar sıfırlanır)
+            AchievementManager.shared.resetAllProgress()
+            print("✅ Achievement progress reset")
+            
+            // 5. ReverseGeocoder cache'ini temizle
+            ReverseGeocoder.shared.clearCache()
+            print("✅ ReverseGeocoder cache cleared")
+            
+            // 6. POI Cache'ini temizle
+            POIEnrichmentManager.shared.clearCache()
+            print("✅ POIEnrichmentManager cache cleared")
+            
+            print("🎉 All exploration data cleared successfully!")
+            print("📊 App is now like a newborn baby - fresh start!")
+            print("🔄 Next location update will start fresh exploration")
         }
     }
 }

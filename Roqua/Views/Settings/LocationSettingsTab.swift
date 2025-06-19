@@ -7,30 +7,37 @@ struct LocationSettingsTab: View {
         Form {
             // MARK: - Location Tracking Section
             Section("Konum Takibi") {
-                // Tracking Distance
-                VStack(alignment: .leading, spacing: 8) {
+                // Tracking Distance - Slider
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: "location.circle")
                             .foregroundColor(.blue)
                         Text("Konum Takip Mesafesi")
                             .font(.headline)
+                        Spacer()
+                        Text("\(Int(settings.locationTrackingDistance))m")
+                            .font(.headline)
+                            .foregroundColor(.blue)
                     }
                     
-                    Picker("Tracking Distance", selection: $settings.locationTrackingDistance) {
-                        ForEach(AppSettings.trackingDistanceOptions, id: \.value) { option in
-                            VStack(alignment: .leading) {
-                                Text(option.label)
-                                    .font(.body)
-                                Text(option.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .tag(option.value)
-                        }
+                    Slider(
+                        value: $settings.locationTrackingDistance,
+                        in: AppSettings.minTrackingDistance...AppSettings.maxTrackingDistance,
+                        step: AppSettings.trackingStep
+                    ) {
+                        Text("Konum Takip Mesafesi")
+                    } minimumValueLabel: {
+                        Text("\(Int(AppSettings.minTrackingDistance))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Text("\(Int(AppSettings.maxTrackingDistance))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .pickerStyle(.menu)
+                    .tint(.blue)
                     
-                    Text("Mevcut: \(settings.currentTrackingOption.description)")
+                    Text("Düşük değerler daha sık konum güncellemesi, yüksek değerler pil tasarrufu sağlar")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -65,30 +72,37 @@ struct LocationSettingsTab: View {
                     Toggle("", isOn: $settings.preserveZoomPan)
                 }
                 
-                // Accuracy Threshold
-                VStack(alignment: .leading, spacing: 8) {
+                // Accuracy Threshold - Slider
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: "target")
                             .foregroundColor(.red)
                         Text("Doğruluk Eşiği")
                             .font(.headline)
+                        Spacer()
+                        Text("\(Int(settings.accuracyThreshold))m")
+                            .font(.headline)
+                            .foregroundColor(.red)
                     }
                     
-                    Picker("Accuracy Threshold", selection: $settings.accuracyThreshold) {
-                        ForEach(AppSettings.accuracyOptions, id: \.value) { option in
-                            VStack(alignment: .leading) {
-                                Text(option.label)
-                                    .font(.body)
-                                Text(option.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .tag(option.value)
-                        }
+                    Slider(
+                        value: $settings.accuracyThreshold,
+                        in: AppSettings.minAccuracyThreshold...AppSettings.maxAccuracyThreshold,
+                        step: AppSettings.accuracyStep
+                    ) {
+                        Text("Doğruluk Eşiği")
+                    } minimumValueLabel: {
+                        Text("\(Int(AppSettings.minAccuracyThreshold))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Text("\(Int(AppSettings.maxAccuracyThreshold))m")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .pickerStyle(.menu)
+                    .tint(.red)
                     
-                    Text("Mevcut: \(settings.currentAccuracyOption.description)")
+                    Text("Düşük değerler daha hassas konum, yüksek değerler daha hızlı güncellemeler sağlar")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

@@ -102,18 +102,9 @@ class VisitedRegionManager: ObservableObject {
         let accuracy = location.horizontalAccuracy
         print("📍 PROCESSING LOCATION: \(String(format: "%.6f", location.coordinate.latitude)), \(String(format: "%.6f", location.coordinate.longitude)) - accuracy: \(Int(accuracy))m")
         
-        // Settings'den accuracy threshold al
-        let accuracyThreshold = await settings.accuracyThreshold
-        
-        guard accuracy <= accuracyThreshold && accuracy > 0 else {
-            // Sadece çok kötü accuracy'de log
-            if accuracy > accuracyThreshold * 2 {
-                print("❌ Location rejected - poor accuracy: \(Int(accuracy))m > \(Int(accuracyThreshold))m threshold")
-            }
-            return
-        }
-        
-        print("✅ Location accepted - accuracy: \(Int(accuracy))m ≤ \(Int(accuracyThreshold))m threshold")
+        // LocationManager zaten accuracy kontrolünü yaptı, buraya gelen location'lar geçerli
+        // Accuracy kontrolü artık LocationManager'da tek yerden yapılıyor
+        print("✅ Location accepted - passed LocationManager accuracy check (accuracy: \(Int(accuracy))m)")
         
         // Yakındaki bölgeleri kontrol et
         let nearbyRegions = await findNearbyRegions(location: location)

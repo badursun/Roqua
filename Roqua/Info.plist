@@ -5,8 +5,17 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>processing</string>
+        <string>remote-notification</string>
+        <string>fetch</string>
 	</array>
-	
+
+	<!-- Background Task Scheduler for processing mode -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.adjans.roqua.background-location</string>
+	</array>
+
 	<!-- Location Usage Descriptions -->
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Roqua, gezdiğiniz yerleri haritalamak ve POI'leri tespit etmek için konum bilginizi kullanır.</string>
